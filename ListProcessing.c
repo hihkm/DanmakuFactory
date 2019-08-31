@@ -1,20 +1,34 @@
-#include "DanmakuFactory.h"
+/*
+Copyright 2019 TIKM(github:HITIKM)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 /*
-桶排序整理整个链表
+排序整个链表（桶排序）
 参数：
 要排序的链表头
 返回值：
 0 正常退出
-1 传入指针为空
+1 弹幕池为空 
 2 桶空间申请失败 
 */
-int SortList(DANMAKU **listHead)
+int sortList(DANMAKU **listHead)
 {
 	if(*listHead == NULL)
 	{
 		#if PRINT_ERR == TRUE
-		printf("\n         [错误]弹幕池为空");
+		printf("\n[X] 弹幕池为空");
 		#endif
 		return 1;
 	}
@@ -52,7 +66,7 @@ int SortList(DANMAKU **listHead)
 	if((bucket = (DANMAKU **)malloc(sizeof(DANMAKU *) * bucketNum)) == NULL)
 	{
 		#if PRINT_ERR == TRUE
-		printf("\n         [错误]申请内存空间失败");
+		printf("\n[X] 申请内存空间失败");
 		#endif
 		return 2;
 	}
@@ -118,13 +132,12 @@ int SortList(DANMAKU **listHead)
 	return 0; 
 }
 
-
 /*
 释放整个链表
 参数：
 要free掉的链表头
 */
-void FreeList(DANMAKU *listHead)
+void freeList(DANMAKU *listHead)
 {
 	DANMAKU *ptr = listHead;
 	while(ptr != NULL)
@@ -133,5 +146,32 @@ void FreeList(DANMAKU *listHead)
 		free(ptr -> text);/*释放文本部分的空间*/ 
 		free(ptr);
 		ptr = listHead;
+	}
+}
+
+/*
+转换整个弹幕池的文本编码
+参数：
+链表头/目标编码/
+目前仅支持ANSI与UTF-8互转 
+*/
+void transListCoding(DANMAKU *listHead, UINT targetCoding)
+{
+	if (listHead == NULL)
+	{
+		return;
+	}
+	DANMAKU *nowPtr = listHead;int cnt = 0;
+	while (nowPtr != NULL)
+	{
+		if (targetCoding == UTF_8 && isUtf8(nowPtr -> text) == FALSE)
+		{
+			transcoding(ANSI, UTF_8, nowPtr -> text, NULL, MAX_TEXT_LENGTH);
+		}
+		else if (targetCoding == ANSI && isUtf8(nowPtr -> text) == TRUE)
+		{
+			transcoding(UTF_8, ANSI, nowPtr -> text, NULL, MAX_TEXT_LENGTH);
+		}
+		nowPtr = nowPtr -> next;
 	}
 }

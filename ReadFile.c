@@ -1,4 +1,18 @@
-#include "DanmakuFactory.h"
+/*
+Copyright 2019 TIKM(github:HITIKM)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 /*弹幕类型重定义规范*/
 /*+----------+---------+*/
@@ -25,9 +39,10 @@
 1 打开文件失败 
 2 3 4 读取文件发生错误
 5 节点空间申请失败
-6 文本部分空间申请失败 
+6 文本部分空间申请失败
+7 文件未能按正确格式读入 
 */
-int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float timeShift)
+int readXml(const char *ipFile, DANMAKU **head, const char *mode, const float timeShift)
 {
 	FILE *ipF;
 	DANMAKU *now = NULL, *last = NULL;
@@ -37,7 +52,7 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 	if((ipF = fopen(ipFile, "r")) == NULL)
 	{
 		#if PRINT_ERR == TRUE
-		printf("\n         [错误]文件打开失败"); 
+		printf("\n[X] 文件打开失败"); 
 		#endif
 		return 1;
 	}
@@ -45,7 +60,7 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 	/*判断读入方式*/
 	if(*head == NULL || *mode == 'n')
 	{/*新建模式*/
-		FreeList(*head);
+		freeList(*head);
 		*head = NULL;
 	}
 	else if(*mode == 'a')
@@ -84,9 +99,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 			}
 			if(ferror(ipF))
 			{
-				ErrorExit(ipF, *head, last);
+				errorExit(ipF, *head, last);
 				#if PRINT_ERR == TRUE
-				printf("\n         [错误]读文件发生错误"); 
+				printf("\n[X] 读文件发生错误"); 
 				#endif
 				return 2;
 			}
@@ -103,9 +118,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 			}
 			if(ferror(ipF))
 			{
-				ErrorExit(ipF, *head, last);
+				errorExit(ipF, *head, last);
 				#if PRINT_ERR == TRUE
-				printf("\n         [错误]读文件发生错误"); 
+				printf("\n[X] 读文件发生错误"); 
 				#endif
 				return 3;
 			}
@@ -122,9 +137,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 			}
 			if(ferror(ipF))
 			{
-				ErrorExit(ipF, *head, last);
+				errorExit(ipF, *head, last);
 				#if PRINT_ERR == TRUE
-				printf("\n         [错误]读文件发生错误"); 
+				printf("\n[X] 读文件发生错误"); 
 				#endif
 				return 4;
 			}
@@ -135,18 +150,18 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 		/*申请一个节点的空间*/
 		if((now = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
 		{
-			ErrorExit(ipF, *head, last);
+			errorExit(ipF, *head, last);
 			#if PRINT_ERR == TRUE
-			printf("\n         [错误]申请内存空间失败"); 
+			printf("\n[X] 申请内存空间失败"); 
 			#endif
 			return 5;
 		}
 		/*申请文本部分的空间*/ 
 		if((now -> text = (char *)malloc(strlen(t_text) + 1)) == NULL)
 		{
-			ErrorExit(ipF, *head, now);
+			errorExit(ipF, *head, now);
 			#if PRINT_ERR == TRUE
-			printf("\n         [错误]申请内存空间失败"); 
+			printf("\n[X] 申请内存空间失败"); 
 			#endif
 			return 6;
 		}
@@ -204,7 +219,7 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 		}
 		
 		/*如果时间加偏移量是负数则置0*/
-		if(t_time + timeShift < -TIME_EPS)
+		if(t_time + timeShift < TIME_EPS)
 		{
 			now -> time = 0.00;
 		}
@@ -227,7 +242,7 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 	else
 	{
 		#if PRINT_ERR == TRUE
-		printf("\n         [错误]文件不能按正确格式读入"); 
+		printf("\n[X] 文件不能按正确格式读入"); 
 		#endif
 		return 7;
 	}
@@ -240,13 +255,13 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 参数： 
 文件指针/链表头指针/最后一个未结尾节点指针/
 */
-void ErrorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr)
+void static errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr)
 {
-	close(ipF);
+	fclose(ipF);
 	if(head != NULL)
 	{
 		ptr -> next = NULL;
-		FreeList(head);
+		freeList(head);
 	}
 	return;
 }
