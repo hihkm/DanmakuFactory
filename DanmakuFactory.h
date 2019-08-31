@@ -25,7 +25,7 @@ limitations under the License.
 #include <direct.h> 
 #include <stdarg.h>
 
-#define VERSION "1.30 release"
+#define VERSION "1.31 release"
 
 #define UP 72
 #define DOWN 80

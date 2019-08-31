@@ -898,10 +898,12 @@ int writeAssDebugPath(const char *opFileName, DANMAKU *head, char *mode, const i
 		printDebugDataStr(opF, 0.00, endTime, 232, 35, NULL, "blockCnt");
 		printDebugDataStr(opF, 0.00, endTime, 317, 35, NULL, "count");
 		printDebugDataStr(opF, 0.00, endTime, 402, 35, NULL, "total");
+		#ifdef VERSION
 		fprintf(opF, "\nDialogue:10,0:00:00.00,");
 		printTime(opF, endTime, ",");
 		fprintf(opF, "Default,,0000,0000,0000,,{\\an4\\pos(35,245)\\b1\\fs25\\1c&HFFFFFF"
 					 "\\1a&H35\\shad1\\bord0}DanmakuFactory v%s", VERSION);
+		#endif
 		
 		/*显示弹幕类型表头，如果被屏蔽就使用划线*/
 		if(blockMode[0] == '0' || blockMode[1] == '0' || blockMode[2] == '0' ||

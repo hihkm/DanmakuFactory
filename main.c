@@ -1444,42 +1444,56 @@ int main(int argc, char **argv)
 			{/*帮助*/
 				printf("\n> 命令行调用_帮助");
 				printf("\n  ./danmakuFactory [-h][-s][-ip 输入文件名][-if 输入文件格式][-op 输出文件名]"
-							"[-of 输出文件格式][-oe 输出文件编码][-t 时轴偏移][-rx 分辨率宽][-ry 分辨率高]"
-							"[-rt 滚动弹幕滚动时间][-ht 固定弹幕存活时间][-d 弹幕密度]"
-							"[-fs 文字大小][-fn 字体][-o 不透明度][-l 描边][-sd 阴影]"
-							"[-b 底部留白][-bm 屏蔽模式][-dm 调试模式]"
-
-					   "\n\n> 选项解释"
-					   "\n  -h, --help 显示帮助文本，除非存在其他选项"
-					   "\n  -s, --set 将设置保存到文件，没有其他选项则将列出当前文件中的设置值；"
-							   "转换时加入此选项表示将本次设置保存到文件中；如果输入文件名-ip缺省则"
-							   "只修改设置而不进行其他操作"
-					
-					   "\n\n  -ip, --input 输入文件名，除非使用了-s选项，否则缺省将导致出错"
-					   "\n  -if, --inputformat 输入文件格式，缺省时程序将自动判断"
-					   "\n  -op, --output 输出文件名，缺省时默认为 \"输入文件名.输出文件格式\""
-					   "\n  -of, --outputformat 输出文件格式，缺省时默认为ass"
-					   "\n  -oe, --outputencoding 输出文件编码，缺省时将使用配置文件中的值"
-					   "\n  -t, --timeshift 时轴偏移量，缺省时默认为0.00"
-					
-					   "\n\n  -rx, --resx 分辨率宽，缺省时将使用配置文件中的值"
-					   "\n  -ry, --resy 分辨率高，缺省时将使用配置文件中的值"
-					   "\n  -rt, --rolltime 滚动弹幕滚动时间，缺省时将使用配置文件中的值"
-					   "\n  -ht, --holdtime 固定弹幕存活时间，缺省时将使用配置文件中的值"
-					   "\n  -d, --density 弹幕密度，缺省时将使用配置文件中的值"
-					   "\n  -fs, --fontsize 文字大小，缺省时将使用配置文件中的值"
-					   "\n  -fn, --fontname 字体名称，缺省时将使用配置文件中的值"
-					   "\n  -o, --opacity 不透明度，缺省时将使用配置文件中的值"
-					   "\n  -l, --outline 描边程度，缺省时将使用配置文件中的值"
-					   "\n  -sd, --shadow 阴影程度，缺省时将使用配置文件中的值"
-					   "\n  -b, --blank 底部留白，缺省时将使用配置文件中的值"
-					   "\n  -bm, --blockmode 屏蔽模式，缺省时将使用配置文件中的值"
-					   "\n  -dm, --debugmode 调试模式，缺省时将使用配置文件中的值"
-					   "\n\n> 注意"
-					   "\n  如果参数带有空格请使用双引号，否则将会截断。如：\"Microsoft YaHei\""
-					   "\n  如果参数带有负号请使用括号，否则将解析为选项。如：(-1024.25)"
-					   "\n\n> 举例"
-					   "\n  danmakuFactory -ip \"D:/test.xml\"");
+					   "[-of 输出文件格式][-oe 输出文件编码][-t 时轴偏移][-rx 分辨率宽][-ry 分辨率高]"
+					   "[-rt 滚动弹幕滚动时间][-ht 固定弹幕存活时间][-d 弹幕密度]"
+					   "[-fs 文字大小][-fn 字体][-o 不透明度][-l 描边][-sd 阴影]"
+					   "[-b 底部留白][-bm 屏蔽模式][-dm 调试模式]"
+					   "\n"
+					   "\n-h,  --help 显示帮助文本，除非存在其他选项"
+					   "\n-s,  --set 将设置保存到文件，没有其他选项则将列出当前文件中的设置"
+						   "值；转换时加入此选项表示将本次设置保存到文件中；如果输入文件名"
+						   "-ip缺省则只修改设置而不进行其他操作"
+					   "\n"
+					   "\n-ip, --input 输入文件名，除非使用了-s选项，否则缺省将导致出错"
+					   "\n-if, --inputformat 输入文件格式，缺省时程序将自动判断（目前无意义）"
+				       "\n-op, --output 输出文件名，缺省时默认为 \"输入文件名.输出文件格式\""
+				       "\n-of, --outputformat 输出文件格式，缺省时默认为ass（目前无意义）"
+				       "\n-oe, --outputencoding 输出文件编码，支持utf-8与ansi，缺省时将使用配置文件中的值"
+				       "\n-t,  --timeshift 时轴偏移量，缺省时默认为0.00"
+					   "\n"
+				       "\n-rx, --resx 分辨率宽，单位像素，缺省时将使用配置文件中的值"
+				       "\n-ry, --resy 分辨率高，单位像素，缺省时将使用配置文件中的值"
+				       "\n-rt, --rolltime 滚动弹幕滚动时间，单位秒，缺省时将使用配置文件中的值"
+				       "\n-ht, --holdtime 固定弹幕存活时间，单位秒，缺省时将使用配置文件中的值"
+				       "\n-d,  --density 弹幕密度，0 表示无限制，(-1) 表示不重叠，缺省时将使用配置文件中的值"
+				       "\n-fs, --fontsize 文字大小，缺省时将使用配置文件中的值"
+				       "\n-fn, --fontname 字体名称，缺省时将使用配置文件中的值"
+				       "\n-o,  --opacity 不透明度，范围0-255，缺省时将使用配置文件中的值"
+				       "\n-l,  --outline 描边程度，范围0-4，缺省时将使用配置文件中的值"
+				       "\n-sd, --shadow 阴影程度，范围0-4，缺省时将使用配置文件中的值"
+				       "\n-b,  --blank 底部留白，单位像素，缺省时将使用配置文件中的值"
+				       "\n-bm, --blockmode 屏蔽模式，参数由七个0或1组成，分别对应 右左/左右/顶部/底部/特殊"
+						   "/彩色/重复 七类弹幕，0表示不屏蔽，1表示屏蔽，缺省时将使用配置文件中的值"
+				       "\n-dm, --debugmode 调试模式，参数由两个0或1组成，分别对应 数据表格/分布图 两个"
+						   "模块，0表示关闭，1表示开启，缺省时将使用配置文件中的值"
+					   "\n\n"
+					   "\n> 注意"
+			           "\n如果参数带有空格请使用双引号，否则将会截断。如：\"Microsoft YaHei\""
+			           "\n如果参数带有负号请使用括号，否则将解析为选项。如：(-1024.25)"
+					   "\n\n"
+					   "\n> 举例"
+			           "\n转换test.xml输出默认为D:/test.xml.ass"
+			           "\ndanmakuFactory -ip D:/test.xml"
+			           "\n"
+			           "\n转换test.xml输出为D:/test.ass"
+			           "\ndanmakuFactory -ip D:/test.xml -op D:/test.ass"
+			           "\n"
+			           "\n转换test.xml输出为D:/test.ass，弹幕密度为不重叠，字体为微软雅黑，不改变配置文件"
+			           "\ndanmakuFactory -ip D:/test.xml -op D:/test.ass -d (-1) -fn \"Microsoft YaHei\""
+			      	   "\n"
+			           "\n上一例改变配置文件值"
+			           "\ndanmakuFactory -ip D:/test.xml -op D:/test.ass -d (-1) -fn \"Microsoft YaHei\" -s"
+					);
 				exit(0); 
 			}
 			else if (strcmp(argv[cnt], "-s") == 0 || strcmp(argv[cnt], "--set") == 0)
@@ -2007,6 +2021,8 @@ void readConfigFile(CONFIG *config, char *fileName)
 	{
 		(*config).blockMode[6] = '0';
 	}
+	(*config).blockMode[7] = '\0';
+	
 	
 	GetPrivateProfileString("DanmakuSet", "debugTable", "false", tempText, MAX_TEXT_LENGTH, fileName);
 	if (strcmp(toLower(NULL, tempText), "true") == 0)
@@ -2027,6 +2043,8 @@ void readConfigFile(CONFIG *config, char *fileName)
 	{
 		(*config).debugMode[1] = '0';
 	}
+	
+	(*config).debugMode[2] = '\0';
 }
 
 /*
