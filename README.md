@@ -1,7 +1,7 @@
 ## DanmukuFactory
 
 ### 获取
-[1.10 Lastest Release](release/DanmakuFactory_1.10_release.zip)
+[1.11 Lastest Release](release/DanmakuFactory_1.11_release.zip)
 
 [使用说明](https://jingyan.baidu.com/article/d169e1861b8b9f436611d8e0.html)
 
@@ -70,6 +70,10 @@ GetStrLen()函数用于获取弹幕文本的宽度，半角字符算半个字，
 
 #### 1.10
 - 结构调整
+
+#### 1.11
+- UI微调
+- 逻辑优化
 
 ---
 

@@ -8,13 +8,15 @@
 #include <assert.h>
 #include <time.h>
 
-#define VERSION "1.10"
+#define VERSION "1.11"
 #define NUM_OF_TYPE 5 
 #define TIME_EPS 1e-4
 #define MAX_TEXT_LENGTH 1024
 
 #define TRUE 1
 #define FALSE 0
+
+#define PRINT_ERR TRUE
 
 #define IS_R2L(ptr) (ptr -> type == 1 || ptr -> type == -1)
 #define IS_L2R(ptr) (ptr -> type == 2 || ptr -> type == -2)

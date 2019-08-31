@@ -36,6 +36,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 	/*打开文件*/
 	if((ipF = fopen(ipFile, "r")) == NULL)
 	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]文件打开失败"); 
+		#endif
 		return 1;
 	}
 	
@@ -82,6 +85,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 			if(ferror(ipF))
 			{
 				ErrorExit(ipF, *head, last);
+				#if PRINT_ERR == TRUE
+				printf("\n         [错误]读文件发生错误"); 
+				#endif
 				return 2;
 			}
 		}
@@ -98,6 +104,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 			if(ferror(ipF))
 			{
 				ErrorExit(ipF, *head, last);
+				#if PRINT_ERR == TRUE
+				printf("\n         [错误]读文件发生错误"); 
+				#endif
 				return 3;
 			}
 		}
@@ -114,6 +123,9 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 			if(ferror(ipF))
 			{
 				ErrorExit(ipF, *head, last);
+				#if PRINT_ERR == TRUE
+				printf("\n         [错误]读文件发生错误"); 
+				#endif
 				return 4;
 			}
 			cnt++;
@@ -124,12 +136,18 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 		if((now = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
 		{
 			ErrorExit(ipF, *head, last);
+			#if PRINT_ERR == TRUE
+			printf("\n         [错误]申请内存空间失败"); 
+			#endif
 			return 5;
 		}
 		/*申请文本部分的空间*/ 
 		if((now -> text = (char *)malloc(strlen(t_text) + 1)) == NULL)
 		{
 			ErrorExit(ipF, *head, now);
+			#if PRINT_ERR == TRUE
+			printf("\n         [错误]申请内存空间失败"); 
+			#endif
 			return 6;
 		}
 		
@@ -202,7 +220,17 @@ int ReadXml(const char *ipFile, DANMAKU **head, const char *mode, const float ti
 		last = now;
 	}/*结束 while*/
 	ENDREAD:
-	now -> next = NULL;
+	if (now != NULL)
+	{
+		now -> next = NULL;
+	}
+	else
+	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]文件不能按正确格式读入"); 
+		#endif
+		return 7;
+	}
 	fclose(ipF);
 	return 0;
 }

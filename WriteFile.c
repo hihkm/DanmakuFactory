@@ -1,4 +1,5 @@
 #include "DanmakuFactory.h"
+#include "StringProcessing.c"
 
 /*
 函数接口： 
@@ -12,6 +13,9 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 {
 	if(head == NULL)
 	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]弹幕池为空");
+		#endif
 		return 1;
 	}
 	
@@ -22,6 +26,9 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 	/*打开文件*/
 	if((opF = fopen(opFileName, "w")) == NULL)
 	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]文件创建失败");
+		#endif
 		return 2;
 	}
 	
@@ -38,17 +45,29 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 	
 	if((R2LToRightTime = (float *)malloc(resY * sizeof(float))) == NULL)
 	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]申请内存空间失败");
+		#endif
+		close(opF);
 		return 3;
 	}
 	if((R2LToLeftTime = (float *)malloc(resY * sizeof(float))) == NULL)
 	{
 		free(R2LToRightTime);
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]申请内存空间失败");
+		#endif
+		close(opF);
 		return 4;
 	}
 	if((L2RToRightTime = (float *)malloc(resY * sizeof(float))) == NULL)
 	{
 		free(R2LToRightTime);
 		free(R2LToLeftTime);
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]申请内存空间失败");
+		#endif
+		close(opF);
 		return 5;
 	}
 	if((L2RToLeftTime = (float *)malloc(resY * sizeof(float))) == NULL)
@@ -56,6 +75,10 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 		free(R2LToRightTime);
 		free(R2LToLeftTime);
 		free(L2RToRightTime);
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]申请内存空间失败");
+		#endif
+		close(opF);
 		return 6;
 	}
 	if((fixEndTime = (float *)malloc(resY * sizeof(float))) == NULL)
@@ -64,6 +87,10 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 		free(R2LToLeftTime);
 		free(L2RToRightTime);
 		free(L2RToLeftTime);
+		#if PRINT_ERR == TRUE
+		printf("\n         [错误]申请内存空间失败");
+		#endif
+		close(opF);
 		return 7;
 	}
 	
@@ -505,16 +532,26 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 		}
 		else if(now -> type == 8)/*代码弹幕*/ 
 		{
+			#if PRINT_ERR == TRUE
+			printf("\n         [警告]第%d条 无法解析代码弹幕", listCnt);
+			#endif
 			fprintf(opF, "\nDialogue: 0,0:00:00.00,0:00:00.00,Default,"
 					"NO.%d(Code danmaku):unable to read this type,0000,0000,0000,,", listCnt);
 		}
 		else if(now -> type > 0)/*错误弹幕*/ 
 		{
+			#if PRINT_ERR == TRUE
+			printf("\n         [警告]第%d条 弹幕类型错误", listCnt);
+			#endif
 			fprintf(opF, "\nComment: NO.%d:unknow type", listCnt);
 		}
 		
 		if(ferror(opF))
 		{
+			#if PRINT_ERR == TRUE
+			printf("\n         [错误]申请内存空间失败");
+			#endif
+			close(opF);
 			return 8;
 		}
 		
@@ -551,6 +588,9 @@ int WriteAss(const char *opFileName, DANMAKU *head, const int resX, int resY, co
 int WriteAssDebugPath(const char *opFileName, DANMAKU *head, char *mode, const int speed, const int holdTime,
 					  char *shieldMode)
 {
+	#if PRINT_ERR == TRUE
+	printf("\n         [警告]程序处于调试模式");
+	#endif
 	if(mode[0] == '0' && mode[1] == '0')
 	{
 		return 0;

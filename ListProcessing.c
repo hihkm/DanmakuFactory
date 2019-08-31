@@ -13,6 +13,9 @@ int SortList(DANMAKU **listHead)
 {
 	if(*listHead == NULL)
 	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [´íÎó]µ¯Ä»³ØÎª¿Õ");
+		#endif
 		return 1;
 	}
 	
@@ -48,6 +51,9 @@ int SortList(DANMAKU **listHead)
 	bucketNum = danmakuNum / 128 + 1;
 	if((bucket = (DANMAKU **)malloc(sizeof(DANMAKU *) * bucketNum)) == NULL)
 	{
+		#if PRINT_ERR == TRUE
+		printf("\n         [´íÎó]ÉêÇëÄÚ´æ¿Õ¼äÊ§°Ü");
+		#endif
 		return 2;
 	}
 	memset(bucket, 0, sizeof(DANMAKU *) * bucketNum);

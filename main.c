@@ -1,4 +1,8 @@
 #include "DanmakuFactory.h"
+#include "ReadFile.c"
+#include "WriteFile.c"
+#include "ListProcessing.c"
+
 #include <io.h>
 
 typedef struct Config
@@ -9,11 +13,12 @@ typedef struct Config
 } CONFIG;
 
 void PrintFunctionDebugData(char *name, long wasteTime, int returnValue);
-char *AddSlash(char *ipStr);
+char *timestampToText(time_t timestamp, char *text); 
 
 int main(void)
 {
-	char inputFileName[MAX_TEXT_LENGTH], outputFileName[MAX_TEXT_LENGTH], displayFileName[MAX_TEXT_LENGTH];
+	char tempText[MAX_TEXT_LENGTH];
+	char inputFileName[MAX_TEXT_LENGTH], outputFileName[MAX_TEXT_LENGTH];
 	/*文件导入页*/ 
 	printf("DanmakuFactory v%s\n", VERSION);
 	printf("------------------------\n");
@@ -22,15 +27,15 @@ int main(void)
 	{
 		fflush(stdin);
 		printf("输入文件名 ");
-		fgets(displayFileName, MAX_TEXT_LENGTH / 2, stdin);
-		if(displayFileName[strlen(displayFileName + 1)] == '\n')
+		fgets(inputFileName, MAX_TEXT_LENGTH / 2, stdin);
+		if(inputFileName[strlen(inputFileName + 1)] == '\n')
 		{
-			displayFileName[strlen(displayFileName + 1)] = '\0';
+			inputFileName[strlen(inputFileName + 1)] = '\0';
 		}
-		DeQuotMarks(displayFileName);/*如果有的话 去两端引号*/
-		if(access(displayFileName, 0))
+		DeQuotMarks(inputFileName);/*如果有的话 去两端引号*/
+		if(access(inputFileName, 0))
 		{
-			printf("文件 %s 不存在，请重新输入\n", displayFileName); 
+			printf("文件 %s 不存在，请重新输入\n", inputFileName); 
 		}
 		else
 		{
@@ -38,8 +43,6 @@ int main(void)
 		}
 	}
 	
-	strcpy(inputFileName, displayFileName);
-	AddSlash(inputFileName);/*将一个斜杠转换成两个斜杠*/
 	strcpy(outputFileName, inputFileName);
 	strcat(outputFileName, ".ass");
 	fflush(stdin);
@@ -47,7 +50,7 @@ int main(void)
 	
 	if(!access(outputFileName, 0))
 	{
-		printf("\n输出文件%s.ass已存在，继续执行原文件将会被覆盖\n", displayFileName);
+		printf("\n输出文件%s已存在，继续执行原文件将会被覆盖\n", outputFileName);
 		printf("输入y或Y继续，其他任意字符退出\n");
 		char ch = getchar();
 		if(ch != 'Y' && ch != 'y')
@@ -92,7 +95,7 @@ int main(void)
 	{
 		system("cls");
 		printf("DanmakuFactory v%s\n", VERSION);
-		printf("%s\n\n", displayFileName);
+		printf("%s\n\n", inputFileName);
 		printf("弹幕设置\n");
 		printf("------------------------");
 		printf("\n 1 分辨率宽 = %d", danmakuConfig.resX);
@@ -117,12 +120,13 @@ int main(void)
 		printf("\n------------------------\n"); 
 		printf("请输入要修改的项目前面的序号\n输入0开始转换\n");
 		printf("请输入 ");
+		fflush(stdin);
 		char ch = getchar();
 		
 		fflush(stdin);
 		system("cls");
 		printf("DanmakuFactory v1.10\n");
-		printf("%s\n\n", displayFileName);
+		printf("%s\n\n", inputFileName);
 		printf("弹幕设置\n");
 		printf("------------------------\n");
 		switch(ch)
@@ -276,29 +280,31 @@ int main(void)
 	/*开始转换*/
 	system("cls");
 	printf("DanmakuFactory v%s\n", VERSION);
-	printf("%s\n", displayFileName);
-	printf("------------------------\n");
+	printf("%s\n", inputFileName);
+	printf("------------------------");
 	int rt;
-	printf("\n===== transform now start =====\n");
+	printf("\n%s [信息] 转换开始", timestampToText(time(NULL), tempText));
 	DANMAKU *danmakuPoorHead = NULL;
 	clock_t startTime, midTime, endTime;
 	midTime = startTime = clock();
 	
 	
-	/*读入文件*/ 
+	/*读入文件*/
+	printf("\n%s [信息] 开始读入文件", timestampToText(time(NULL), tempText));
 	rt = ReadXml(inputFileName, &danmakuPoorHead, "n", danmakuConfig.timeShift);
 	endTime = clock();
 	PrintFunctionDebugData("ReadXml", endTime - midTime, rt);
 	
-	
 	/*对弹幕池按时间进行桶排序*/
+	printf("\n%s [信息] 开始排序弹幕", timestampToText(time(NULL), tempText));
 	midTime = clock();
 	rt = SortList(&danmakuPoorHead);
 	endTime = clock();
 	PrintFunctionDebugData("SortList", endTime - midTime, rt);
 	
 	
-	/*写ass*/ 
+	/*写ass*/
+	printf("\n%s [信息] 开始写入文件", timestampToText(time(NULL), tempText));
 	midTime = clock();
 	rt = WriteAss(outputFileName,/*输出文件*/
 				  danmakuPoorHead,/*头指针*/
@@ -321,59 +327,62 @@ int main(void)
 	endTime = clock();
 	PrintFunctionDebugData("WriteAssDebugPath", endTime - midTime, rt);
 	
-	
-	printf("\n===== end of debug data =====\n");
-	printf("\n\n任务完成!\n输出文件为 %s.ass\n\n", displayFileName);
+	printf("\n%s [信息] 转换完成", timestampToText(time(NULL), tempText));
+	printf("\n\n转换完成不等价于转换成功，请查看上面日志是否有错误信息\n输出文件为 %s.ass\n\n", inputFileName);
 	printf("\nMade by TIKM\n");
+	printf("https://github.com/HITIKM/DanmakuFactory\n");
 	endTime = clock();
-	PrintFunctionDebugData("main", endTime - startTime, 0);
-	system("pause"); 
+	system("pause");
 	return 0;
 }
 
 void PrintFunctionDebugData(char *name, long wasteTime, int returnValue)
 {
-	printf("\nFunction %s", name);
+	char tempText[MAX_TEXT_LENGTH]; 
+	printf("\n%s [信息] 函数%s耗时", timestampToText(time(NULL), tempText), name);
 	if(wasteTime > 1000)
 	{
-		printf(" waste %ld %03ld ms ", wasteTime / 1000, wasteTime % 1000);
+		printf(" %ld %03ld ms ", wasteTime / 1000, wasteTime % 1000);
 	}
 	else
 	{
-		printf(" waste %ld ms ", wasteTime);
+		printf(" %ld ms ", wasteTime);
 	}
-	printf("and return value %d\n", returnValue);
+	printf("返回值为 %d", returnValue);
 	return;
 }
 
 /*
-将输入字符串中的单斜杠变成双斜杠作为路径
-参数：
-字符数组地址
-返回值：
-输入数组地址 
+时间戳转时间字符串 
+参数：时间戳、用于放置返回字符串的字符数组】
+返回值：传入数组的地址 
 */
-char *AddSlash(char *ipStr)
+char *timestampToText(time_t timestamp, char *text)
 {
-	char tempStr[1000];
-	char *tempPtr = tempStr;
-	char *ipPtr = ipStr;
+	char *ptr = text;
+	int cnt;
+	int hour, min, sec;
 	
-	while(*ipPtr != '\0')
-	{
-		if(*ipPtr == '\\')
-		{
-			*(tempPtr + 1) = *tempPtr = '\\';
-			tempPtr++;
-		}
-		else
-		{
-			*tempPtr = *ipPtr;
-		}
-		tempPtr++;
-		ipPtr++;
-	}
-	*tempPtr = '\0';
-	strcpy(ipStr, tempStr);
-	return ipStr;
+	/*将时间戳变成以北京时间为基准的*/
+	timestamp += 8 * 3600;/*北京时间是东八区要在0时区基础上加8个小时*/
+	
+	/*计算时分秒*/
+	sec = timestamp % 60;
+	min = timestamp % 3600 / 60;
+	hour = timestamp % (24 * 3600) / 3600;
+	
+	/*时*/
+	text[0] = hour / 10 + '0';
+	text[1] = hour % 10 + '0';
+	/*分*/
+	text[3] = min / 10 + '0';
+	text[4] = min % 10 + '0';
+	/*秒*/
+	text[6] = sec / 10 + '0';
+	text[7] = sec % 10 + '0';
+	
+	/*写分隔符号*/
+	text[2] = text[5] = ':';
+	text[8] = '\0';
+	return text;
 }
