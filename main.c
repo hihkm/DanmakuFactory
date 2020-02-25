@@ -1,2221 +1,1392 @@
-/*
-Copyright 2019 TIKM(github:HITIKM)
+#include <io.h>
+#include <math.h>
+#include "CDanmakuFactory.h"
+#include "Define/CLIDef.h"
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+void printConfigInfo(CONFIG config);
+void printHelpInfo();
+int getArgNum(int argc, char **argv, const int optionIndex);
+char *getFormat(char *outFormat, const char *const fileName, int maxLen);
+char *getPath(char *outPath, const char *const fileName, int maxLen);
+double getArgVal(int argc, char **argv, const int optIndex, const char *const optName, const double errorReturnValue);
 
-http://www.apache.org/licenses/LICENSE-2.0
+void pause();
+BOOL isContinue();
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-#include "DanmakuFactory.h"
-#include "DanmakuConvert.h"
-#include "ui.c"
-#include "ReadFile.c"
-#include "WriteFile.c"
-#include "StringProcessing.c" 
-#include "ListProcessing.c"
+static CONFIG defauleConfig =
+{
+    1920,           /*åˆ†è¾¨ç‡å®½*/
+    1080,           /*åˆ†è¾¨ç‡é«˜*/ 
+    12.0,           /*æ»šåŠ¨æ—¶é—´*/ 
+    5.0,            /*å›ºå®šæ—¶é—´*/ 
+    0,              /*å¼¹å¹•å¯†åº¦*/
+    38,             /*å­—å·*/
+                    /*å­—ä½“*/
+    "Microsoft YaHei Light", 
+    180,            /*ä¸é€æ˜åº¦*/ 
+    0,              /*æè¾¹*/ 
+    1,              /*é˜´å½±*/ 
+    1.00,           /*æ˜¾ç¤ºåŒºåŸŸ*/ 
+    1.00,           /*æ»šåŠ¨åŒºåŸŸ*/
+    TRUE,           /*æ˜¯å¦ä¿å­˜å±è”½éƒ¨åˆ†*/ 
+    0,              /*å±è”½æ¨¡å¼*/ 
+    0,              /*ç»Ÿè®¡æ¨¡å¼*/
+};
 
 int main(int argc, char **argv)
 {
-	int cnt;
-	char key;/*´Ó¼üÅÌ»ñÈ¡µÄ¼üÖµ*/ 
-	char firSelected, secSelected, thiSelected;/*Ò»¶şÈı¼¶²Ëµ¥ÒÑÑ¡ÔñÏî*/ 
-	
-	char tempText[MAX_TEXT_LENGTH];
-	
-	FILE *configFilePtr;/*ÅäÖÃÎÄ¼şÖ¸Õë*/ 
-	CONFIG defaultConfig;/*Ä¬ÈÏÅäÖÃ*/
-	CONFIG *inputFile = NULL;/*¶ÔÊäÈëµÄÅäÖÃ*/ 
-	char configFilePath[MAX_TEXT_LENGTH];/*ÅäÖÃÎÄ¼şÂ·¾¶*/ 
-	
-	/*winAPI¶ÁĞ´ini²»Ö§³ÖÏà¶ÔÂ·¾¶ ½«Ïà¶ÔÂ·¾¶×ª»»Îª¾ø¶ÔÂ·¾¶*/
-	getcwd(configFilePath, MAX_TEXT_LENGTH);
-	sprintf(configFilePath, "%s\\DanmakuFactoryConfig.ini", configFilePath);
-	
-	/*¶ÁÈ¡ÅäÖÃÎÄ¼ş*/
-	readConfigFile(&defaultConfig, configFilePath);
-	if (!access("DanmakuFactoryConfig.bin", 0))
-	{/*¶ş½øÖÆÅäÖÃÎÄ¼ş¼æÈİ*/
-		printf("DanmakuFactory v%s\n", VERSION);
-		printf("\n--------------------------------------------------------"
-			   "\n[!] ¼ì²éµ½¾É°æ±¾ÅäÖÃÎÄ¼şDanmakuFactoryConfig.bin"
-			   "\n    Ô­¶ş½øÖÆÅäÖÃÎÄ¼ş²»ÔÙÊÜÖ§³Ö"
-			   "\n    ÇëÊäÈëY»òy×ª»»ÎªĞÂ°æ±¾ Ô­ÅäÖÃÎÄ¼ş½«»á±»É¾³ı"
-			   "\n--------------------------------------------------------"
-			   "\nÇëÑ¡Ôñ ");
-		firSelected = getchar();
-		if((configFilePtr = fopen("DanmakuFactoryConfig.bin", "rb")) != NULL)
-		{
-			OLDCONFIG oldConfig;
-			fread(&oldConfig, sizeof(oldConfig), 1, configFilePtr);
-			defaultConfig.resX = oldConfig.resX;
-			defaultConfig.resY = oldConfig.resY;
-			defaultConfig.rollTime = oldConfig.rollTime;
-			defaultConfig.holdTime = oldConfig.holdTime;
-			defaultConfig.density = oldConfig.density;
-			defaultConfig.outline = oldConfig.outline;
-			defaultConfig.shadow = oldConfig.shadow;
-			defaultConfig.fontSize = oldConfig.fontSize;
-			defaultConfig.blank = oldConfig.blank;
-			strcpy(defaultConfig.fontName, oldConfig.fontName);
-			strcpy(defaultConfig.blockMode, oldConfig.blockMode);
-			strcpy(defaultConfig.debugMode, oldConfig.debugMode);
-			fclose(configFilePtr);
-		}
-		else
-		{
-			firSelected = 'n';
-			printf("[X] ¶ÁÈ¡Ô­ÅäÖÃÎÄ¼şÊ§°Ü\n");
-		}
-		
-		if (firSelected == 'Y' || firSelected == 'y')
-		{
-			if (writeConfigFile(defaultConfig, configFilePath) == FALSE)
-			{
-				printf("[X] Ğ´ÅäÖÃÎÄ¼şÊ§°Ü Ã»ÓĞ½øĞĞÈÎºÎÎÄ¼şĞŞ¸Ä\n");
-			}
-			else
-			{
-				if (remove("DanmakuFactoryConfig.bin"))
-				{
-					printf("[!] Ô­ÅäÖÃÎÄ¼şÉ¾³ıÊ§°Ü ÇëÊÖ¶¯É¾³ı\n");
-				}
-				else
-				{
-					printf("[!] ×ª»»Íê³É Ô­ÅäÖÃÎÄ¼şÒÑÉ¾³ı\n");
-				}
-			}
-			system("pause");
-		}
-		else
-		{
-			printf("   Ã»ÓĞ½øĞĞÈÎºÎÎÄ¼şĞŞ¸Ä\n"); 
-		}
-	}
-	
-	/*×ª»»ÈÎÎñ*/
-	if (argc == 1)
-	{/*Ö±½ÓÔËĞĞ*/
-		/*¶ÁÈ¡ÅäÖÃÎÄ¼şÓÃ»§Éè¶¨µÄ»º³åÇø´óĞ¡ Ó¦µ±ÊôÓÚProgramSet*/
-		int bufferX = GetPrivateProfileInt("ProgramSet", "bufferX", 0, configFilePath);
-		int bufferY = GetPrivateProfileInt("ProgramSet", "bufferY", 0, configFilePath);
-		if (bufferX == 0 || bufferY == 0)
-		{/*Èç¹ûÓÃ»§Ğ´µ½ÁËDanmakuSetÒ²Í¬Ñù¿ÉÒÔ¶Á³öÀ´*/
-			bufferX = GetPrivateProfileInt("DanmakuSet", "bufferX", 512, configFilePath);
-			bufferY = GetPrivateProfileInt("DanmakuSet", "bufferY", 2096, configFilePath);
-		}
-		/*Éè¶¨»º³åÇø´óĞ¡*/
-		sprintf(tempText, "mode con cols=%d lines=%d", bufferX, bufferY);
-		system(tempText);
-		
-		/*¶ÁÈ¡ÅäÖÃÎÄ¼şÓÃ»§Éè¶¨µÄ´°Ìå´óĞ¡ Ó¦µ±ÊôÓÚProgramSet*/
-		int windowX = GetPrivateProfileInt("ProgramSet", "windowX", 0, configFilePath);
-		int windowY = GetPrivateProfileInt("ProgramSet", "windowY", 0, configFilePath);
-		if (windowX == 0 || windowY == 0)
-		{/*Èç¹ûÓÃ»§Ğ´µ½ÁËDanmakuSetÒ²Í¬Ñù¿ÉÒÔ¶Á³öÀ´*/
-			windowX = GetPrivateProfileInt("DanmakuSet", "windowX", GetSystemMetrics(SM_CXSCREEN)/2, configFilePath);
-			windowY = GetPrivateProfileInt("DanmakuSet", "windowY", GetSystemMetrics(SM_CYSCREEN)/1.5, configFilePath);
-		}
-		/*Éè¶¨´°¿Ú´óĞ¡*/
-		MoveWindow(GetConsoleWindow(), 
-				   (GetSystemMetrics(SM_CXSCREEN) - windowX) / 2,
-				   (GetSystemMetrics(SM_CYSCREEN) - windowY) / 2,
-				   windowX, windowY, TRUE);
-		/*½ûÖ¹ÍÏ¶¯¸Ä±ä´°¿Ú´óĞ¡*/
-		SetWindowLongPtr(GetConsoleWindow(), GWL_STYLE, 
-			  GetWindowLong(GetConsoleWindow(), GWL_STYLE) & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX & ~WS_MINIMIZEBOX);
-		
-		MAINPAGE:
-		system("cls");
-		showCursor(FALSE);/*Òş²ØÖ¸Õë*/
-		
-		printf("DanmakuFactory v%s\n", VERSION);
-		printf("--------------------------------"
-			   "\n\n\n\n"
-			   "--------------------------------"
-			   "\n¡ü¡ı»òÑ¡ÏîÇ°ĞòºÅÑ¡Ôñ ENTERÈ·¶¨"
-			   );
-		
-		key = 0;
-		firSelected = 0;
-		while (key != ENTER)
-		{
-			printMenuText(2, 2, firSelected, "> ", 0x0F, 0xF0, FALSE, 3,
-						  "0 ¿ªÊ¼×ª»»          ",
-						  "1 ¸üĞÂÓë°ïÖú        ",
-						  "2 ÍË³ö              "
-						);
-			fflush(stdin);
-			key = getch();
-			fflush(stdin);
-			if (key == UP)
-			{
-				if (firSelected == 0)
-				{
-					firSelected = 2;
-				}
-				else
-				{
-					firSelected--;
-				}
-			}
-			else if (key == DOWN)
-			{
-				if (firSelected == 2)
-				{
-					firSelected = 0;
-				}
-				else
-				{
-					firSelected++;
-				}
-			}
-			else if (key >= '0' && key <= '2')
-			{
-				firSelected = key - '0';
-			}
-		}
-		
-		showCursor(TRUE);/*ÏÔÊ¾Ö¸Õë*/
-		if (firSelected == 0)
-		{/*¼òµ¥×ª»»*/
-			int i = 0;
-			system("cls");
-			printf("DanmakuFactory v%s\n", VERSION);
-			printf("--------------------------------");
-			printf("\nÇëÊäÈëÒª×ª»»µÄÎÄ¼şµÄÂ·¾¶\n");
-			do {
-				if (i % 16 == 0)
-				{
-					/*ÉêÇëÓÃÓÚ´æ·ÅÂ·¾¶µÄÄÚ´æ*/
-					if ((inputFile = (CONFIG *)realloc(inputFile, (i+16)*sizeof(CONFIG))) == NULL)
-					{
-						printf("\n[X] ÄÚ´æÉêÇëÊ§°Ü\n");
-						system("pause");
-						exit(1);
-					}
-				}
-				
-				/*¸³Óè³õÖµ*/
-				inputFile[i] = defaultConfig;/*±ØĞëÏÈ¶ÁÈ«²¿ÖµÔÙ½«²»ÄÜÖ±½Ó¶Á³õÖµµÄÄÚÈİ¸³Öµ*/
-				//strcpy(inputFile[i].outputFormat, "ass");
-				
-				inputFile[i].timeShift = 0.00;
-				
-				/*ÊäÈëÊäÈëÎÄ¼şÂ·¾¶*/
-				if (i == 1)
-				{
-					printf("¼ÌĞøÊäÈëÎÄ¼şÂ·¾¶ÒÔÅúÁ¿×ª»»»òÊäÈë»Ø³µ½áÊø\n");
-				}
-				printf("%d > ", i + 1);
-				fgets(inputFile[i].input, MAX_TEXT_LENGTH, stdin);
-				if((inputFile[i].input)[strlen(inputFile[i].input) - 1] == '\n')
-				{
-					(inputFile[i].input)[strlen(inputFile[i].input) - 1] = '\0';
-				}
-				deQuotMarks(inputFile[i].input);
-				sprintf(inputFile[i].output, "%s.%s", inputFile[i].input, "ass");/*Éú³ÉÊä³öÎÄ¼şÂ·¾¶*/ 
-				
-				i++;
-			} while ((inputFile[i - 1].input)[0] != '\0');
-			i--;/*×îºóÒ»¸öÃ»ÓĞÊı¾İËùÒÔ¶ªÆú*/
-			
-			/*Ã»ÓĞÈÎºÎÊı¾İ¾ÍÖ±½Ó·µ»Ø*/ 
-			if (i == 0)
-			{
-				free(inputFile);
-				inputFile = NULL;/*²»ÖØÖÃÏÂ´Îrealloc¾Í»á³ö´í*/
-				goto MAINPAGE;
-			}
-			
-			/*Éè¶¨Ò³*/
-			int nowFile = 0;
-			int page = 0;
-			secSelected = 6;
-			
-			/*Ö»ÓĞÒ»ÌõÊı¾İ¾ÍÃ»ÓĞ·Ö¿ªÈ«²¿ÓëµÚÒ»ÌõµÄÒâÒåÁË*/
-			if (i == 1)
-			{
-				nowFile = 1;
-			}
-			
-			while (TRUE)
-			{
-				char displayText[4][MAX_TEXT_LENGTH];/*Ç°8ĞĞ¸øÄ¿Â¼ÏÔÊ¾ ºóÃæµÄ¸ø²Ëµ¥*/
-				
-				key = 0;
-				system("cls");
-				showCursor(FALSE);/*Òş²ØÖ¸Õë*/
-				
-				/*´òÓ¡½çÃæ*/ 
-				printf("DanmakuFactory v%s\n", VERSION);
-				printf("\n¹²½ÓÊÕµ½ %d ¸öÎÄ¼ş", i);
-				printf("\n--------------------------------");
-				printf("\n\n\n\n\n\n\n\n");
-				printf("\n¡ûÉÏÒ»Ò³   ¡úÏÂÒ»Ò³"
-					   "\n--------------------------------"
-					   );
-				printf("\n"
-					   "\n"
-					   "\n"
-					   "\n"
-					   "\n"
-					   "\n"
-					   "\n" 
-					   "\n--------------------------------"
-					   "\n¡ü¡ıÑ¡Ôñ  ENTER½øÈë"
-					   );
-				
-				/*´òÓ¡µ±Ç°Ò³ÄÜÏÔÊ¾µÄÎÄ¼şÁĞ±í*/ 
-				for (cnt = 0; cnt < 8 && page * 8 + cnt < i; cnt++)
-				{
-					setPos(0, 4 + cnt);
-					printf("%d %s", page*8 + cnt + 1, inputFile[page*8 + cnt].input);
-				}
-				setPos(21, 12);
-				printf("µÚ%dÒ³ ¹²%dÒ³", page + 1, (int)(ceil(i / 8.0))); 
-				
-				/*²Ëµ¥À¸ĞèÒªÏÔÊ¾µÄÎÄ±¾ Ìî³äµ½Êı×édisplayText*/
-				if (nowFile == 0)
-				{
-					sprintf(displayText[0], "1 µ±Ç°ÉèÖÃ È«²¿ÎÄ¼ş");
-					sprintf(displayText[1], "2 ×ª»»Îª --");
-					sprintf(displayText[2], "3 Ê±ÖáÆ«ÒÆ %.2f", inputFile[0].timeShift);
-					for (cnt = 1; cnt < i; cnt++)
-					{
-						if (fabs(inputFile[cnt].timeShift - inputFile[cnt - 1].timeShift) > FLOAT_EPS)
-						{
-							sprintf(displayText[2], "3 Ê±ÖáÆ«ÒÆ --");
-							break;
-						}
-					}
-					
-					if (inputFile[0].outputEncoding == ANSI)
-					{
-						sprintf(displayText[3], "4 Êä³ö±àÂë ANSI");
-					}
-					else
-					{
-						sprintf(displayText[3], "4 Êä³ö±àÂë UTF-8");
-					}
-					
-					for (cnt = 1; cnt < i; cnt++)
-					{
-						if (inputFile[cnt].outputEncoding != inputFile[cnt - 1].outputEncoding)
-						{
-							sprintf(displayText[3], "4 Êä³ö±àÂë --");
-							break;
-						}
-					}
-				}
-				else
-				{
-					sprintf(displayText[0], "1 µ±Ç°ÉèÖÃ %d", nowFile);
-					sprintf(displayText[1], "2 ×ª»»Îª %s", inputFile[nowFile - 1].output);
-					sprintf(displayText[2], "3 Ê±ÖáÆ«ÒÆ %.2f", inputFile[nowFile - 1].timeShift);
-					if (inputFile[nowFile - 1].outputEncoding == ANSI)
-					{
-						sprintf(displayText[3], "4 Êä³ö±àÂë ANSI");
-					}
-					else
-					{
-						sprintf(displayText[3], "4 Êä³ö±àÂë UTF-8");
-					}
-				}
-				
-				
-				/*»ñÈ¡¼üÅÌÊäÈë*/ 
-				while (key != ENTER)
-				{
-					if (key == UP)
-					{
-						if (secSelected == 0)
-						{
-							secSelected = 6;
-						}
-						else
-						{
-							secSelected--;
-						}
-					}
-					else if (key == DOWN)
-					{
-						if (secSelected == 6)
-						{
-							secSelected = 0;
-						}
-						else
-						{
-							secSelected++;
-						}
-					}
-					else if (key == LEFT || key == RIGHT)
-					{
-						if (key == LEFT)
-						{
-							if (page == 0)
-							{
-								page = (int)(ceil(i / 8.0)) - 1;/*ÏòÉÏÈ¡Õû*/
-							}
-							else
-							{
-								page--;
-							}
-						}
-						else
-						{
-							if (page == (int)(ceil(i / 8.0)) - 1)
-							{
-								page = 0;/*ÏòÉÏÈ¡Õû*/
-							}
-							else
-							{
-								page++;
-							}
-						}
-						break;/*Ìø³öÑ­»·È»ºóË¢ĞÂÕû¸öÒ³Ãæ*/	
-					}
-					else if (key == '0')
-					{
-						secSelected = 6;
-					}
-					else if (key >= '1' && key <= '6')
-					{
-						secSelected = key - '0' - 1;
-					}
-					
-					/*´òÓ¡²Ëµ¥*/
-					printMenuText(0, 14, secSelected, "> ", 0x0F, 0xF0, FALSE, 7,
-								  displayText[0],
-								  displayText[1],
-								  displayText[2],
-								  displayText[3],
-								  "5 ¸ü¶àµ¯Ä»ÉèÖÃ",
-								  "6 ±£´æµ±Ç°ÉèÖÃ", 
-								  "0 ¿ªÊ¼È«²¿×ª»»"
-								 );
-					fflush(stdin);
-					key = getch();
-					fflush(stdin);
-				}/*½áÊø²Ëµ¥Ñ¡ÔñÑ­»·*/ 
-				
-				if (key == LEFT || key == RIGHT)
-				{/*Èç¹û·­Ò³ÔòÖ±½ÓË¢ĞÂÕû¸öÒ³Ãæ*/
-					continue;
-				}
-				
-				showCursor(TRUE);/*ÏÔÊ¾Ö¸Õë*/
-				/*¸ù¾İÓÃ»§Ñ¡ÔñµÄ½øÒ»²½²Ù×÷*/
-				if (secSelected == 0)
-				{/*ÉèÖÃµ±Ç°ÒªÉèÖÃµÄÎÄ¼ş*/
-					setPos(0, 22);
-					if (i == 1)
-					{
-						printf("[!] µ±Ç°ÏîÎŞ·¨ÉèÖÃ£¬ÒòÎªÖ»ÓĞÒ»¸öÎÄ¼ş\n");
-						system("pause"); 
-					}
-					else
-					{
-						printf("ÇëÊäÈëÄãÒªÉèÖÃµÄÎÄ¼şÇ°ĞòºÅ 0±íÊ¾È«²¿\n");
-						do {
-							fflush(stdin);
-							printf("ÇëÊäÈë(0-%d) ", i);
-							fgets(tempText, MAX_TEXT_LENGTH, stdin);
-							if(tempText[strlen(tempText) - 1] == '\n')
-							{
-								tempText[strlen(tempText) - 1] = '\0';
-							}
-							nowFile = strToInt(tempText);/*ÏÈ»ñÈ¡×Ö·û´®ÅĞ¶ÏÊÇ·ñÓĞ·Ç·¨×Ö·û*/
-						} while ((nowFile < 0 || nowFile > i) && !isDesignatedChar(tempText, "0123456789"));
-					}
-				}
-				else if (secSelected == 1)
-				{/*ÉèÖÃÎÄ¼şÂ·¾¶*/ 
-					setPos(0, 22);
-					if (nowFile == 0)
-					{/*È«²¿ÉèÖÃ»áµ¼ÖÂ´íÎó*/
-						printf("[X] ²»ÄÜÍ¬Ê±Éè¶¨È«²¿ÎÄ¼şµÄÊä³öÂ·¾¶\n");
-						system("pause"); 
-					}
-					else
-					{/*¾Ö²¿ÉèÖÃ*/ 
-						printf("ÇëÊäÈë %d ºÅÎÄ¼şµÄÊä³öÂ·¾¶\n", nowFile);
-						printf("ÇëÊäÈë(º¬ºó×ºÃû) ");
-						fgets(inputFile[nowFile - 1].output, MAX_TEXT_LENGTH, stdin);
-						if((inputFile[nowFile - 1].output)[strlen(inputFile[nowFile - 1].output) - 1] == '\n')
-						{
-							(inputFile[nowFile - 1].output)[strlen(inputFile[nowFile - 1].output) - 1] = '\0';
-						}
-						deQuotMarks(inputFile[nowFile - 1].output);
-					}
-				}
-				else if (secSelected == 2)
-				{/*ÉèÖÃÊ±ÖáÆ«ÒÆÁ¿*/ 
-					setPos(0, 22);
-					if (nowFile == 0)
-					{/*È«²¿ÉèÖÃ*/ 
-						printf("ÇëÊäÈëÈ«²¿ÎÄ¼şµÄÊ±ÖáÆ«ÒÆ\n", nowFile);
-						do {
-							printf("ÇëÊäÈë(Ğ¡Êı) ");
-							fgets(tempText, MAX_TEXT_LENGTH, stdin);
-							if(tempText[strlen(tempText) - 1] == '\n')
-							{
-								tempText[strlen(tempText) - 1] = '\0';
-							}
-						} while (!isDesignatedChar(tempText, "-.0123456789"));/*ÅĞ¶ÏÊÇ·ñÓĞ·Ç·¨×Ö·û*/
-						float tempTimeShift = strToFloat(tempText);
-						for (cnt = 0; cnt < i; cnt++)
-						{
-							inputFile[cnt].timeShift = tempTimeShift;
-						}
-						
-					}
-					else
-					{/*¾Ö²¿ÉèÖÃ*/
-						printf("ÇëÊäÈë %d ºÅÎÄ¼şµÄÊ±ÖáÆ«ÒÆ\n", nowFile);
-						do {
-							printf("ÇëÊäÈë(Ğ¡Êı) ");
-							fgets(tempText, MAX_TEXT_LENGTH, stdin);
-							if(tempText[strlen(tempText) - 1] == '\n')
-							{
-								tempText[strlen(tempText) - 1] = '\0';
-							}
-						} while (!isDesignatedChar(tempText, "-.0123456789"));/*ÅĞ¶ÏÊÇ·ñÓĞ·Ç·¨×Ö·û*/ 
-						inputFile[nowFile - 1].timeShift = strToFloat(tempText);
-					}
-					
-				}
-				else if (secSelected == 3)
-				{/*ÉèÖÃÊä³ö±àÂë*/ 
-					setPos(0, 22);
-					showCursor(FALSE);/*Òş²ØÖ¸Õë*/
-					if (nowFile == 0)
-					{/*ÉèÖÃÈ«²¿*/ 
-						printf("ÇëÑ¡ÔñÈ«²¿ÎÄ¼şµÄÊä³ö±àÂë\n", nowFile);
-					}
-					else
-					{/*ÉèÖÃµ¥¸ö*/ 
-						printf("ÇëÑ¡Ôñ %d ºÅÎÄ¼şµÄÊä³ö±àÂë\n", nowFile);
-					}
-					
-					/*Í¨¹ıÑ¡Ôñ²Ëµ¥Ñ¡ÔñÒ»¸öÏî*/
-					key = 0;
-					thiSelected = 0; 
-					while (key != ENTER)
-					{
-						printMenuText(0, 23, thiSelected, "> ", 0x0F, 0xF0, FALSE, 2,
-									  "0 ANSI           ",
-									  "1 UTF-8          ");
-						printf("\n\n[!] Ä¿Ç°µÄ±àÂë×ª»»²¢²»ÍêÈ«¿É¿¿");
-						printf("\n    ÒÑÖªGB2312×ªUTF-8ÓĞ¼¸ÂÊ·¢Éú±ÀÀ£");
-						printf("\n    Ïà¹Ø±àÂë×ª»»½¨ÒéÔÚÎÄ±¾±à¼­Æ÷Íê³É");
-						fflush(stdin);
-						key = getch();
-						fflush(stdin);
-						if (key == UP)
-						{
-							if (thiSelected == 0)
-							{
-								thiSelected = 1;
-							}
-							else
-							{
-								thiSelected--;
-							}
-						}
-						else if (key == DOWN)
-						{
-							if (thiSelected == 1)
-							{
-								thiSelected = 0;
-							}
-							else
-							{
-								thiSelected++;
-							}
-						}
-						else if (key >= '0' && key <= '1')
-						{
-							thiSelected = key - '0';
-						}
-					}/*½áÊø±àÂëÑ¡Ôñ²Ëµ¥*/ 
-					 
-					/*ÏìÓ¦ÓÃ»§µÄÑ¡Ôñ*/ 
-					if (thiSelected == 0)
-					{
-						if (nowFile == 0)
-						{/*È«²¿ĞŞ¸Ä*/ 
-							for (cnt = 0; cnt < i; cnt++)
-							{
-								inputFile[cnt].outputEncoding = ANSI;
-							}
-						}
-						else
-						{/*¾Ö²¿ĞŞ¸Ä*/
-							inputFile[nowFile - 1].outputEncoding = ANSI;
-						}
-						
-					}
-					else
-					{
-						if (nowFile == 0)
-						{/*È«²¿ĞŞ¸Ä*/ 
-							for (cnt = 0; cnt < i; cnt++)
-							{
-								inputFile[cnt].outputEncoding = UTF_8;
-							}
-						}
-						else
-						{/*¾Ö²¿ĞŞ¸Ä*/ 
-							inputFile[nowFile - 1].outputEncoding = UTF_8;
-						}
-					}
-				}
-				else if (secSelected == 4)
-				{/*ÆäËûµ¯Ä»ÉèÖÃ*/ 
-					char setDisplay[20][MAX_TEXT_LENGTH];
-					CONFIG newSet;
-					
-					/*
-					¶ÁÈ¡Ö¸¶¨ÎÄ¼şµÄµ¯Ä»ÉèÖÃ
-					Êı×éÏÂ±ê´Ó0¿ªÊ¼£¬nowFile´Ó1¿ªÊ¼£¬Òò´Ë¶ÔÄ³Ò»¸öÎÄ¼şÒª¼õ 1
-					ÓÉÓÚ0±íÊ¾È«²¿ Òò´ËnowFile Îª 0 Ê±Ä¬ÈÏÈ¡µÚÒ»¸öÎÄ¼şÎŞĞè¼õ 1
-					*/
-					int dSetSelected = 0;
-					int dSetKey; 
-					int shift = 1;
-					if (nowFile == 0)
-					{
-						shift = 0;
-					}
-					
-					/*Éè¶¨Ò³ÃæUI*/
-					do {
-						system("cls");
-						dSetKey = 0;
-						showCursor(FALSE);/*Òş²ØÖ¸Õë*/
-						printf("> DanmakuFactory µ¯Ä»ÉèÖÃ", nowFile);
-						sprintf(setDisplay[0], "   1 ·Ö±æÂÊ¿í %dpx", inputFile[nowFile - shift].resX);
-						sprintf(setDisplay[1], "   2 ·Ö±æÂÊ¸ß %dpx", inputFile[nowFile - shift].resY);
-						sprintf(setDisplay[2], "   3 ¹ö¶¯µ¯Ä»Ê±¼ä %dÃë", inputFile[nowFile - shift].rollTime);
-						sprintf(setDisplay[3], "   4 ¹Ì¶¨µ¯Ä»Ê±¼ä %dÃë", inputFile[nowFile - shift].holdTime);
-						if (inputFile[nowFile - shift].density == -1)
-						{
-							sprintf(setDisplay[4], "   5 µ¯Ä»ÃÜ¶È ²»ÖØµş(-1)");
-						}
-						else if (inputFile[nowFile - shift].density == 0)
-						{
-							sprintf(setDisplay[4], "   5 µ¯Ä»ÃÜ¶È ÎŞÏŞÖÆ(0)");
-						}
-						else
-						{
-							sprintf(setDisplay[4], "   5 µ¯Ä»ÃÜ¶È %dÌõ", inputFile[nowFile-shift].density);
-						}
-						sprintf(setDisplay[5], "   6 ÎÄ×Ö´óĞ¡ %d", inputFile[nowFile - shift].fontSize);
-						if (isUtf8(defaultConfig.fontName) == TRUE)
-						{/*¶Ô×ÖÌåËµÃ÷ÎÄ±¾*/
-							transcoding(UTF_8, ANSI, inputFile[nowFile - shift].fontName, NULL, 0);
-						}
-						sprintf(setDisplay[6], "   7 ×ÖÌå %s", inputFile[nowFile - shift].fontName);
-						sprintf(setDisplay[7], "   8 Ãè±ß %d", inputFile[nowFile - shift].outline);
-						sprintf(setDisplay[8], "   9 ÒõÓ° %d", inputFile[nowFile - shift].shadow);
-						sprintf(setDisplay[9], "   a ²»Í¸Ã÷¶È %d", inputFile[nowFile - shift].opacity);
-						sprintf(setDisplay[10], "   b ÏÂ²¿Áô°× %dpx", inputFile[nowFile - shift].blank);
-						if ((inputFile[nowFile - shift].blockMode)[0] == '0')
-						{
-							sprintf(setDisplay[11], "   c ÓÒ×ó¹ö¶¯[²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[11], "   c ÓÒ×ó¹ö¶¯[ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].blockMode)[1] == '0')
-						{
-							sprintf(setDisplay[12], "   d ×óÓÒ¹ö¶¯[²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[12], "   d ×óÓÒ¹ö¶¯[ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].blockMode)[2] == '0')
-						{
-							sprintf(setDisplay[13], "   e ¶¥²¿¹Ì¶¨[²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[13], "   e ¶¥²¿¹Ì¶¨[ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].blockMode)[3] == '0')
-						{
-							sprintf(setDisplay[14], "   f µ×²¿¹Ì¶¨[²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[14], "   f µ×²¿¹Ì¶¨[ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].blockMode)[4] == '0')
-						{
-							sprintf(setDisplay[15], "   g ÌØÊâ    [²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[15], "   g ÌØÊâ    [ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].blockMode)[5] == '0')
-						{
-							sprintf(setDisplay[16], "   h ²ÊÉ«    [²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[16], "   h ²ÊÉ«    [ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].blockMode)[6] == '0')
-						{
-							sprintf(setDisplay[17], "   i ÄÚÈİÖØ¸´[²»ÆÁ±Î]");
-						}
-						else
-						{
-							sprintf(setDisplay[17], "   i ÄÚÈİÖØ¸´[ÆÁ±Î]");
-						}
-						
-						if ((inputFile[nowFile - shift].debugMode)[0] == '0')
-						{
-							sprintf(setDisplay[18], "   j Êı¾İ±í¸ñ[¹Ø±Õ]");
-						}
-						else
-						{
-							sprintf(setDisplay[18], "   j Êı¾İ±í¸ñ[¿ªÆô]");
-						}
-						
-						if ((inputFile[nowFile - shift].debugMode)[1] == '0')
-						{
-							sprintf(setDisplay[19], "   k Í³¼ÆÍ¼  [¹Ø±Õ]");
-						}
-						else
-						{
-							sprintf(setDisplay[19], "   k Í³¼ÆÍ¼  [¿ªÆô]");
-						}
-						
-						if (nowFile == 0)
-						{/*ÉèÖÃÈ«²¿*/
-							printf("(È«²¿ÎÄ¼ş)\n");
-							/*¼ì²éËùÓĞÎÄ¼şÉèÖÃÊÇ·ñÏàÍ¬ ²»Í¬µÄÖÃ--*/ 
-							for (cnt = 1; cnt < i; cnt++)
-							{
-								if (inputFile[cnt].resX != inputFile[cnt - 1].resX)
-								{
-									sprintf(setDisplay[0], "   1 ·Ö±æÂÊ¿í --");
-								}
-								if (inputFile[cnt].resY != inputFile[cnt - 1].resY)
-								{
-									sprintf(setDisplay[1], "   2 ·Ö±æÂÊ¿í --");
-								}
-								if (inputFile[cnt].rollTime != inputFile[cnt - 1].rollTime)
-								{
-									sprintf(setDisplay[2], "   3 ¹ö¶¯µ¯Ä»Ê±¼ä --");
-								}
-								if (inputFile[cnt].holdTime != inputFile[cnt - 1].holdTime)
-								{
-									sprintf(setDisplay[3], "   4 ¹Ì¶¨µ¯Ä»Ê±¼ä --");
-								}
-								if (inputFile[cnt].density != inputFile[cnt - 1].density)
-								{
-									sprintf(setDisplay[4], "   5 µ¯Ä»ÃÜ¶È --");
-								}
-								if (inputFile[cnt].fontSize != inputFile[cnt - 1].fontSize)
-								{
-									sprintf(setDisplay[5], "   6 ÎÄ×Ö´óĞ¡ --");
-								}
-								if (strcmp(inputFile[cnt].fontName, inputFile[cnt - 1].fontName))
-								{
-									sprintf(setDisplay[6], "   7 ×ÖÌå --");
-								}
-								if (inputFile[cnt].outline != inputFile[cnt - 1].outline)
-								{
-									sprintf(setDisplay[7], "   8 Ãè±ß --");
-								}
-								if (inputFile[cnt].shadow != inputFile[cnt - 1].shadow)
-								{
-									sprintf(setDisplay[8], "   9 ÒõÓ° --");
-								}
-								if (inputFile[cnt].opacity != inputFile[cnt - 1].opacity)
-								{
-									sprintf(setDisplay[9], "   a ²»Í¸Ã÷¶È --");
-								}
-								if (inputFile[cnt].blank != inputFile[cnt - 1].blank)
-								{
-									sprintf(setDisplay[10], "   b ÏÂ²¿Áô°× --");
-								}
-								if ((inputFile[cnt].blockMode)[0] != 
-									(inputFile[cnt - 1].blockMode)[0])
-								{
-									sprintf(setDisplay[11], "   c ÓÒ×ó¹ö¶¯ --");
-								}
-								if ((inputFile[cnt].blockMode)[1] != 
-									(inputFile[cnt - 1].blockMode)[1])
-								{
-									sprintf(setDisplay[12], "   d ×óÓÒ¹ö¶¯ --");
-								}
-								if ((inputFile[cnt].blockMode)[2] != 
-									(inputFile[cnt - 1].blockMode)[2])
-								{
-									sprintf(setDisplay[13], "   e ¶¥²¿¹Ì¶¨ --");
-								}
-								if ((inputFile[cnt].blockMode)[3] != 
-									(inputFile[cnt - 1].blockMode)[3])
-								{
-									sprintf(setDisplay[14], "   f µ×²¿¹Ì¶¨ --");
-								}
-								if ((inputFile[cnt].blockMode)[4] != 
-									(inputFile[cnt - 1].blockMode)[4])
-								{
-									sprintf(setDisplay[15], "   g ÌØÊâ     --");
-								}
-								if ((inputFile[cnt].blockMode)[5] != 
-									(inputFile[cnt - 1].blockMode)[5])
-								{
-									sprintf(setDisplay[16], "   h ²ÊÉ«     --");
-								}
-								if ((inputFile[cnt].blockMode)[6] != 
-									(inputFile[cnt - 1].blockMode)[6])
-								{
-									sprintf(setDisplay[17], "   i ÄÚÈİÖØ¸´ --");
-								}
-								if ((inputFile[cnt].debugMode)[0] != 
-									(inputFile[cnt - 1].debugMode)[0])
-								{
-									sprintf(setDisplay[18], "   j Êı¾İ±í¸ñ --");
-								}
-								if ((inputFile[cnt].debugMode)[1] != 
-									(inputFile[cnt - 1].debugMode)[1])
-								{
-									sprintf(setDisplay[19], "   k Í³¼ÆÍ¼   --");
-								}
-							}
-						}
-						else
-						{/*ÉèÖÃµ¥¸ö*/ 
-							printf("(%dºÅÎÄ¼ş)\n", nowFile);
-						}
-						printf("--------------------------------\n");
-						
-						while (dSetKey != ENTER)
-						{
-							if (dSetKey == UP)
-							{
-								if (dSetSelected == 0)
-								{
-									dSetSelected = 23;
-								}
-								else
-								{
-									dSetSelected--;
-								}
-							}
-							else if (dSetKey == DOWN)
-							{
-								if (dSetSelected == 23)
-								{
-									dSetSelected = 0;
-								}
-								else
-								{
-									dSetSelected++;
-								}
-							}
-							else if (dSetKey >= '1' && dSetKey <= '9')
-							{
-								dSetSelected = dSetKey - '0';
-							}
-							else if (dSetKey >= 'a' && dSetKey <= 'b')
-							{
-								dSetSelected = dSetKey - 'a' + 10;
-							}
-							else if (dSetKey >= 'c' && dSetKey <= 'i')
-							{
-								dSetSelected = dSetKey - 'c' + 13;
-							}
-							else if (dSetKey >= 'j' && dSetKey <= 'k')
-							{
-								dSetSelected = dSetKey - 'j' + 21;
-							}
-							else if (dSetKey == '0')
-							{
-								dSetSelected = 23;
-							}
-										
-							printMenuText(0, 2, dSetSelected, "> ", 0x0F, 0xF0, FALSE, 24,
-										  "³£¹æÉè¶¨",
-										  setDisplay[0], setDisplay[1], setDisplay[2],
-										  setDisplay[3], setDisplay[4], setDisplay[5],
-										  setDisplay[6], setDisplay[7], setDisplay[8],
-										  setDisplay[9], setDisplay[10],
-										  "°´ÀàĞÍÆÁ±Î", setDisplay[11], setDisplay[12],
-										  setDisplay[13], setDisplay[14], setDisplay[15],
-										  setDisplay[16], setDisplay[17],
-										  "µ÷ÊÔÄ£Ê½",
-										  setDisplay[18], setDisplay[19],
-										  "0 Íê³É²¢ÍË³ö");
-							printf("\n--------------------------------");
-							printf("\n¡ü¡ı»òÑ¡ÏîÇ°ĞòºÅÑ¡Ôñ ENTERĞŞ¸Ä");
-							fflush(stdin);
-							dSetKey = getch();
-							fflush(stdin);
-						}
-						
-						/*Ö´ĞĞÑ¡Ôñ*/
-						setPos(0, 27);
-						
-						showCursor(TRUE);/*ÏÔÊ¾Ö¸Õë*/
-						if (dSetSelected == 1)
-						{
-							printf("Éè¶¨ĞÂµÄ·Ö±æÂÊ¿í(px)            \n");						
-							inputFile[nowFile - shift].resX = inputInt(1, INT_MAX, "ÇëÊäÈë(>0) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].resX = inputFile[0].resX;
-								}
-							}
-						}
-						else if (dSetSelected == 2) 
-						{
-							printf("Éè¶¨ĞÂµÄ·Ö±æÂÊ¸ß(px)            \n");
-							inputFile[nowFile - shift].resY = inputInt(1, INT_MAX, "ÇëÊäÈë(>0) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].resY = inputFile[0].resY;
-								}
-							}
-						}
-						else if (dSetSelected == 3) 
-						{
-							printf("Éè¶¨ĞÂµÄ¹ö¶¯µ¯Ä»¹ö¶¯ËÙ¶È(Ãë)    \n");
-							inputFile[nowFile - shift].rollTime = inputInt(1, INT_MAX, "ÇëÊäÈë(>0) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].rollTime = inputFile[0].rollTime;
-								}
-							}
-						}
-						else if (dSetSelected == 4) 
-						{
-							printf("Éè¶¨ĞÂµÄ¹Ì¶¨µ¯Ä»Í£ÁôÊ±¼ä(Ãë)    \n");
-							inputFile[nowFile - shift].holdTime = inputInt(1, INT_MAX, "ÇëÊäÈë(>0) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].holdTime = inputFile[0].holdTime;
-								}
-							}
-						}
-						else if (dSetSelected == 5) 
-						{
-							printf("Éè¶¨ĞÂµÄµ¯Ä»ÃÜ¶È(Ìõ)(0 ±íÊ¾ÎŞÏŞÖÆ -1 ±íÊ¾²»ÖØµş)\n");
-							inputFile[nowFile - shift].density = inputInt(-1, INT_MAX, "ÇëÊäÈë(>=-1) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].density = inputFile[0].density;
-								}
-							}
-						}
-						else if (dSetSelected == 6) 
-						{
-							printf("Éè¶¨ĞÂµÄÎÄ×Ö´óĞ¡                \n");
-							inputFile[nowFile - shift].fontSize = inputInt(1, INT_MAX, "ÇëÊäÈë(>0) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].fontSize = inputFile[0].fontSize;
-								}
-							}
-						}
-						else if (dSetSelected == 7) 
-						{
-							printf("Éè¶¨ĞÂµÄ×ÖÌå                    \nÇëÊäÈë ");
-							fgets(inputFile[nowFile - shift].fontName, MAX_TEXT_LENGTH, stdin);
-							if(tempText[strlen(inputFile[nowFile - shift].fontName) - 1] == '\n')
-							{
-								tempText[strlen(inputFile[nowFile - shift].fontName) - 1] = '\0';
-							}
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									strcpy(inputFile[cnt].fontName, inputFile[0].fontName);
-								}
-							}
-						}
-						else if (dSetSelected == 8) 
-						{
-							printf("Éè¶¨ĞÂµÄÃè±ß´ÖÏ¸(0 ¹Ø±Õ)        \n");
-							inputFile[nowFile - shift].outline = inputInt(0, 4, "ÇëÊäÈë(0-4) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].outline = inputFile[0].outline;
-								}
-							}
-						}
-						else if (dSetSelected == 9) 
-						{
-							printf("Éè¶¨ĞÂµÄÒõÓ°´óĞ¡(0 ¹Ø±Õ)        \n");
-							inputFile[nowFile - shift].shadow = inputInt(0, 4, "ÇëÊäÈë(0-4) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].shadow = inputFile[0].shadow;
-								}
-							}
-						}
-						else if (dSetSelected == 10) 
-						{
-							printf("Éè¶¨ĞÂµÄ²»Í¸Ã÷¶È(0 ÍêÈ«Í¸Ã÷ 255 ²»Í¸Ã÷)\n");
-							inputFile[nowFile - shift].opacity = inputInt(0, 255, "ÇëÊäÈë(0-255) ");
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].opacity = inputFile[0].opacity;
-								}
-							}
-						}
-						else if (dSetSelected == 11) 
-						{
-							printf("Éè¶¨ĞÂµÄÏÂ²¿Áô°×ÇøÓò´óĞ¡£¨·Àµ²×ÖÄ»£©\n");
-							inputFile[nowFile - shift].blank = inputInt(0,
-													inputFile[nowFile - shift].resY,
-													 "ÇëÊäÈë(0-%d) ", inputFile[nowFile - shift].resY);
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blank = inputFile[0].blank;
-								}
-							}
-						}
-						else if (dSetSelected == 13) 
-						{
-							if (inputFile[nowFile - shift].blockMode[0] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[0] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[0] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[0] = inputFile[0].blockMode[0];
-								}
-							}
-						}
-						else if (dSetSelected == 14) 
-						{
-							if (inputFile[nowFile - shift].blockMode[1] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[1] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[1] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[1] = inputFile[0].blockMode[1];
-								}
-							}
-						}
-						else if (dSetSelected == 15) 
-						{
-							if (inputFile[nowFile - shift].blockMode[2] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[2] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[2] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[2] = inputFile[0].blockMode[2];
-								}
-							}
-						}
-						else if (dSetSelected == 16) 
-						{
-							if (inputFile[nowFile - shift].blockMode[3] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[3] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[3] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[3] = inputFile[0].blockMode[3];
-								}
-							}
-						}
-						else if (dSetSelected == 17) 
-						{
-							if (inputFile[nowFile - shift].blockMode[4] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[4] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[4] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[4] = inputFile[0].blockMode[4];
-								}
-							}
-						}
-						else if (dSetSelected == 18) 
-						{
-							if (inputFile[nowFile - shift].blockMode[5] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[5] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[5] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[5] = inputFile[0].blockMode[5];
-								}
-							}
-						}
-						else if (dSetSelected == 19) 
-						{
-							if (inputFile[nowFile - shift].blockMode[6] == '0')
-							{
-								inputFile[nowFile - shift].blockMode[6] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].blockMode[6] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].blockMode[6] = inputFile[0].blockMode[6];
-								}
-							}
-						}
-						else if (dSetSelected == 21) 
-						{
-							if (inputFile[nowFile - shift].debugMode[0] == '0')
-							{
-								inputFile[nowFile - shift].debugMode[0] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].debugMode[0] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].debugMode[0] = inputFile[0].debugMode[0];
-								}
-							}
-						}
-						else if (dSetSelected == 22) 
-						{
-							if (inputFile[nowFile - shift].debugMode[1] == '0')
-							{
-								inputFile[nowFile - shift].debugMode[1] = '1';
-							}
-							else
-							{
-								inputFile[nowFile - shift].debugMode[1] = '0';
-							}
-							
-							if (nowFile == 0)
-							{/*È«²¿ÉèÖÃĞèÒª½«µÚÒ»¸öÎÄ¼ş¿½±´µ½È«²¿ÎÄ¼ş*/
-								for (cnt = 1; cnt < i; cnt++)
-								{
-									inputFile[cnt].debugMode[1] = inputFile[0].debugMode[1];
-								}
-							}
-						}
-					} while (dSetSelected != 23);
-				}
-				else if (secSelected == 5)
-				{/*±£´æÉèÖÃ*/
-					setPos(0, 22);
-					if (nowFile == 0)
-					{/*Ñ¡ÔñÈ«²¿Ôò±£´æµÚÒ»¸öÎÄ¼şµÄÉèÖÃ*/
-						if (writeConfigFile(inputFile[0], configFilePath))
-						{
-							printf("[!] ±£´æ³É¹¦                    \n");
-						}
-						else
-						{
-							printf("[X] ±£´æÊ§°Ü                    \n");
-						}
-					}
-					else
-					{
-						if (writeConfigFile(inputFile[nowFile - 1], configFilePath))
-						{
-							printf("[!] ±£´æ³É¹¦                    \n");
-						}
-						else
-						{
-							printf("[X] ±£´æÊ§°Ü                    \n");
-						}
-					}
-					system("pause");
-				}
-				else if (secSelected == 6)
-				{/*¿ªÊ¼×ª»»*/
-					break;
-				}
-			}/*½áÊøÉè¶¨Ò³*/ 
-			
-			/*×ª»»*/
-			int failNum = 0, existNum = 0;
-			system("cls");
-			printf("DanmakuFactory v%s\n", VERSION);
-			printf("--------------------------------");
-			printf("\n> ÕıÔÚ¼ì²éÊä³öÎÄ¼şÊÇ·ñ´æÔÚ");
-			for (cnt = 0; cnt < i; cnt++)
-			{
-				if (access(inputFile[cnt].output, 0) == FALSE)
-				{
-					existNum++;
-					printf("\n%d %s", existNum, inputFile[cnt].output);
-				}
-			}
-			if (existNum > 0)
-			{
-				printf("\n´æÔÚÒÔÉÏ %d ¸öÒÑ¾­´æÔÚµÄÎÄ¼ş£¬¼ÌĞø½«»á±»¸²¸Ç"
-					   "\nÈçÁĞ±í²»ÍêÕûÇëÉèÖÃ¸ü´óµÄÆÁÄ»»º³åÇø´óĞ¡"
-					   "\nÊäÈëY»òy¼ÌĞø ÆäËûÈÎÒâ×Ö·ûÍË³ö\nÇëÊäÈë ", existNum);
-				fflush(stdin);
-				char ch = getchar();
-				fflush(stdin);
-				if (ch != 'Y' && ch != 'y')
-				{
-					free(inputFile);
-					inputFile = NULL;
-					goto MAINPAGE;
-				}
-			}
-			
-			printf("\n> ÈÎÎñÕıÔÚ¿ªÊ¼ ¹² %d ¸öÎÄ¼ş", i);
-			for (cnt = 0; cnt < i; cnt++)
-			{
-				char code[4] = "000";
-				DANMAKU *danmakuPoorHead = NULL;
-				clock_t startTime, endTime;
-				
-				printf("\n> %d/%d ¿ªÊ¼×ª»» ", cnt + 1, i);
-				startTime = clock();
-				
-				/*¶ÁÈ¡*/
-				code[0] += readXml(inputFile[cnt].input, &danmakuPoorHead, "n", inputFile[cnt].timeShift);
-				/*±àÂë×ª»»*/
-				if (inputFile[cnt].outputEncoding == UTF_8 && isUtf8(inputFile[cnt].fontName) == FALSE)
-				{/*¶Ô×ÖÌåËµÃ÷ÎÄ±¾*/
-					transcoding(ANSI, UTF_8, inputFile[cnt].fontName, NULL, 0);
-				}
-				else if (inputFile[cnt].outputEncoding == ANSI && isUtf8(inputFile[cnt].fontName) == TRUE)
-				{
-					transcoding(UTF_8, ANSI, inputFile[cnt].fontName, NULL, 0);
-				}
-				transListCoding(danmakuPoorHead, inputFile[cnt].outputEncoding);/*¶ÔÈ«²¿µ¯Ä»*/ 
-				/*ÅÅĞò*/
-				code[1] += sortList(&danmakuPoorHead);
-				/*Ğ´³ö*/
-				code[2] += writeAss(inputFile[cnt].output,/*Êä³öÎÄ¼ş*/
-								    danmakuPoorHead,/*Í·Ö¸Õë*/
-								    inputFile[cnt].resX,/*·Ö±æÂÊ¿í*/
-								    inputFile[cnt].resY,/*·Ö±æÂÊ¸ß*/
-								    inputFile[cnt].fontSize,/*×ÖºÅ*/
-								    inputFile[cnt].fontName,/*×ÖÌå(utf-8)*/
-								    inputFile[cnt].shadow,/*ÒõÓ°(0-4)*/
-								    inputFile[cnt].outline,/*Ãè±ß(0-4)*/
-								    inputFile[cnt].rollTime,/*¹ö¶¯ËÙ¶È£¨¹ö¶¯µ¯Ä»£©*/
-								    inputFile[cnt].holdTime,/*Í£ÁôÊ±¼ä£¨ÏÖÒşµ¯Ä»£©*/ 
-								    inputFile[cnt].density,/*ÃÜ¶È*/
-								    inputFile[cnt].opacity,/*²»Í¸Ã÷¶È*/
-								    inputFile[cnt].blank, /*ÏÂ²¿Áô¿Õ*/
-								    inputFile[cnt].blockMode,/*ÆÁ±Î*/
-								    inputFile[cnt].debugMode);/*µ÷ÊÔÄ£Ê½*/
-				endTime = clock();
-				
-				freeList(danmakuPoorHead);
-				if (strcmp(code ,"000") == 0 || strcmp(code ,"009") == 0)
-				{
-					printf(" -> ×ª»»³É¹¦");
-					printf(" ºÄÊ± %d ms ×´Ì¬±àÂë C%s", endTime - startTime, code);
-					printf("\n  Êä³öÎÄ¼ş %s", inputFile[cnt].output);
-				}
-				else
-				{
-					failNum++;
-					printf(" -> ×ª»»Ê§°Ü ");
-					printf(" ºÄÊ± %d ms ×´Ì¬±àÂë C%s ", endTime - startTime, code);
-					printErrInfo(code);/*½âÊÍ±àÂë*/
-				}
-				endTime = clock();
-			}
-			
-			free(inputFile);
-			inputFile = NULL;
-			printf("\n--------------------------------");
-			printf("\n×ª»»½áÊø %d ¸ö³É¹¦£¬%d¸öÊ§°Ü", i - failNum, failNum);
-			printf("\nMade by TIKM");
-			printf("\nhttps://github.com/HITIKM/DanmakuFactory\n");
-			system("pause");
-		}
-		else if (firSelected == 1)
-		{/*¸üĞÂÓë°ïÖú*/
-			showCursor(FALSE);/*Òş²ØÖ¸Õë*/
-			system("cls");
-			secSelected = 1;
-			key = 0;
-			do {
-				setPos(0, 0);
-				printf("DanmakuFactory v%s\n", VERSION);
-				printf("--------------------------------");
-				printMenuText(0, 2, secSelected, "> ", 0x0F, 0xF0, FALSE, 10,
-							  "> »ñÈ¡¸üĞÂ", 
-							  "  github https://github.com/HITIKM/DanmakuFactory/tree/master/release",
-			                  "  °Ù¶ÈÍøÅÌ https://pan.baidu.com/s/1mkMaiq8AaUFUAGmv0s74vw ÌáÈ¡Âë£º5vqj",
-							  "> ½Ì³Ì",
-							  "  ¹ÙÍø http://tikm.org/df/help/",
-							  "> ·´À¡",
-							  "  ÓÊÏä hkm@tikm.org",
-							  "  github https://github.com/HITIKM/DanmakuFactory/issues",
-							  "  ¹ÙÍø https://df.tikm.org/fk/ (Èç¹û×öºÃÁËµÄ»°)",
-							  "> ·µ»Ø");
-				printf("\n--------------------------------");
-				printf("\n¡ü¡ıÑ¡Ôñ  ENTER Ìø×ªµ½¶ÔÓ¦ÍøÒ³");
-				fflush(stdin);
-				key = getch();
-				fflush(stdin);
-				
-				if (key == UP)
-				{
-					if (secSelected == 0)
-					{
-						secSelected = 9;
-					}
-					else
-					{
-						secSelected--;
-					}
-				}
-				else if (key == DOWN)
-				{
-					if (secSelected == 9)
-					{
-						secSelected = 0;
-					}
-					else
-					{
-						secSelected++;
-					}
-				}
-				else if (key == ENTER && secSelected != 9)
-				{
-					switch (secSelected)
-					{
-						case 1:
-						{
-							system("start https://github.com/HITIKM/DanmakuFactory/tree/master/release");
-							break;
-						}
-						case 2:
-						{
-							system("start https://pan.baidu.com/s/1mkMaiq8AaUFUAGmv0s74vw");
-							break;
-						}
-						case 4:
-						{
-							system("start http://tikm.org/df/help/");
-							break;
-						}
-						case 6:
-						{
-							system("start mailto:hkm@tikm.org");
-							break;
-						}
-						case 7:
-						{
-							system("start https://github.com/HITIKM/DanmakuFactory/issues");
-							break;
-						}
-					}
-				}
-				else if (key == ENTER && secSelected == 9)
-				{
-					break;
-				}
-			} while (TRUE);
-			
-			showCursor(TRUE);/*ÏÔÊ¾Ö¸Õë*/ 
-		}
-		else if (firSelected == 2)
-		{/*ÍË³ö*/ 
-			exit(0); 
-		}
-		goto MAINPAGE;
-	}
-	else
-	{
-		/*ÃüÁîĞĞµ÷ÓÃ
-		./danmakuFactory [-h][-s][-ip ÊäÈëÎÄ¼şÃû][-if ÊäÈëÎÄ¼ş¸ñÊ½][-op Êä³öÎÄ¼şÃû]
-					[-of Êä³öÎÄ¼ş¸ñÊ½][-t Ê±ÖáÆ«ÒÆ][-rx ·Ö±æÂÊ¿í][-ry ·Ö±æÂÊ¸ß][-rt ¹ö¶¯µ¯Ä»¹ö¶¯Ê±¼ä]
-					[-ht ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä][-d µ¯Ä»ÃÜ¶È][-fs ÎÄ×Ö´óĞ¡][-fn ×ÖÌå][-o ²»Í¸Ã÷¶È][-l Ãè±ß]
-					[-s ÒõÓ°][-b µ×²¿Áô°×][-bm ÆÁ±ÎÄ£Ê½][-dm µ÷ÊÔÄ£Ê½]*/
-		BOOL save = FALSE;
-		float timeShift = 0.00;
-		char inputFormat[MAX_TEXT_LENGTH] = {0};
-		char outputFormat[MAX_TEXT_LENGTH] = {0};
-		char inputFileName[MAX_TEXT_LENGTH] = {0}, outputFileName[MAX_TEXT_LENGTH] = {0};
-		printf("DanmakuFactory v%s\n", VERSION);
-		for (cnt = 1; cnt < argc; cnt++)
-		{
-			if (argv[cnt][0] == '-')
-			{/*½«Ñ¡ÏîÈ«²¿×ª»»ÎªĞ¡Ğ´ÒÔÖ§³Ö´óĞ¡Ğ´»ìÓÃ*/
-				toLower(NULL, argv[cnt]);
-			}
-			else
-			{/*·ÇÑ¡ÏîÖ±½ÓÌø¹ı*/
-				continue;
-			}
-			
-			/*²ÎÊı¿ÉÑ¡µÄÑ¡Ïî*/
-			if ((strcmp(argv[cnt], "-h") == 0 || strcmp(argv[cnt], "--help") == 0) && argc == 2)
-			{/*°ïÖú*/
-				printf("\n> ÃüÁîĞĞµ÷ÓÃ_°ïÖú");
-				printf("\n  ./danmakuFactory [-h][-s][-ip ÊäÈëÎÄ¼şÃû][-if ÊäÈëÎÄ¼ş¸ñÊ½][-op Êä³öÎÄ¼şÃû]"
-					   "[-of Êä³öÎÄ¼ş¸ñÊ½][-oe Êä³öÎÄ¼ş±àÂë][-t Ê±ÖáÆ«ÒÆ][-rx ·Ö±æÂÊ¿í][-ry ·Ö±æÂÊ¸ß]"
-					   "[-rt ¹ö¶¯µ¯Ä»¹ö¶¯Ê±¼ä][-ht ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä][-d µ¯Ä»ÃÜ¶È]"
-					   "[-fs ÎÄ×Ö´óĞ¡][-fn ×ÖÌå][-o ²»Í¸Ã÷¶È][-l Ãè±ß][-sd ÒõÓ°]"
-					   "[-b µ×²¿Áô°×][-bm ÆÁ±ÎÄ£Ê½][-dm µ÷ÊÔÄ£Ê½]"
-					   "\n"
-					   "\n-h,  --help ÏÔÊ¾°ïÖúÎÄ±¾£¬³ı·Ç´æÔÚÆäËûÑ¡Ïî"
-					   "\n-s,  --set ½«ÉèÖÃ±£´æµ½ÎÄ¼ş£¬Ã»ÓĞÆäËûÑ¡ÏîÔò½«ÁĞ³öµ±Ç°ÎÄ¼şÖĞµÄÉèÖÃ"
-						   "Öµ£»×ª»»Ê±¼ÓÈë´ËÑ¡Ïî±íÊ¾½«±¾´ÎÉèÖÃ±£´æµ½ÎÄ¼şÖĞ£»Èç¹ûÊäÈëÎÄ¼şÃû"
-						   "-ipÈ±Ê¡ÔòÖ»ĞŞ¸ÄÉèÖÃ¶ø²»½øĞĞÆäËû²Ù×÷"
-					   "\n"
-					   "\n-ip, --input ÊäÈëÎÄ¼şÃû£¬³ı·ÇÊ¹ÓÃÁË-sÑ¡Ïî£¬·ñÔòÈ±Ê¡½«µ¼ÖÂ³ö´í"
-					   "\n-if, --inputformat ÊäÈëÎÄ¼ş¸ñÊ½£¬È±Ê¡Ê±³ÌĞò½«×Ô¶¯ÅĞ¶Ï£¨Ä¿Ç°ÎŞÒâÒå£©"
-				       "\n-op, --output Êä³öÎÄ¼şÃû£¬È±Ê¡Ê±Ä¬ÈÏÎª \"ÊäÈëÎÄ¼şÃû.Êä³öÎÄ¼ş¸ñÊ½\""
-				       "\n-of, --outputformat Êä³öÎÄ¼ş¸ñÊ½£¬È±Ê¡Ê±Ä¬ÈÏÎªass£¨Ä¿Ç°ÎŞÒâÒå£©"
-				       "\n-oe, --outputencoding Êä³öÎÄ¼ş±àÂë£¬Ö§³Öutf-8Óëansi£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-t,  --timeshift Ê±ÖáÆ«ÒÆÁ¿£¬È±Ê¡Ê±Ä¬ÈÏÎª0.00"
-					   "\n"
-				       "\n-rx, --resx ·Ö±æÂÊ¿í£¬µ¥Î»ÏñËØ£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-ry, --resy ·Ö±æÂÊ¸ß£¬µ¥Î»ÏñËØ£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-rt, --rolltime ¹ö¶¯µ¯Ä»¹ö¶¯Ê±¼ä£¬µ¥Î»Ãë£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-ht, --holdtime ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä£¬µ¥Î»Ãë£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-d,  --density µ¯Ä»ÃÜ¶È£¬0 ±íÊ¾ÎŞÏŞÖÆ£¬(-1) ±íÊ¾²»ÖØµş£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-fs, --fontsize ÎÄ×Ö´óĞ¡£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-fn, --fontname ×ÖÌåÃû³Æ£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-o,  --opacity ²»Í¸Ã÷¶È£¬·¶Î§0-255£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-l,  --outline Ãè±ß³Ì¶È£¬·¶Î§0-4£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-sd, --shadow ÒõÓ°³Ì¶È£¬·¶Î§0-4£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-b,  --blank µ×²¿Áô°×£¬µ¥Î»ÏñËØ£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-bm, --blockmode ÆÁ±ÎÄ£Ê½£¬²ÎÊıÓÉÆß¸ö0»ò1×é³É£¬·Ö±ğ¶ÔÓ¦ ÓÒ×ó/×óÓÒ/¶¥²¿/µ×²¿/ÌØÊâ"
-						   "/²ÊÉ«/ÖØ¸´ ÆßÀàµ¯Ä»£¬0±íÊ¾²»ÆÁ±Î£¬1±íÊ¾ÆÁ±Î£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-				       "\n-dm, --debugmode µ÷ÊÔÄ£Ê½£¬²ÎÊıÓÉÁ½¸ö0»ò1×é³É£¬·Ö±ğ¶ÔÓ¦ Êı¾İ±í¸ñ/·Ö²¼Í¼ Á½¸ö"
-						   "Ä£¿é£¬0±íÊ¾¹Ø±Õ£¬1±íÊ¾¿ªÆô£¬È±Ê¡Ê±½«Ê¹ÓÃÅäÖÃÎÄ¼şÖĞµÄÖµ"
-					   "\n\n"
-					   "\n> ×¢Òâ"
-			           "\nÈç¹û²ÎÊı´øÓĞ¿Õ¸ñÇëÊ¹ÓÃË«ÒıºÅ£¬·ñÔò½«»á½Ø¶Ï¡£Èç£º\"Microsoft YaHei\""
-			           "\nÈç¹û²ÎÊı´øÓĞ¸ººÅÇëÊ¹ÓÃÀ¨ºÅ£¬·ñÔò½«½âÎöÎªÑ¡Ïî¡£Èç£º(-1024.25)"
-					   "\n\n"
-					   "\n> ¾ÙÀı"
-			           "\n×ª»»test.xmlÊä³öÄ¬ÈÏÎªD:/test.xml.ass"
-			           "\ndanmakuFactory -ip D:/test.xml"
-			           "\n"
-			           "\n×ª»»test.xmlÊä³öÎªD:/test.ass"
-			           "\ndanmakuFactory -ip D:/test.xml -op D:/test.ass"
-			           "\n"
-			           "\n×ª»»test.xmlÊä³öÎªD:/test.ass£¬µ¯Ä»ÃÜ¶ÈÎª²»ÖØµş£¬×ÖÌåÎªÎ¢ÈíÑÅºÚ£¬²»¸Ä±äÅäÖÃÎÄ¼ş"
-			           "\ndanmakuFactory -ip D:/test.xml -op D:/test.ass -d (-1) -fn \"Microsoft YaHei\""
-			      	   "\n"
-			           "\nÉÏÒ»Àı¸Ä±äÅäÖÃÎÄ¼şÖµ"
-			           "\ndanmakuFactory -ip D:/test.xml -op D:/test.ass -d (-1) -fn \"Microsoft YaHei\" -s"
-					);
-				exit(0); 
-			}
-			else if (strcmp(argv[cnt], "-s") == 0 || strcmp(argv[cnt], "--set") == 0)
-			{/*ÉèÖÃ*/
-				if (argc == 2)
-				{
-					printf("\n> ÉèÖÃÏî");
-					printf("\n  %10s ·Ö±æÂÊ¿í = %d", "resX", defaultConfig.resX);
-					printf("\n  %10s ·Ö±æÂÊ¸ß = %d", "resY", defaultConfig.resY);
-					printf("\n");
-					printf("\n  %10s ¹ö¶¯µ¯Ä»ËÙ¶È£¨Ãë£© = %d", "rollTime", defaultConfig.rollTime);
-					printf("\n  %10s ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä£¨Ãë£© = %d", "holdTime", defaultConfig.holdTime);
-					printf("\n  %10s µ¯Ä»ÃÜ¶È£¨Ìõ£© = %d", "density", defaultConfig.density);
-					printf("\n");
-					if (defaultConfig.outputEncoding == UTF_8)
-					{
-						printf("\n  %10s Êä³ö±àÂë = utf-8", "outputEncoding");
-					}
-					else
-					{
-						printf("\n  %10s Êä³ö±àÂë = ansi", "outputEncoding");
-					}
-					printf("\n  %10s ÎÄ×Ö´óĞ¡ = %d", "fontSize", defaultConfig.fontSize);
-					
-					
-					if (isUtf8(defaultConfig.fontName) == TRUE)
-					{/*¶Ô×ÖÌåËµÃ÷ÎÄ±¾*/
-						transcoding(UTF_8, ANSI, defaultConfig.fontName, NULL, 0);
-					}
-					printf("\n  %10s ×ÖÌå = %s", "fontName", defaultConfig.fontName);
-					
-					printf("\n  %10s ²»Í¸Ã÷¶È£¨0-255£© = %d", "opacity", defaultConfig.opacity);
-					printf("\n  %10s Ãè±ß£¨0-4£© = %d", "outline", defaultConfig.outline);
-					printf("\n  %10s ÒõÓ°£¨0-4£© = %d", "shadow", defaultConfig.shadow);
-					printf("\n");
-					printf("\n  %10s µ×²¿Áô°×£¨ÏñËØ£© = %d", "blank", defaultConfig.blank);
-					printf("\n  %10s °´ÀàĞÍÆÁ±Î£¨ÓÒ×ó/×óÓÒ/¶¥²¿/µ×²¿/ÌØÊâ/²ÊÉ«/ÖØ¸´£© = %s",
-							"blockMode", defaultConfig.blockMode);
-					printf("\n  %10s µ÷ÊÔÄ£Ê½£¨Êı¾İ±í¸ñ/·Ö²¼Í¼£© = %s",
-							"debugMode", defaultConfig.debugMode);
-					printf("\n ÉÏÃæÁ½Ïî 1 ±íÊ¾¶ÔÓ¦Î»ÖÃÏî¿ªÆô£¬0 ±íÊ¾¶ÔÓ¦Î»ÖÃÏî¹Ø±Õ");
-					exit(0);
-				}
-				save = TRUE;
-				continue; 
-			}
-			
-			/*²ÎÊı±ØÑ¡µÄÑ¡Ïî*/
-			if (cnt + 1 < argc)
-			{/*¼ì²é²ÎÊıÊÇ·ñÈ±Ê¡*/ 
-				if (argv[cnt + 1][0] == '-')
-				{
-					printf("> ´íÎó£ºÃüÁîĞĞÎŞ·¨Ê¶±ğ»òÕß²»ÍêÕû", argv[cnt]);
-					printf("\n\n> µ÷ÓÃ·½·¨");
-					printf("\n  ./danmakuFactory [-h][-s][-ip ÊäÈëÎÄ¼şÃû][-if ÊäÈëÎÄ¼ş¸ñÊ½][-op Êä³öÎÄ¼şÃû]"
-								"[-of Êä³öÎÄ¼ş¸ñÊ½][-oe Êä³öÎÄ¼ş±àÂë][-t Ê±ÖáÆ«ÒÆ][-rx ·Ö±æÂÊ¿í][-ry ·Ö±æÂÊ¸ß]"
-								"[-rt ¹ö¶¯µ¯Ä»¹ö¶¯Ê±¼ä][-ht ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä][-d µ¯Ä»ÃÜ¶È]"
-								"[-fs ÎÄ×Ö´óĞ¡][-fn ×ÖÌå][-o ²»Í¸Ã÷¶È][-l Ãè±ß][-sd ÒõÓ°]"
-								"[-b µ×²¿Áô°×][-bm ÆÁ±ÎÄ£Ê½][-dm µ÷ÊÔÄ£Ê½]");
-					printf("\n\n ./danmakuFactory -h ²é¿´ÏêÏ¸");
-					exit(1);
-				}
-			}
-			else
-			{
-				printf("> ´íÎó£ºÃüÁîĞĞÎŞ·¨Ê¶±ğ»òÕß²»ÍêÕû", argv[cnt]);
-				printf("\n\n> µ÷ÓÃ·½·¨");
-				printf("\n  ./danmakuFactory [-h][-s][-ip ÊäÈëÎÄ¼şÃû][-if ÊäÈëÎÄ¼ş¸ñÊ½][-op Êä³öÎÄ¼şÃû]"
-							"[-of Êä³öÎÄ¼ş¸ñÊ½][-oe Êä³öÎÄ¼ş±àÂë][-t Ê±ÖáÆ«ÒÆ][-rx ·Ö±æÂÊ¿í][-ry ·Ö±æÂÊ¸ß]"
-							"[-rt ¹ö¶¯µ¯Ä»¹ö¶¯Ê±¼ä][-ht ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä][-d µ¯Ä»ÃÜ¶È]"
-							"[-fs ÎÄ×Ö´óĞ¡][-fn ×ÖÌå][-o ²»Í¸Ã÷¶È][-l Ãè±ß][-sd ÒõÓ°]"
-							"[-b µ×²¿Áô°×][-bm ÆÁ±ÎÄ£Ê½][-dm µ÷ÊÔÄ£Ê½]");
-				printf("\n\n ./danmakuFactory -h ²é¿´ÏêÏ¸");
-				exit(1);
-			}
-			
-			if (strcmp(argv[cnt], "-ip") == 0 || strcmp(argv[cnt], "--input") == 0)
-			{/*ÊäÈëÎÄ¼şÃû*/
-				strcpy(inputFileName, argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-if") == 0 || strcmp(argv[cnt], "--inputformat") == 0)
-			{/*ÊäÈëÎÄ¼ş¸ñÊ½*/
-				strcpy(inputFormat, argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-op") == 0 || strcmp(argv[cnt], "--output") == 0)
-			{/*Êä³öÎÄ¼şÃû*/
-				strcpy(outputFileName, argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-of") == 0 || strcmp(argv[cnt], "--outputformat") == 0)
-			{/*Êä³öÎÄ¼ş¸ñÊ½*/
-				strcpy(inputFormat, argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-oe") == 0 || strcmp(argv[cnt], "--outputencoding") == 0)
-			{/*Êä³öÎÄ¼ş±àÂë*/
-				if (strcmp(toLower(NULL, argv[cnt + 1]), "utf-8") == 0)
-				{
-					defaultConfig.outputEncoding = UTF_8;
-				}
-				else if (strcmp(toLower(NULL, argv[cnt + 1]), "ansi") == 0)
-				{
-					defaultConfig.outputEncoding = ANSI;
-				}
-				else
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ¿ÉÑ¡ÖµÄ¿Ç°Ö»ÓĞutf-8Óëansi");
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-t") == 0 || strcmp(argv[cnt], "--timeshift") == 0)
-			{/*Ê±ÖáÆ«ÒÆ*/
-				if (!isDesignatedChar(argv[cnt + 1], "()-.0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬ÒòÎªÓĞ·Ç·¨×Ö·û", argv[cnt]);
-					exit(1);
-				}
-				timeShift = strToFloat(argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-rx") == 0 || strcmp(argv[cnt], "--resx") == 0)
-			{/*·Ö±æÂÊ¿í*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬·Ö±æÂÊ¿í±ØĞëÊÇ´óÓÚ0µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.resX = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.resX <= 0)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ·Ö±æÂÊ¿í±ØĞëÊÇ´óÓÚ0µÄÕûÊı");
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-ry") == 0 || strcmp(argv[cnt], "--resy") == 0)
-			{/*·Ö±æÂÊ¸ß*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬·Ö±æÂÊ¸ß±ØĞëÊÇ´óÓÚ0µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.resY = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.resY <= 0)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ·Ö±æÂÊ¸ß±ØĞëÊÇ´óÓÚ0µÄÕûÊı");
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-rt") == 0 || strcmp(argv[cnt], "--rolltime") == 0)
-			{/*¹ö¶¯µ¯Ä»¹ö¶¯ËÙ¶È*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬¹ö¶¯µ¯Ä»¹ö¶¯ËÙ¶È±ØĞëÊÇ´óÓÚ0µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.rollTime = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.rollTime <= 0)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ¹ö¶¯µ¯Ä»¹ö¶¯ËÙ¶È±ØĞëÊÇ´óÓÚ0µÄÕûÊı");
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-ht") == 0 || strcmp(argv[cnt], "--holdtime") == 0)
-			{/*¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä±ØĞëÊÇ´óÓÚ0µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.holdTime = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.holdTime <= 0)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä±ØĞëÊÇ´óÓÚ0µÄÕûÊı");
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-d") == 0 || strcmp(argv[cnt], "--density") == 0)
-			{/*µ¯Ä»ÃÜ¶È*/
-				if (!isDesignatedChar(argv[cnt + 1], "()-.0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬ÒòÎªÓĞ·Ç·¨×Ö·û", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.density = strToFloat(argv[cnt + 1]);
-				if (defaultConfig.density < -1)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        µ¯Ä»ÃÜ¶È±ØĞëÊÇ´óÓÚ»òµÈÓÚ-1µÄÕûÊı");
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-fs") == 0 || strcmp(argv[cnt], "--fontsize") == 0)
-			{/*ÎÄ×Ö´óĞ¡*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬ÎÄ×Ö´óĞ¡±ØĞëÊÇ´óÓÚ0µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.fontSize = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.fontSize <= 0)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ÎÄ×Ö´óĞ¡±ØĞëÊÇ´óÓÚ0µÄÕûÊı"); 
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-fn") == 0 || strcmp(argv[cnt], "--fontname") == 0)
-			{/*×ÖÌåÃû³Æ*/
-				strcpy(defaultConfig.fontName, argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-o") == 0 || strcmp(argv[cnt], "--opacity") == 0)
-			{/*²»Í¸Ã÷¶È*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬²»Í¸Ã÷¶È±ØĞëÊÇ0 - 255µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.opacity = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.opacity < 0 || defaultConfig.opacity > 255) 
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ²»Í¸Ã÷¶È±ØĞëÊÇ0 - 255µÄÕûÊı"); 
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-l") == 0 || strcmp(argv[cnt], "--outline") == 0)
-			{/*²»Í¸Ã÷¶È*/
-				if (!isDesignatedChar(argv[cnt + 1], "()01234"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬Ãè±ß±ØĞëÊÇ0 - 4µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.outline = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.outline < 0 || defaultConfig.outline > 4)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        Ãè±ß±ØĞëÊÇ0 - 4µÄÕûÊı"); 
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-sd") == 0 || strcmp(argv[cnt], "--shadow") == 0)
-			{/*²»Í¸Ã÷¶È*/
-				if (!isDesignatedChar(argv[cnt + 1], "()01234"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬ÒõÓ°±ØĞëÊÇ0 - 4µÄÕûÊı", argv[cnt]);
-					exit(1);
-				}
-				defaultConfig.shadow = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.shadow < 0 || defaultConfig.shadow > 4)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ÒõÓ°±ØĞëÊÇ0 - 4µÄÕûÊı"); 
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-b") == 0 || strcmp(argv[cnt], "--blank") == 0)
-			{/*µ×²¿Áô°×*/
-				if (!isDesignatedChar(argv[cnt + 1], "()0123456789"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬·Ö±æÂÊ¸ßÎª%dÊ±£¬µ×²¿Áô°×±ØĞëÊÇ0 - %dµÄÕûÊı",
-							argv[cnt], defaultConfig.resY, defaultConfig.resY - defaultConfig.fontSize);
-					exit(1);
-				}
-				defaultConfig.shadow = (int)(strToFloat(argv[cnt + 1]));
-				if (defaultConfig.shadow < 0 ||
-					defaultConfig.shadow > defaultConfig.resY - defaultConfig.fontSize)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ·Ö±æÂÊ¸ßÎª%dÊ±£¬µ×²¿Áô°×±ØĞëÊÇ0 - %dµÄÕûÊı", 
-							defaultConfig.resY, defaultConfig.resY - defaultConfig.fontSize);
-					exit(1);
-				}
-			}
-			else if (strcmp(argv[cnt], "-bm") == 0 || strcmp(argv[cnt], "--blockmode") == 0)
-			{/*ÆÁ±ÎÄ£Ê½*/
-				if (!isDesignatedChar(argv[cnt + 1], "()01"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬ÆÁ±ÎÄ£Ê½ÖµÖ»ÄÜÎª 0 »ò 1",
-							argv[cnt], defaultConfig.resY, defaultConfig.resY - defaultConfig.fontSize);
-					exit(1);
-				}
-				if (strlen(argv[cnt + 1]) != 7)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ²ÎÊıÖ»ÄÜÓÉ7¸ö0»ò1×é³É",
-							argv[cnt], defaultConfig.resY, defaultConfig.resY - defaultConfig.fontSize);
-					exit(1);
-				}
-				strcpy(defaultConfig.blockMode, argv[cnt + 1]);
-			}
-			else if (strcmp(argv[cnt], "-dm") == 0 || strcmp(argv[cnt], "--debugmode") == 0)
-			{/*µ÷ÊÔÄ£Ê½*/
-				if (!isDesignatedChar(argv[cnt + 1], "()01"))
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ³ÌĞòÎŞ·¨½ÓÊÜÖµ %s £¬µ÷ÊÔÄ£Ê½ÖµÖ»ÄÜÎª 0 »ò 1",
-							argv[cnt], defaultConfig.resY, defaultConfig.resY - defaultConfig.fontSize);
-					exit(1);
-				}
-				if (strlen(argv[cnt + 1]) != 2)
-				{
-					printf("> ´íÎó£ºÑ¡Ïî%sµÄ²ÎÊı´íÎó", argv[cnt]);
-					printf("\n        ²ÎÊıÖ»ÄÜÓÉ2¸ö0»ò1×é³É",
-							argv[cnt], defaultConfig.resY, defaultConfig.resY - defaultConfig.fontSize);
-					exit(1);
-				}
-				strcpy(defaultConfig.debugMode, argv[cnt + 1]);
-			}
-			else
-			{
-				printf("> ´íÎó£ºÃüÁîĞĞÎŞ·¨Ê¶±ğ»ò²»ÍêÕû");
-				printf("\n        ÎŞ·¨Ê¶±ğ %s", argv[cnt]);
-				printf("\n\n> µ÷ÓÃ·½·¨");
-				printf("\n  ./danmakuFactory [-h][-s][-ip ÊäÈëÎÄ¼şÃû][-if ÊäÈëÎÄ¼ş¸ñÊ½][-op Êä³öÎÄ¼şÃû]"
-							"[-of Êä³öÎÄ¼ş¸ñÊ½][-oe Êä³öÎÄ¼ş±àÂë][-t Ê±ÖáÆ«ÒÆ][-rx ·Ö±æÂÊ¿í][-ry ·Ö±æÂÊ¸ß]"
-							"[-rt ¹ö¶¯µ¯Ä»¹ö¶¯Ê±¼ä][-ht ¹Ì¶¨µ¯Ä»´æ»îÊ±¼ä][-d µ¯Ä»ÃÜ¶È]"
-							"[-fs ÎÄ×Ö´óĞ¡][-fn ×ÖÌå][-o ²»Í¸Ã÷¶È][-l Ãè±ß][-sd ÒõÓ°]"
-							"[-b µ×²¿Áô°×][-bm ÆÁ±ÎÄ£Ê½][-dm µ÷ÊÔÄ£Ê½]");
-				printf("\n\n ./danmakuFactory -h ²é¿´ÏêÏ¸");
-				exit(1);
-			}
-		}
-		
-		/*Ğ´ÅäÖÃÎÄ¼ş*/
-		if (save == TRUE)
-		{
-			if (!writeConfigFile(defaultConfig, configFilePath))
-			{
-				printf("\n> ¾¯¸æ£ºÉèÖÃÎŞ·¨¸üĞÂµ½ÎÄ¼ş£¬ÒòÎªÅäÖÃÎÄ¼ş¶ªÊ§»ò²»¿ÉĞ´\n");
-			}
-		}
-		
-		if (inputFileName[0] == '\0')
-		{
-			exit(0);
-		} 
-		
-		/*×ª»» xml ×ª ass*/
-		if (outputFileName[0] == '\0')
-		{
-			sprintf(outputFileName, "%s.ass", inputFileName);
-		}
-		
-		if(!access(outputFileName, 0))
-		{
-			printf("\nÊä³öÎÄ¼ş%sÒÑ´æÔÚ£¬¼ÌĞøÖ´ĞĞÔ­ÎÄ¼ş½«»á±»¸²¸Ç\n", outputFileName);
-			printf("ÊäÈëy»òY¼ÌĞø£¬ÆäËûÈÎÒâ×Ö·ûÍË³ö\n");
-			fflush(stdin);
-			char ch = getchar();
-			if(ch != 'Y' && ch != 'y')
-			{
-				exit(0);
-			}
-		}
-		
-		int rt = 0;
-		char code[] = "000";
-		DANMAKU *danmakuPoorHead = NULL;
-		clock_t startTime, endTime;
-		
-		printf("\n> ×ª»»¿ªÊ¼");
-		startTime = clock();
-		
-		
-		code[0] += readXml(inputFileName, &danmakuPoorHead, "n", timeShift);
-		
-		/*±àÂë×ª»»*/ 
-		if (defaultConfig.outputEncoding == UTF_8 && isUtf8(defaultConfig.fontName) == FALSE)
-		{/*¶Ô×ÖÌåËµÃ÷ÎÄ±¾*/
-			transcoding(ANSI, UTF_8, defaultConfig.fontName, NULL, 0);
-		}
-		else if (defaultConfig.outputEncoding == ANSI && isUtf8(defaultConfig.fontName) == TRUE)
-		{
-			transcoding(UTF_8, ANSI, defaultConfig.fontName, NULL, 0);
-		}
-		transListCoding(danmakuPoorHead, defaultConfig.outputEncoding);/*¶ÔÈ«²¿µ¯Ä»*/
-		
-		code[1] += sortList(&danmakuPoorHead);
-		code[2] += writeAss(outputFileName,/*Êä³öÎÄ¼ş*/
-						    danmakuPoorHead,/*Í·Ö¸Õë*/
-						    defaultConfig.resX, defaultConfig.resY,/*·Ö±æÂÊ¿í/·Ö±æÂÊ¸ß*/
-						    defaultConfig.fontSize, defaultConfig.fontName,/*×ÖºÅ/×ÖÌå(utf-8)*/
-						    defaultConfig.shadow, defaultConfig.outline,/*ÒõÓ°(0-4)/Ãè±ß(0-4)*/
-						    defaultConfig.rollTime, defaultConfig.holdTime,/*¹ö¶¯ËÙ¶È£¨¹ö¶¯µ¯Ä»£©/Í£ÁôÊ±¼ä£¨ÏÖÒşµ¯Ä»£©*/ 
-						    defaultConfig.density, defaultConfig.opacity,/*ÃÜ¶È/²»Í¸Ã÷¶È*/
-						    defaultConfig.blank, /*ÏÂ²¿Áô¿Õ*/
-						    defaultConfig.blockMode,/*ÆÁ±Î£¨ÓÒ×ó/×óÓÒ/¶¥²¿/µ×²¿/ÌØÊâ/²ÊÉ«/ÖØ¸´£©*/
-						    defaultConfig.debugMode);/*µ÷ÊÔÄ£Ê½£¨Êı¾İÍ³¼Æ/·Ö²¼Í¼£©*/
-		endTime = clock();
-		
-		if (strcmp(code, "000") == 0 || strcmp(code, "009") == 0)
-		{
-			printf("-> ×ª»»³É¹¦");
-			printf(" ºÄÊ± %d ms ×´Ì¬±àÂë C%s", endTime - startTime, code);
-		}
-		else
-		{
-			printf("-> ×ª»»Ê§°Ü");
-			printf(" ºÄÊ± %d ms ×´Ì¬±àÂë C%s ", endTime - startTime, code);
-			printErrInfo(code);
-		}
-		
-		
-		printf("\nÊä³öÎÄ¼şÎª %s", outputFileName);
-		printf("\nMade by TIKM");
-		printf("\nhttps://github.com/HITIKM/DanmakuFactory");
-		endTime = clock();
-		exit(0);
-	}
-	return 0;
+    FINFO outfile;
+    FINFO *infile = NULL;
+    int infileNum = 0;
+    int argCnt = 1;
+    int cnt;
+    BOOL showConfig = FALSE;
+    BOOL saveConfig = FALSE;
+    BOOL configFileErr = FALSE;
+    CONFIG config;
+    char tempStr[MAX_TEXT_LENGTH], *tempPtr;
+    char configFilePath[MAX_TEXT_LENGTH];
+    outfile.isSet = FALSE;
+
+    /*æ‰“å°ç¨‹åºç‰ˆæœ¬ä¿¡æ¯*/
+    printf("DanamkuFactory "VERSION" by TIKM (hkm@tikm.org)\n"
+           "https://github.com/HITIKM/DanmakuFactory\n"
+          );
+    
+    /*è·å–é…ç½®æ–‡ä»¶è·¯å¾„*/
+    getPath(configFilePath, _pgmptr, MAX_TEXT_LENGTH);
+    strncat(configFilePath, "\\"CONFIG_FILE_NAME, MAX_TEXT_LENGTH);
+    configFilePath[MAX_TEXT_LENGTH - 1] = '\0';
+    if (strstr(configFilePath, CONFIG_FILE_NAME) == NULL)
+    {
+        printf("\nWARNING"
+               "\nOut of buffer.");
+        printf("\nNOTE"
+               "\nFail to get config file path, because the path is too long\n");
+        
+        configFileErr = TRUE;
+        pause();
+    }
+
+    /*è§£æå‚æ•°*/
+    if (argc <= 1)
+    {
+        printHelpInfo();
+        return 0;
+    }
+    else
+    {
+        /*è¯»é…ç½®æ–‡ä»¶*/
+        config = readConfig(configFilePath, defauleConfig);
+        
+        /*éå†å‚æ•°*/ 
+        while (argCnt < argc)
+        {
+            if (!strcmp("-h", argv[argCnt]) || !strcmp("--help", argv[argCnt]))
+            {
+                printHelpInfo();
+                return 0;
+            }
+            else if (!strcmp("-c", argv[argCnt]) || !strcmp("--config", argv[argCnt]))
+            {
+                showConfig = TRUE;
+                argCnt += 1;
+            }
+            else if (!strcmp("--save", argv[argCnt]))
+            {
+                saveConfig = TRUE;
+                showConfig = TRUE;
+                argCnt += 1;
+            }
+            else if (!strcmp("-o", argv[argCnt]) || !strcmp("--output", argv[argCnt]))
+            {/*è¾“å‡ºæ–‡ä»¶å*/
+                switch (getArgNum(argc, argv, argCnt))
+                {
+                    case 0:
+                        printf("\nERROR"
+                               "\nOutput file must be specified\n");
+                        return 0;
+                        break;
+                    case 1:
+                        strSafeCopy(outfile.fileName, argv[argCnt+1], FILENAME_LEN);
+                        getFormat(outfile.format, outfile.fileName, FORMAT_LEN);
+                        argCnt += 2;
+                        break;
+                    case 2:
+                        strSafeCopy(outfile.format,   argv[argCnt+1], FORMAT_LEN);
+                        strSafeCopy(outfile.fileName, argv[argCnt+2], FILENAME_LEN);
+                        argCnt += 3;
+                        break;
+                    default:
+                        /*ä¼ å…¥æœªçŸ¥å‚æ•°ä¸¢ç»™ä¸‹ä¸€è½®è·å–é€‰é¡¹æ—¶æŠ¥é”™*/
+                        argCnt += 3;
+                        break;
+                }
+                
+                deQuotMarks(outfile.fileName);
+                deQuotMarks(outfile.format);
+                outfile.isSet = TRUE;
+                
+                /*åˆæ³•æ€§æ£€æŸ¥*/ 
+                if (!ISFORMAT(outfile.format))
+                {
+                    printf("\nERROR"
+                           "\nUnknow format %s\n", outfile.format);
+                    
+                    return 0;
+                }
+            }
+            else if (!strcmp("-i", argv[argCnt]) || !strcmp("--input", argv[argCnt]))
+            {/*è¾“å…¥æ–‡ä»¶å*/ 
+                int num = getArgNum(argc, argv, argCnt);
+                for (cnt = 0; cnt < num; cnt++)
+                {
+                    if ((infile = (FINFO *)realloc(infile, (infileNum+1) * sizeof(FINFO))) == NULL)
+                    {
+                        printf("\nERROR"
+                               "\nOut of memory\n");
+                        return 0;
+                    }
+                    
+                    if (ISFORMAT(argv[argCnt + cnt + 1]))
+                    {
+                        strcpy(infile[infileNum].format, argv[argCnt + cnt + 1]);
+                        cnt++;
+                        
+                        if (cnt >= num)
+                        {
+                            printf("\nERROR"
+                                   "\nFormat must be followed by a filename\n");
+                            return 0;
+                        }
+                        
+                        strcpy(infile[infileNum].fileName, argv[argCnt + cnt + 1]);
+                    }
+                    else
+                    {
+                        strcpy(infile[infileNum].fileName, argv[argCnt + cnt + 1]);
+                        getFormat(infile[infileNum].format, infile[infileNum].fileName, FORMAT_LEN);
+                    }
+                    
+                    infile[infileNum].timeShift = 0.00;
+                    deQuotMarks(infile[infileNum].fileName);
+                    deQuotMarks(infile[infileNum].format);
+                    
+                    /*åˆæ³•æ€§æ£€æŸ¥*/ 
+                    if (!ISFORMAT(infile[infileNum].format))
+                    {
+                        printf("\nERROR"
+                               "\nUnknow format %s\n", infile[infileNum].format);
+                        
+                        return 0;
+                    }
+                    
+                    infileNum++;
+                }
+                
+                argCnt += num + 1;
+            }
+            else if (!strcmp("-x", argv[argCnt]) || !strcmp("--resx", argv[argCnt]))
+            {/*åˆ†è¾¨ç‡å®½*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Resolution width", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.resx = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-y", argv[argCnt]) || !strcmp("--resy", argv[argCnt]))
+            {/*åˆ†è¾¨ç‡é«˜*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Resolution height", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.resy = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-s", argv[argCnt]) || !strcmp("--scrolltime", argv[argCnt]))
+            {/*æ»šåŠ¨æ—¶é—´*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Scroll time", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.scrolltime = (float)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-f", argv[argCnt]) || !strcmp("--fixtime", argv[argCnt]))
+            {/*å›ºå®šæ—¶é—´*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Fix time", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.fixtime = (float)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-d", argv[argCnt]) || !strcmp("--density", argv[argCnt]))
+            {/*å¼¹å¹•å¯†åº¦*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Density", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.density = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-S", argv[argCnt]) || !strcmp("--fontsize", argv[argCnt]))
+            {/*å­—å·*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Fontsize", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.fontsize = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-N", argv[argCnt]) || !strcmp("--fontname", argv[argCnt]))
+            {/*å­—å·*/
+                switch (getArgNum(argc, argv, argCnt))
+                {
+                    case 0:
+                        printf("\nERROR"
+                               "\nFontname must be specified\n");
+                        return 0;
+                        break;
+                    case 1:
+                        strSafeCopy(config.fontname, argv[argCnt+1], FONTNAME_LEN);
+                        deQuotMarks(config.fontname);
+                        break;
+                    default:
+                        printf("\nERROR"
+                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        return 0;
+                        break;
+                }
+
+                argCnt += 2; 
+            }
+            else if (!strcmp("-O", argv[argCnt]) || !strcmp("--opacity", argv[argCnt]))
+            {/*ä¸é€æ˜åº¦*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Opacity", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.opacity = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-L", argv[argCnt]) || !strcmp("--outline", argv[argCnt]))
+            {/*æè¾¹*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Outline", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.outline = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-D", argv[argCnt]) || !strcmp("--shadow", argv[argCnt]))
+            {/*é˜´å½±*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Shadow", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.shadow = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("--displayarea", argv[argCnt]))
+            {/*æ˜¾ç¤ºåŒºåŸŸ*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Display area", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.displayarea = (float)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("--scrollarea", argv[argCnt]))
+            {/*æ»šåŠ¨åŒºåŸŸ*/
+                double returnValue = getArgVal(argc, argv, argCnt, "Scroll area", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.scrollarea = (float)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-b", argv[argCnt]) || !strcmp("--blockmode", argv[argCnt]))
+            {/*å±è”½æ¨¡å¼*/
+                switch (getArgNum(argc, argv, argCnt))
+                {
+                    case 0:
+                        printf("\nERROR"
+                               "\nBlockmode must be specified\n");
+                        return 0;
+                        break;
+                    case 1:
+                        break;
+                    default:
+                        printf("\nERROR"
+                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        return 0; 
+                        break;
+                }
+                
+                config.blockmode = 0;
+                if (!strcmp("null", argv[argCnt+1]))
+                {
+                    argCnt += 2;
+                    continue;
+                }
+                
+                cnt = 0;
+                char *argPtr = argv[argCnt+1];
+                while (*argPtr != '\0')
+                {
+                    tempPtr = tempStr;
+                    while (*argPtr != '\0' && *argPtr != '-' && cnt < MAX_TEXT_LENGTH)
+                    {
+                        *tempPtr = *argPtr;
+                        tempPtr++;
+                        argPtr++;
+                        cnt++;
+                    }
+                    if (*argPtr == '-')
+                    {
+                        argPtr++;
+                    }
+                    *tempPtr = '\0';
+                    
+                    deQuotMarks(tempStr);
+                    toLower(NULL, tempStr);
+                    if (!strcmp("l2r", tempStr))
+                    {
+                        config.blockmode += BLK_L2R;
+                    }
+                    else if (!strcmp("r2l", tempStr))
+                    {
+                        config.blockmode += BLK_R2L;
+                    }
+                    else if (!strcmp("top", tempStr))
+                    {
+                        config.blockmode += BLK_TOP;
+                    }
+                    else if (!strcmp("bottom", tempStr))
+                    {
+                        config.blockmode += BLK_BOTTOM;
+                    }
+                    else if (!strcmp("special", tempStr))
+                    {
+                        config.blockmode += BLK_SPECIAL;
+                    }
+                    else if (!strcmp("color", tempStr) || !strcmp("colour", tempStr))
+                    {
+                        config.blockmode += BLK_COLOR;
+                    }
+                    else if (!strcmp("repeat", tempStr))
+                    {
+                        config.blockmode += BLK_REPEAT;
+                    }
+                    else
+                    {
+                        printf("\nERROR"
+                               "\nInvalid type-name %s\n", tempStr);
+                        return 0;
+                    }
+                }
+                
+                argCnt += 2;
+            }
+            else if (!strcmp("--statmode", argv[argCnt]))
+            {/*ç»Ÿè®¡æ¨¡å¼*/
+                switch (getArgNum(argc, argv, argCnt))
+                {
+                    case 0:
+                        printf("\nERROR"
+                               "\nStatmode must be specified\n");
+                        return 0;
+                        break;
+                    case 1:
+                        break;
+                    default:
+                        printf("\nERROR"
+                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        return 0; 
+                        break;
+                }
+                
+                config.statmode = 0;
+                if (!strcmp("null", argv[argCnt+1]))
+                {
+                    argCnt += 2;
+                    continue;
+                }
+                
+                cnt = 0;
+                char *argPtr = argv[argCnt+1];
+                while (*argPtr != '\0')
+                {
+                    tempPtr = tempStr;
+                    while (*argPtr != '\0' && *argPtr != '-' && cnt < MAX_TEXT_LENGTH)
+                    {/*æ‹·è´ - ä¹‹å‰çš„å­—ç¬¦*/
+                        *tempPtr = *argPtr;
+                        tempPtr++;
+                        argPtr++;
+                        cnt++;
+                    }
+                    if (*argPtr == '-')
+                    {
+                        argPtr++;
+                    }
+                    *tempPtr = '\0';
+                    /*å­—ç¬¦ä¸²æ¯”å¯¹*/
+                    deQuotMarks(tempStr);
+                    toLower(NULL, tempStr);
+                    if (!strcmp("table", tempStr))
+                    {
+                        config.statmode += TABLE;
+                    }
+                    else if (!strcmp("histogram", tempStr))
+                    {
+                        config.statmode += HISTOGRAM;
+                    }
+                    else
+                    {
+                        printf("\nERROR"
+                               "\nInvalid type-name %s\n", tempStr);
+                        return 0; 
+                    }
+                }
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("--saveblocked", argv[argCnt]))
+            {/*æ˜¯å¦ä¿å­˜å±è”½éƒ¨åˆ†*/
+                switch (getArgNum(argc, argv, argCnt))
+                {
+                    case 0:
+                        printf("\nERROR"
+                               "\nSaveblocked must be specified\n");
+                        return 0;
+                        break;
+                    case 1:
+                        break;
+                    default:
+                        printf("\nERROR"
+                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        return 0; 
+                        break;
+                }
+                
+                deQuotMarks(argv[argCnt+1]);
+                toLower(NULL, argv[argCnt+1]);
+                if (!strcmp("true", argv[argCnt+1]))
+                {
+                    config.saveBlockedPart = TRUE;
+                }
+                else if (!strcmp("false", argv[argCnt+1]))
+                {
+                    config.saveBlockedPart = FALSE;
+                }
+                else
+                {
+                    printf("\nERROR"
+                           "\nInvalid value %s\n", argv[argCnt+1]);
+                    return 0;
+                }
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-t", argv[argCnt]) || !strcmp("--timeshift", argv[argCnt]))
+            {
+                argCnt++;
+                while (argCnt < argc && ISNUMBERIC(argv[argCnt]))
+                {
+                    argCnt++;
+                }
+            }
+            else
+            {
+                printf("\nERROR"
+                       "\nInvalid argument %s\n", argv[argCnt]);
+                return 0;
+            }
+        }
+        
+        /*å¯»æ‰¾å¹¶è§£ææ—¶é—´å¹³ç§»é‡*/ 
+        for (argCnt = 0; argCnt < argc; argCnt++)
+        {
+            if (!strcmp("-t", argv[argCnt]) || !strcmp("--timeshift", argv[argCnt]))
+            {
+                argCnt++;
+                for (cnt = 0; cnt < infileNum; cnt++)
+                {
+                    if (argCnt >= argc || !ISNUMBERIC(argv[argCnt]))
+                    {
+                        printf("\nERROR"
+                               "\nToo few values in option timeshift(-t, --timeshift)");
+                        printf("\nNOTE"
+                               "\n%d filenames are provided, but only %d timeshift value.\n",
+                               infileNum, cnt);
+                        return 0;
+                    }
+                    
+                    strSafeCopy(tempStr, argv[argCnt], MAX_TEXT_LENGTH);
+                    deQuotMarks(tempStr);
+                    infile[cnt].timeShift = atof(tempStr);
+                    
+                    argCnt++;
+                }
+                
+                /*æœ‰æ›´å¤šçš„æ•°å­—æ„å‘³ç€è¯­æ³•é”™è¯¯*/
+                if (argCnt < argc && ISNUMBERIC(argv[argCnt]))
+                {
+                    printf("\nERROR"
+                           "\nToo many values in option timeshift(-t, --timeshift)");
+                    printf("\nNOTE"
+                           "\nOnly %d filename(s) are provided, but more than %d timeshift values.\n",
+                           infileNum, infileNum);
+                    return 0;
+                }
+                
+                /*è§£æå®Œæ¯•å³è·³å‡ºå¾ªç¯*/
+                break;
+            }
+        }
+            
+    }
+    
+    /*æ˜¾ç¤ºé…ç½®ä¿¡æ¯*/
+    if (showConfig == TRUE)
+    {
+        printConfigInfo(config);
+    }
+
+    /*é…ç½®é¡¹åˆæ³•æ€§æ£€æŸ¥*/
+    {
+        /*åˆ†è¾¨ç‡å®½*/
+        if (config.resx <= 0)
+        {
+            printf("\nERROR"
+                    "\nResolution width must be an integer greater than 0");
+            return 0;
+        }
+        /*åˆ†è¾¨ç‡é«˜*/
+        if (config.resy <= 0)
+        {
+            printf("\nERROR"
+                    "\nResolution height must be an integer greater than 0");
+            return 0;
+        }
+        /*æ»šåŠ¨æ—¶é—´*/
+        if (config.scrolltime < EPS)
+        {
+            printf("\nERROR"
+                    "\nScroll time must be a real number greater than 0.00");
+            return 0;
+        }
+        /*å›ºå®šæ—¶é—´*/
+        if (config.fixtime < EPS)
+        {
+            printf("\nERROR"
+                    "\nFix time must be a real number greater than 0.00");
+            return 0;
+        }
+        /*å¯†åº¦*/
+        if (config.density < -1)
+        {
+            printf("\nERROR"
+                    "\nDensity must be an integer greater than or equal to -1");
+            return 0;
+        }
+        /*å­—å·*/
+        if (config.fontsize <= 0)
+        {
+            printf("\nERROR"
+                    "\nFontsize must be an integer greater than 0");
+            return 0;
+        }
+        /*ä¸é€æ˜åº¦*/
+        if (config.opacity <= 0 || config.opacity > 255)
+        {
+            printf("\nERROR"
+                    "\nOpacity must be an integer greater than 0 and less than or equal to 255");
+            return 0;
+        }
+        /*æè¾¹*/
+        if (config.outline < 0 || config.outline > 4)
+        {
+            printf("\nERROR"
+                    "\nOutline must be an integer greater than or equal to 0 and less than or equal to 4");
+            return 0;
+        }
+        /*é˜´å½±*/
+        if (config.shadow < 0 || config.shadow > 4)
+        {
+            printf("\nERROR"
+                    "\nShadow must be an integer greater than or equal to 0 and less than or equal to 4");
+            return 0;
+        }
+        /*æ˜¾ç¤ºåŒºåŸŸ*/
+        if (config.displayarea < EPS || fabs(config.displayarea-1.0) > EPS)
+        {
+            printf("\nERROR"
+                    "\nDisplay area must be a real number greater than 0.0 and less than or equal to 1.0");
+            return 0;
+        }
+        /*æ»šåŠ¨åŒºåŸŸ*/
+        if (config.scrollarea < EPS || fabs(config.scrollarea-1.0) > EPS)
+        {
+            printf("\nERROR"
+                    "\nScroll area must be a real number greater than 0.0 and less than or equal to 1.0");
+            return 0;
+        }
+        /*å­—ä½“*/
+        tempPtr = config.fontname;
+        while (*tempPtr != '\0')
+        {/*éªŒè¯æ˜¯å¦å…¨éƒ¨ä¸ºå¯æ‰“å°çš„asciiå­—ç¬¦*/
+            if (*tempPtr < 0x20 || *tempPtr > 0x7e)
+            {/*ascii éå¯æ‰“å°å­—ç¬¦èŒƒå›´*/
+                printf("\nWARNING"
+                    "\nSome characters of fontname are non-ASCII characters, which may cause the garbled problem\n");
+                pause();
+                break;
+            }
+
+            tempPtr++;
+        }
+    }
+
+    
+    
+    /*ä¿å­˜é…ç½®æ–‡ä»¶*/
+    if (saveConfig == TRUE && configFileErr == FALSE)
+    {
+        if (writeConfig(configFilePath, config) == TRUE)
+        {
+            printf("\nConfiguration file had been saved successfully!\n");
+        }
+        else
+        {
+            printf("\nWARNING"
+                   "\nFailed to write the configuration file!\n");
+            
+            pause();
+        }
+    }
+    
+    if (outfile.isSet == FALSE && infileNum == 0)
+    {
+        return 0;
+    }
+
+    /*æ˜¾ç¤ºæ–‡ä»¶ä¿¡æ¯*/
+    if (outfile.isSet == FALSE)
+    {
+        printf("\nERROR"
+               "\nOutput file must be specified");
+        printf("\nNOTE"
+               "\nUse -o or --output to specify.\n");
+        return 0;
+    }
+    if (infileNum == 0)
+    {
+        printf("\nERROR"
+               "\nInput file must be specified");
+        printf("\nNOTE"
+               "\nUse -i or --input to specify.\n");
+        return 0;
+    }
+    
+    printf("\nInput file(s):");
+    printf("\nNumber|Format|TimeShift|FileName\n");
+    for (cnt = 0; cnt < infileNum; cnt++)
+    {
+        printf("%6d|%6s|%8.3fs|%s\n", cnt+1, infile[cnt].format, infile[cnt].timeShift, infile[cnt].fileName);
+    }
+    
+    printf("\nOutput file:");
+    printf("\nFormat|FileName");
+    printf("\n%6s|%s\n", outfile.format, outfile.fileName);
+    
+    /*è¯»å–æ–‡ä»¶*/
+    printf("\nLoading files...\n");
+    
+    int returnValue;
+    STATUS status;
+    DANMAKU *danmakuPool = NULL;
+    
+    status.totalNum = 0;
+    for (cnt = 0; cnt < infileNum; cnt++)
+    {
+        printf("Loading file %s\n", infile[cnt].fileName);
+        /*æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
+        if (access(infile[cnt].fileName, F_OK) != 0)
+        {
+            printf ("\nERROR"
+                    "\nNo such file.\n");
+            return 0;
+        }
+
+        /*æƒé™æ£€æŸ¥*/
+        if (access(infile[cnt].fileName, R_OK) != 0)
+        {
+            printf ("\nERROR"
+                    "\nPermission denied.\n");
+            return 0;
+        }
+        
+        if (!strcmp("xml", infile[cnt].format))
+        {
+            returnValue = readXml(infile[cnt].fileName, &danmakuPool, "a", infile[cnt].timeShift, &status);
+            
+            switch (returnValue)
+            {
+                case 0:
+                    break;
+                case 1:
+                    printf("\nERROR [code rx%d]"
+                           "\nFailed to open file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    printf("\nERROR [code rx%d]"
+                           "\nFailed to read file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    printf("\nERROR [code rx%d]"
+                           "\nOut of memory\n",
+                           returnValue
+                          );
+                    return 0;
+                    break;
+                case 8:
+                    printf("\nWARNING [code rx%d]"
+                           "\nIncorrect file format, contiune or exit?",
+                           returnValue
+                          );
+                    printf("\nNOTE"
+                           "\nCould not load file %s as a xml file.\n", infile[cnt].fileName);
+                    if (isContinue() == FALSE)
+                    {
+                        return 0;
+                    }
+                    break;
+                default:
+                    printf("\nERROR [code rx%d]"
+                           "\nUndefined Error\n",
+                           returnValue
+                          );
+                    break;
+            }
+        }
+        else if (!strcmp("json", infile[cnt].format))
+        {
+            returnValue = readJson(infile[cnt].fileName, &danmakuPool, "a", infile[cnt].timeShift, &status);
+            
+            switch (returnValue)
+            {
+                case 0:
+                    break;
+                case 1:
+                    printf("\nERROR [code rj%d]"
+                           "\nFailed to open file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    printf("\nERROR [code rj%d]"
+                           "\nFailed to read file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+                case 5:
+                case 6:
+                    printf("\nERROR [code rj%d]"
+                           "\nOut of memory\n",
+                           returnValue
+                          );
+                    return 0;
+                    break;
+                case 7:
+                    printf("\nWARNING [code rj%d]"
+                           "\nIncorrect file format, contiune or exit?",
+                           returnValue
+                          );
+                    printf("\nNOTE"
+                           "\nCould not load file %s as a xml file.\n", infile[cnt].fileName);
+                    if (isContinue() == FALSE)
+                    {
+                        return 0;
+                    }
+                    break;
+                default:
+                    printf("\nERROR [code rj%d]"
+                           "\nUndefined Error\n",
+                           returnValue
+                          );
+                    break;
+            }
+        }
+        else if (!strcmp("ass", infile[cnt].format))
+        {
+            returnValue = readAss(infile[cnt].fileName, &danmakuPool, "a", NULL, infile[cnt].timeShift, &status);
+            /*è§£æåä½é”™è¯¯ç */
+            switch (returnValue / 10)
+            {
+                case 0:
+                    break;
+                case 1:
+                    printf("\nERROR [code ra%d]"
+                           "\nFailed to open file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    printf("\nERROR [code ra%d]"
+                           "\nOut of memory\n",
+                           returnValue
+                          );
+                    return 0;
+                    break;
+                default:
+                    printf("\nERROR [code ra%d]"
+                           "\nUndefined Error\n",
+                           returnValue
+                          );
+                    break;
+            }
+            /*è§£æä¸ªä½*/
+            switch (returnValue % 10)
+            {
+                case 0:
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    printf("\nERROR [code ra%d]"
+                           "\nOut of memory\n",
+                           returnValue
+                          );
+                    return 0;
+                    break;
+                default:
+                    printf("\nERROR [code ra%d]"
+                           "\nUndefined Error\n",
+                           returnValue
+                          );
+                    break;
+            }
+        }
+    }
+
+    /*å±è”½*/
+    blockByType(danmakuPool, config.blockmode, NULL);
+    
+    /*è¯»å®Œæˆæç¤º*/
+    printf("\nFile Loading Complete");
+    if (status.totalNum != 0)
+    {
+        printf(". Danmaku Pool: %d\n", status.totalNum);
+    }
+    else
+    {
+        printf(" and nothing was read.\nexit...\n");
+        return 0;
+    }
+    
+    /*æ’åº*/
+    printf ("\nSorting...\n");
+    returnValue = sortList(&danmakuPool, NULL);
+    switch (returnValue)
+    {
+        case 0:
+            break;
+        case 2:
+            printf("\nERROR [code s%d]"
+                   "\nOut of memory\n",
+                   returnValue
+                  );
+            return 0;
+            break;
+        default:
+            printf("\nERROR [code s%d]"
+                   "\nUndefined Error\n",
+                   returnValue
+                  );
+            break;
+    }
+    
+    /*å†™æ–‡ä»¶*/
+    printf ("\nWritting file %s\n", outfile.fileName);
+    if (access(outfile.fileName, F_OK) == 0)
+    {/*æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
+        printf ("\nWARNING"
+                "\nFile %s already exists, it will be overwritten when continue.\n", outfile.fileName);
+        if (isContinue() == FALSE)
+        {
+            return 0;
+        }
+        
+        /*æƒé™æ£€æŸ¥*/
+        if (access(outfile.fileName, W_OK) != 0)
+        {
+            printf ("\nERROR"
+                    "\nPermission denied.\n");
+            return 0;
+        }
+    }
+    
+    if (!strcmp("ass", outfile.format))
+    {
+        returnValue = writeAss(outfile.fileName,/*è¾“å‡ºæ–‡ä»¶å*/
+                               danmakuPool,/*å¼¹å¹•æ± çš„å¤´æŒ‡é’ˆ*/
+                               config,
+                               NULL,/*å­—å¹•éƒ¨åˆ†*/ 
+                               NULL/*çŠ¶æ€*/
+                              );
+        /*è§£æç™¾ä½*/
+        switch (returnValue / 100)
+        {
+            case 0:
+                break;
+            case 100:
+                printf("\nERROR [code wa%d]"
+                       "\nFailed to create file %s\n",
+                       returnValue, outfile.fileName
+                      );
+                return 0;
+                break;
+            default:
+                printf("\nERROR [code wa%d]"
+                       "\nUndefined Error\n",
+                       returnValue
+                      );
+                break;
+        }
+        /*è§£æåä½*/
+        returnValue -= returnValue % 100;
+        switch (returnValue % 10)
+        {
+            case 0:
+                break;
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                printf("\nERROR [code wa%d]"
+                       "\nOut of memory\n",
+                       returnValue
+                      );
+                return 0;
+                break;
+            case 9:
+                    printf("\nERROR [code wa%d]"
+                           "\nFailed to write file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+            default:
+                printf("\nERROR [code wa%d]"
+                       "\nUndefined Error\n",
+                       returnValue
+                      );
+                break;
+        }
+        /*ä¸ªä½å‡½æ•°é”™è¯¯ä¿¡æ¯å·²ç»è¢«ä»¥ä¸Šè¿‡æ»¤å®Œæ¯• æ— éœ€é‡æ–°æŠ¥é”™*/
+    }
+    else if (!strcmp("xml", outfile.format))
+    {
+        returnValue = writeXml(outfile.fileName, danmakuPool, NULL);
+        switch (returnValue)
+        {
+            case 0:
+                break;
+            case 2:
+                printf("\nERROR [code wx%d]"
+                       "\nFailed to create file %s\n",
+                       returnValue, outfile.fileName
+                      );
+                return 0;
+                break;
+            case 3:
+                    printf("\nERROR [code wx%d]"
+                           "\nFailed to write file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+            default:
+                printf("\nERROR [code wx%d]"
+                       "\nUndefined Error\n",
+                       returnValue
+                      );
+                break;
+        }
+    }
+    else if (!strcmp("json", outfile.format))
+    {
+        returnValue = writeJson(outfile.fileName, danmakuPool, NULL);
+        switch (returnValue)
+        {
+            case 0:
+                break;
+            case 2:
+                printf("\nERROR [code wj%d]"
+                       "\nFailed to create file %s\n",
+                       returnValue, outfile.fileName
+                      );
+                return 0;
+                break;
+            case 3:
+                    printf("\nERROR [code wj%d]"
+                           "\nFailed to write file %s\n",
+                           returnValue, infile[cnt].fileName
+                          );
+                    return 0;
+                    break;
+            default:
+                printf("\nERROR [code wj%d]"
+                       "\nUndefined Error\n",
+                       returnValue
+                      );
+                break;
+        }
+    }
+    
+    printf("\nDone!\n");
+    
+    return 0;
 }
 
-/*
-¶ÁÅäÖÃÎÄ¼ş
-²ÎÊı£º
-ÅäÖÃĞÅÏ¢½á¹¹ÌåÖ¸Õë/ÅäÖÃÎÄ¼şÃû/
-*/ 
-void readConfigFile(CONFIG *config, char *fileName)
+/*æ‰“å°é…ç½®ä¿¡æ¯*/
+void printConfigInfo(CONFIG config)
 {
-	BOOL noErr = TRUE;
-	char tempText[MAX_TEXT_LENGTH];
-	
-	(*config).resX = GetPrivateProfileInt("DanmakuSet", "resX", 1920, fileName);
-	(*config).resY = GetPrivateProfileInt("DanmakuSet", "resY", 1080, fileName);
-	(*config).fontSize = GetPrivateProfileInt("DanmakuSet", "fontSize", 38, fileName);
-	(*config).shadow = GetPrivateProfileInt("DanmakuSet", "shadow", 1, fileName);
-	(*config).outline = GetPrivateProfileInt("DanmakuSet", "outline", 0, fileName);
-	(*config).rollTime = GetPrivateProfileInt("DanmakuSet", "rollTime", 10, fileName);
-	(*config).holdTime = GetPrivateProfileInt("DanmakuSet", "holdTime", 10, fileName);
-	(*config).density = GetPrivateProfileInt("DanmakuSet", "density", 0, fileName);
-	(*config).opacity = GetPrivateProfileInt("DanmakuSet", "opacity", 180, fileName);
-	(*config).blank = GetPrivateProfileInt("DanmakuSet", "blank", 0, fileName);
-	GetPrivateProfileString("DanmakuSet", "fontName", "Microsoft YaHei Light", (*config).fontName,
-							MAX_TEXT_LENGTH, fileName);
-	 GetPrivateProfileString("DanmakuSet", "opEncoding", "UTF-8", tempText, MAX_TEXT_LENGTH, fileName);					
-	if (strcmp(toLower(NULL, tempText), "utf-8") == 0)
-	{
-		(*config).outputEncoding = UTF_8;
-	}
-	else
-	{
-		(*config).outputEncoding = ANSI;
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockR2L", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[0] = '1';
-	}
-	else
-	{
-		(*config).blockMode[0] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockL2R", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[1] = '1';
-	}
-	else
-	{
-		(*config).blockMode[1] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockTop", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[2] = '1';
-	}
-	else
-	{
-		(*config).blockMode[2] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockBottom", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[3] = '1';
-	}
-	else
-	{
-		(*config).blockMode[3] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockSpecial", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[4] = '1';
-	}
-	else
-	{
-		(*config).blockMode[4] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockColor", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[5] = '1';
-	}
-	else
-	{
-		(*config).blockMode[5] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "blockRepeat", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).blockMode[6] = '1';
-	}
-	else
-	{
-		(*config).blockMode[6] = '0';
-	}
-	(*config).blockMode[7] = '\0';
-	
-	
-	GetPrivateProfileString("DanmakuSet", "debugTable", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).debugMode[0] = '1';
-	}
-	else
-	{
-		(*config).debugMode[0] = '0';
-	}
-	
-	GetPrivateProfileString("DanmakuSet", "debugChart", "false", tempText, MAX_TEXT_LENGTH, fileName);
-	if (strcmp(toLower(NULL, tempText), "true") == 0)
-	{
-		(*config).debugMode[1] = '1';
-	}
-	else
-	{
-		(*config).debugMode[1] = '0';
-	}
-	
-	(*config).debugMode[2] = '\0';
+    printf("\n"
+           "configuration:\n"
+           "ResX: %d | ResY: %d | ScrollTime: %.3f | FixTime: %.3f | Density: %d",
+           config.resx, config.resy, config.scrolltime, config.fixtime, config.density
+          );
+    if (config.density == -1)
+    {
+        printf("(non-overlap)");
+    }
+    else if (config.density == 0)
+    {
+        printf("(unlimit)");
+    }
+    
+    printf(" | Fontname %s | Fontsize: %d | Opacity: %d | Outline: %d",
+           config.fontname, config.fontsize, config.opacity, config.outline
+          );
+    if (config.outline == 0)
+    {
+        printf("(disable)");
+    }
+    
+    printf(" | Shadow: %d", config.shadow);
+    if (config.shadow == 0)
+    {
+        printf("(disable)");
+    }
+    
+    printf(" | DisplayArea: %.3f", config.displayarea);
+    if (fabs(config.displayarea - 1) < EPS)
+    {
+        printf("(full)");
+    }
+    
+    printf(" | ScrollArea: %.3f", config.scrollarea);
+    if (fabs(config.scrollarea - 1) < EPS)
+    {
+        printf("(full)");
+    }
+
+    printf(" | SaveBlocked: ");
+    if (config.saveBlockedPart == FALSE)
+    {
+        printf("false");
+    }
+    else
+    {
+        printf("true");
+    }
+    
+    printf("\nBlockMode: ");
+    if (config.blockmode == 0)
+    {
+        printf("null(disable)");
+    }
+    else
+    {
+        if (config.blockmode & BLK_L2R)
+        {
+            printf("L2R(left to right) ");
+        }
+        if (config.blockmode & BLK_R2L)
+        {
+            printf("R2L(right to left) ");
+        }
+        if (config.blockmode & BLK_TOP)
+        {
+            printf("top ");
+        }
+        if (config.blockmode & BLK_BOTTOM)
+        {
+            printf("bottom ");
+        }
+        if (config.blockmode & BLK_SPECIAL)
+        {
+            printf("special ");
+        }
+        if (config.blockmode & BLK_COLOR)
+        {
+            printf("color ");
+        }
+        if (config.blockmode & BLK_REPEAT)
+        {
+            printf("repeat ");
+        }
+    }
+    
+    printf("\nStatMode:  ");
+    if (config.statmode == 0)
+    {
+        printf("null(disable)");
+    }
+    else
+    {
+        if (config.statmode & TABLE)
+        {
+            printf("table ");
+        }
+        if (config.statmode & HISTOGRAM)
+        {
+            printf("histogram ");
+        }
+    }
+    
+    printf("\n");
+    return;
 }
 
-/*
-Ğ´ÅäÖÃÎÄ¼ş
-²ÎÊı£º
-ÅäÖÃĞÅÏ¢½á¹¹Ìå/ÅäÖÃÎÄ¼şÃû/
-³É¹¦·µ»ØTRUE Ê§°Ü·µ»ØFALSE
-*/ 
-BOOL writeConfigFile(CONFIG config, char *fileName)
+/*æ‰“å°å¸®åŠ©ä¿¡æ¯*/
+void printHelpInfo()
 {
-	BOOL noErr = TRUE;
-	char tempText[MAX_TEXT_LENGTH];
-	
-	sprintf(tempText, "%d", config.resX);
-	noErr &= WritePrivateProfileString("DanmakuSet", "resX", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.resY);
-	noErr &= WritePrivateProfileString("DanmakuSet", "resY", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.rollTime);
-	noErr &= WritePrivateProfileString("DanmakuSet", "RollTime", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.holdTime);
-	noErr &= WritePrivateProfileString("DanmakuSet", "holdTime", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.shadow);
-	noErr &= WritePrivateProfileString("DanmakuSet", "shadow", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.outline);
-	noErr &= WritePrivateProfileString("DanmakuSet", "outline", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.density);
-	noErr &= WritePrivateProfileString("DanmakuSet", "density", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.opacity);
-	noErr &= WritePrivateProfileString("DanmakuSet", "opacity", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.blank);
-	noErr &= WritePrivateProfileString("DanmakuSet", "blank", tempText, fileName);
-	
-	sprintf(tempText, "%d", config.fontSize);
-	noErr &= WritePrivateProfileString("DanmakuSet", "fontSize", tempText, fileName);
-	
-	noErr &= WritePrivateProfileString("DanmakuSet", "fontName", config.fontName, fileName);
-	
-	if (config.blockMode[0] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockR2L", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockR2L", "false", fileName);
-	}
-	
-	if (config.blockMode[1] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockL2R", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockL2R", "false", fileName);
-	}
-	
-	if (config.blockMode[2] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockTop", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockTop", "false", fileName);
-	}
-	
-	if (config.blockMode[3] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockBottom", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockBottom", "false", fileName);
-	}
-	
-	if (config.blockMode[4] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockSpecial", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockSpecial", "false", fileName);
-	}
-	
-	if (config.blockMode[5] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockColor", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockColor", "false", fileName);
-	}
-	
-	if (config.blockMode[6] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockRepeat", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "blockRepeat", "false", fileName);
-	}
-	
-	if (config.debugMode[0] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "debugTable", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "debugTable", "false", fileName);
-	}
-	
-	if (config.debugMode[1] != '0')
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "debugChart", "true", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "debugChart", "false", fileName);
-	}
-	
-	if (config.outputEncoding != UTF_8)
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "opEncoding", "ansi", fileName);
-	}
-	else
-	{
-		noErr &= WritePrivateProfileString("DanmakuSet", "opEncoding", "utf-8", fileName);
-	}
-	
-	return noErr;
+    printf("\n"
+           "./DanmakuFactory -o [outfile_format] outfile -i [infile1_format] infile1 [infile2_format] infile2 ... "
+           "[-t infile1_timeshift ...] [configuration value] ...\n"
+           "\n"
+           "format:\n"
+           "xml, json, ass\n"
+           "\n"
+           "configurations:\n"
+           "-x, --resx          specify the value of resolution width\n"
+           "-y, --resy          specify the value of resolution height\n"
+           "-s, --scrolltime    specify the time of rolling danmaku to across the screen\n"
+           "-f, --fixtime       specify the time of fix danmaku show on the screen\n"
+           "-d, --density       specify the maximum number of danmaku could show on the screen at the same time\n"
+           "                    special value: -1 non-overlap, 0 unlimit\n"
+           "\n"
+           "-S, --fontsize      specify the fontsize of general danmaku\n"
+           "-N, --fontname      specify the fontname of general danmaku\n"
+           "-O, --opacity       specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)\n"
+           "-L, --outline       specify the width of outline for each danmaku(range: 0-4)\n"
+           "-D, --shadow        specify the depth of shadow for each danmaku(range: 0-4)\n"
+           "\n"
+           "--displayarea       specify the percent of display area on the screen(range: 0.0-1.0)\n"
+           "--scrollarea        specify the percent of scroll area of rolling danmaku on the screen(range: 0.0-1.0)\n"
+           "\n"
+           "-b, --blockmode     specify the type of danmaku which will not show on the screen\n"
+           "                    use '-' to connect the type-name, like L2R-TOP-BOTTOM\n"
+           "                    available value: L2R, R2L, TOP, BOTTOM, SPECIAL, COLOR, REPEAT\n"
+           "\n" 
+           "--statmode          specify the type of statistic box which will show on the screen\n"
+           "                    use '-' to connect the type-name, like TABLE-HISTOGRAM\n"
+           "                    available value: TABLE, HISTOGRAM\n"
+           "\n"
+           "other options:\n"
+           "-h, --help          display this help and version information than exit\n"
+           "-c, --config        display configuration information and exit\n"
+           "--save              save configuration as current command settings\n"
+           "\n"
+           "example:\n"
+           "./DanmakuFactory -o ass \"outfile.ass\" -i xml \"infile1.xml\"\n"
+           "./DanmakuFactory -o \"outfile.ass\" -i \"infile1.xml\"\n"
+           "./DanmakuFactory -o \"outfile.ass\" -i \"infile1.xml\" \"infile2.json\" \"infile3.ass\" -t 0.0 5.0 7.0\n"
+          );
+    
+    return;
 }
 
-/*
-´òÓ¡×ª»»´íÎóÔ­Òò 
-²ÎÊı£º
-×´Ì¬Âë 
-*/
-void printErrInfo(char *code)
+/*è·å–æŒ‡å®šä¸‹æ ‡é€‰é¡¹å‚æ•°ä¸ªæ•°*/
+int getArgNum(int argc, char **argv, const int optionIndex)
 {
-	if (strcmp(code, "000") == 0 || strcmp(code, "009") == 0)
-	{
-		printf("Õı³£");
-	}
-	else if (code[0] == '1')
-	{
-		printf("´ò¿ªÎÄ¼şÊ§°Ü");
-	}
-	else if (code[0] == '2' || code[0] == '3' || code[0] == '4')
-	{
-		printf("¶ÁÎÄ¼şÊ±·¢Éú´íÎó");
-	}
-	else if (code[0] == '5' || code[0] == '6' || code[1] == '2' || (code[2] >= '3' && code[2] <= '7'))
-	{
-		printf("ÄÚ´æ²Ù×÷·¢Éú´íÎó");
-	}
-	else if (code[0] == '7')
-	{
-		printf("ÎÄ¼şÎ´ÄÜ°´ÕıÈ·¸ñÊ½¶ÁÈë");
-	}
-	else if (code[2] == '2')
-	{
-		printf("´´½¨»ò¸²¸ÇÎÄ¼şÊ§°Ü");
-	}
-	else if (code[2] == '8')
-	{
-		printf("Ğ´ÎÄ¼şÊ±·¢Éú´íÎó");
-	}
+    int cnt;
+    for (cnt = optionIndex + 1; cnt < argc; cnt++)
+    {
+        if (argv[cnt][0] == '-')
+        {
+            break;
+        }
+    }
+    return cnt - optionIndex - 1;
+}
+
+/*è·å–æ–‡ä»¶æ ¼å¼*/
+char *getFormat(char *outFormat, const char *const fileName, int maxLen)
+{
+    char *ptr;
+    ptr = (char *)&fileName[strlen(fileName)];
+    
+    while (*ptr != '.')
+    {
+        if (ptr < fileName)
+        {
+            strcpy(outFormat, "");
+            return outFormat;
+        }
+        ptr--;
+    }
+    ptr++;
+    
+    strSafeCopy(outFormat, ptr, maxLen);
+    
+    return outFormat;
+}
+
+/* 
+ * è·å–æ–‡ä»¶è·¯å¾„éƒ¨åˆ†ï¼ˆåŒ…å«æœ€åä¸€ä¸ªæ–œæ ï¼‰ 
+ * å‚æ•°ï¼šè¾“å‡ºæ–‡ä»¶è·¯å¾„/å®Œæ•´æ–‡ä»¶å/æœ€å¤§é•¿åº¦ 
+ * è¿”å›å€¼ï¼šè¾“å‡ºæ–‡ä»¶è·¯å¾„
+ */
+char *getPath(char *outPath, const char *const fileName, int maxLen)
+{
+    int pathLen;
+    char *inPtr = (char *)fileName;
+    char *outPtr = outPath;
+
+    /*ç§»åŠ¨æŒ‡é’ˆåˆ°æœ«å°¾*/
+    while (*inPtr != '\0')
+    {
+        inPtr++;
+    }
+
+    /*å‘å‰å¯»æ‰¾æ–œæ */
+    while (inPtr != fileName)
+    {
+        if (*inPtr == '\\' || *inPtr == '/')
+        {
+            break;
+        }
+        inPtr--;
+    }
+    
+    if (inPtr == fileName)
+    {
+        outPath[0] = '\0';
+        return outPath;
+    }
+    
+    pathLen = inPtr - fileName + 2;/*åŒ…å«æ–œæ ä¸ç»“æŸç¬¦*/
+
+    strSafeCopy(outPtr, fileName, maxLen > pathLen ? pathLen : maxLen);
+
+    return outPath;
+}
+
+/*è·å–ä¸€ä¸ªå®æ•°å‚æ•°*/
+double getArgVal(int argc, char **argv, const int optIndex, const char *const optName, const double errorReturnValue)
+{
+    double value;
+    if (optIndex+1 >= argc)
+    {
+        printf("ERROR\n"
+               "%s must be specified\n", optName);
+        return errorReturnValue;
+    }
+    
+    if (!ISNUMBERIC(argv[optIndex+1]))
+    {
+        printf("ERROR\n"
+               "Invalid argument %s\n", argv[optIndex+1]);
+        return errorReturnValue;
+    }
+    
+    switch (getArgNum(argc, argv, optIndex))
+    {
+        /*0ä¸ªä»£è¡¨åä¸€ä¸ªå‚æ•°ä¸ºè´Ÿæ•°è¢«è§£é‡Šæˆé€‰é¡¹*/
+        case 0:
+        case 1:
+            deQuotMarks(argv[optIndex+1]);
+            value = atof(argv[optIndex+1]);
+            break;
+        default:
+            printf("ERROR\n"
+                   "Invalid argument %s\n", argv[optIndex+2]);
+            return errorReturnValue;
+            break;
+    }
+    
+    return value;
+}
+
+/*æš‚åœ æŒ‰å›è½¦ç»§ç»­*/
+void pause()
+{
+    printf("\nPress ENTER to continue.\n");
+    fflush(stdin);
+    getchar();
+}
+
+/*æ˜¯å¦ç»§ç»­*/
+BOOL isContinue()
+{
+    printf("\nPress 'Y' or 'y' to continue, any other key to exit.\n");
+    printf("> ");
+    fflush(stdin);
+    char ch = getchar();
+    if (ch == 'Y' || ch == 'y')
+    {
+        return TRUE;
+    }
+    
+    return FALSE;
 }
