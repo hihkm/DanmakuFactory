@@ -1,4 +1,16 @@
+#ifdef _MSC_VER
+
 #include <io.h>
+#define F_OK 0
+#define W_OK 2
+#define R_OK 4
+
+#else
+
+#include <unistd.h>
+
+#endif
+
 #include <math.h>
 #include "CDanmakuFactory.h"
 #include "Define/CLIDef.h"

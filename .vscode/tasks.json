@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "Compile",
+        "command": "make",
+        "type": "process", // process是vsc把预定义变量和转义解析后直接全部传给command；shell相当于先打开shell再输入命令，所以args还会经过shell再解析一遍
+        "group": {
+            "kind": "build",
+            "isDefault": true // 不为true时ctrl shift B就要手动选择了
+        },
+        "presentation": {
+            "echo": true,
+            "reveal": "always", // 执行任务时是否跳转到终端面板，可以为always，silent，never。具体参见VSC的文档
+            "focus": false,     // 设为true后可以使执行task时焦点聚集在终端，但对编译C/C++来说，设为true没有意义
+            "panel": "shared"   // 不同的文件的编译信息共享一个终端面板
+        },
+        // "problemMatcher":"$gcc" // 此选项可以捕捉编译时终端里的报错信息；但因为有Lint，再开这个可能有双重报错
+    }]
+}
