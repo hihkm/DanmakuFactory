@@ -258,24 +258,23 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             textPtr = t_text;
             /*[0,0.17,"1-1",7,"文本部分内容",0,0,0,0.17,500,0,true,"微软雅黑",1]*/
             strGetLeftPart(NULL, &textPtr, '[', MAX_TEXT_LENGTH);
-            now->special->startX = atof(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
-            now->special->startY = atof(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
+            now->special->startX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            now->special->startY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             now->special->fadeStart = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,'-',MAX_TEXT_LENGTH)))) * 255);
             now->special->fadeEnd = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,',',MAX_TEXT_LENGTH)))) * 255);
-            now->special->existTime = atof(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
+            now->special->existTime = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             
             /*文本部分*/
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
             strGetLeftPart(textPart, &textPtr, '\"', MAX_TEXT_LENGTH);
-            deQuotMarks(textPart);
             strGetLeftPart(NULL, &textPtr, ',', MAX_TEXT_LENGTH);
             
-            now->special->frZ = atoi(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
-            now->special->frY = atoi(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
-            now->special->endX = atof(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
-            now->special->endY = atof(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
-            now->special->moveTime = atoi(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
-            now->special->pauseTime = atoi(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH));
+            now->special->frZ = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            now->special->frY = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            now->special->endX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            now->special->endY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            now->special->moveTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            now->special->pauseTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             
             /*字体部分*/ 
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
