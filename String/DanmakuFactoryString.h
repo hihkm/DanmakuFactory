@@ -1,5 +1,5 @@
 /*
-Copyright 2019 TIKM(github:HITIKM)
+Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ extern BOOL isDesignatedChar(char ch, const char *designatedChar);
 extern BOOL isDesignatedStr(char *str, char *designatedChar);
 extern BOOL isUtf8(char const *const str);
 extern char *strSafeCopy(char *destination, const char *const source, size_t count);
+extern int match(char *mainStr, char *patternStr);
+extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
 
 #ifdef __cplusplus
 }

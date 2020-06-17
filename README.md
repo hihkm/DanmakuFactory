@@ -10,9 +10,11 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持ass
 
 ##### Windows
 
-[DanmakuFactory_1.40_CLI  Beta(推荐)](Compiled/beta/DanmakuFactory_win_1.40_CLI_Beta.zip)
+[DanmakuFactory_1.41_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
 
-[DanmakuFactory_1.40 GUI Beta(~~在做了在做了 qt真的好难/(ㄒoㄒ)/~~)]()
+[DanmakuFactory_1.41_CLI  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+
+[DanmakuFactory_GUI(~~在做了在做了~~)]()
 
 [1.31  Release](Compiled/release/DanmakuFactory_1.31_release.zip)
 
@@ -20,7 +22,25 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持ass
 
 ##### Linux
 
-敬请期待
+需要提前安装git, make, gcc
+
+1. clone仓库到本地(注意当前目录下不要有相同名字的文件夹)
+
+```shell
+git clone git@github.com:hihkm/DanmakuFactory.git
+```
+
+2. 切换工作目录
+
+```shell
+cd DanmakuFactory
+```
+
+3. 编译，可执行文件为DanmakuFactory
+
+```shell
+make
+```
 
 
 
@@ -73,7 +93,7 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持ass
 
 #### 命令行说明
 
-以下展示的是1.40版本的命令行调用，其余版本请参考打包中的文档
+以下展示的是1.40/1.41版本的命令行调用，其余版本请参考打包中的文档
 
 ##### 调用方法
 
@@ -161,8 +181,6 @@ DanmakuFactory -o [输出文件格式] 输出文件名 -i [输入文件1格式] 
 
 - 增加了多文件弹幕合并
 
-- 增加了其他一些未使用的模块埋了一堆坑
-
   
 
 - 修复了特殊弹幕不换行的问题
@@ -180,3 +198,10 @@ DanmakuFactory -o [输出文件格式] 输出文件名 -i [输入文件1格式] 
   
 
 - 去除了原本不稳定的编码转换模块（后续可能会使用第三方库）
+
+##### 1.41
+
+- 适配linux
+- 修复了部分xml特殊弹幕无法正常解析的问题
+- 修复了ass输出后空格失效的问题
+- 优化排序，对于原本正序的输入无需重新排序

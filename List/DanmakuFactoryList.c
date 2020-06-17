@@ -1,5 +1,5 @@
 /*
-Copyright 2019 TIKM(github:HITIKM)
+Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     DANMAKU **bucket = NULL, *now = NULL, *last = NULL, *ptr = NULL;
     int cnt, index, danmakuNum = 0, bucketNum = 0;
     float max, min;
+    BOOL isSorted = TRUE;
     
     /*统计弹幕数量并找出最大最小值*/
     now = *listHead;
@@ -65,8 +66,19 @@ int sortList(DANMAKU **listHead, STATUS *const status)
                 min = now -> time;
             }
         }
+
+        if (isSorted == TRUE && now -> next != NULL && now->time > now->next->time+EPS)
+        {
+            isSorted = FALSE;
+        }
         danmakuNum++;
         now = now -> next;
+    }
+
+    /*如果本来就排序好了直接退出*/
+    if (isSorted == TRUE)
+    {
+        return 0;
     }
     
     /*申请桶空间并清0*/
@@ -84,7 +96,9 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     /*入桶*/ 
     while(*listHead != NULL)
     {
+        static int cccnnnttt = 0;
         index = (now -> time - min) / (max - min + 1) * bucketNum;
+
         *listHead = (*listHead) -> next;
         if(bucket[index] == NULL)
         {/*如果该桶为空则将新节点指针填入*/ 

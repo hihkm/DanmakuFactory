@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 TIKM(github:HITIKM)
+Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ extern "C" {
 #include "Define/DanmakuDef.h"
 #include "Define/FileDef.h"
 #include "Define/Status.h"
-#include "Config/config.h"
+#include "Config/Config.h"
 #include "String/DanmakuFactoryString.h"
 #include "List/DanmakuFactoryList.h"
 

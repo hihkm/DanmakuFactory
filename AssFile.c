@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 TIKM(github:HITIKM)
+Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -582,25 +582,13 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             }
             *textPartPtr = '\0';
             *codePartPtr = '\0';
-            
-            /*换行符转换 "\N"(ass强制换行符) -> '\n'(换行符)*/
-            char *leftPtr, *rightPtr;
-            leftPtr = rightPtr = textPart;
-            while (*rightPtr != '\0')
+
+            /*ass转义字符转换*/
             {
-                if (*rightPtr == '\\' && *(rightPtr+1) == 'N')
-                {
-                    *leftPtr = '\n';
-                    rightPtr++;
-                }
-                else
-                {
-                    *leftPtr = *rightPtr;
-                }
-                leftPtr++;
-                rightPtr++;
+                char tempText[MAX_TEXT_LENGTH];
+                strrpl(textPart, tempText, "\\h", " ", MAX_TEXT_LENGTH);
+                strrpl(tempText, textPart, "\\N", "\n", MAX_TEXT_LENGTH);
             }
-            *leftPtr = '\0';
             
             /*解析代码部分*/
             codePartPtr = strstr(codePart, "\\pos");/*固定内容*/
@@ -834,7 +822,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             if ((newDanmakuNode = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
             {
                 //TODO:释放弹幕与字幕链表
-                free(textPart);
+                //free(textPart);
                 return 5;
             }
             newDanmakuNode -> special = NULL; 
@@ -938,7 +926,6 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             #endif
             //第三方弹幕正确率测试
             
-            
             /*遍历样式表 寻找匹配的样式*/
             for (cnt = 0; cnt < inputSub->stylesNum; cnt++)
             {
@@ -1037,6 +1024,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             {
                 (status -> totalNum)++;
             }
+            
         }/*end if*/
         inEventPtr = inEventPtr -> next;
     }
@@ -1248,6 +1236,7 @@ int writeAssDanmakuPart(FILE *opF,
     
     DANMAKU *now = NULL;
     int cnt;
+    char EscapedText[MAX_TEXT_LENGTH];
     
     DANMAKU *signPtr = head, *scanPtr = head;
     
@@ -1393,6 +1382,12 @@ int writeAssDanmakuPart(FILE *opF,
         
         textLen = getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
         textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
+
+        /*特殊字符替换 特殊弹幕单独处理*/
+        if (abs(now -> type) != 5)
+        {
+            strrpl(now -> text, EscapedText, " ", "\\h", MAX_TEXT_LENGTH);
+        }
         
         if(now -> type == 1 || now -> type == -1)/*右左弹幕*/ 
         {
@@ -1456,7 +1451,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", now->text);
+            fprintf(opF, "}%s", EscapedText);
         }
         else if(now -> type == 2 || now -> type == -2)/*左右弹幕*/ 
         {
@@ -1521,7 +1516,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", now->text);
+            fprintf(opF, "}%s", EscapedText);
         }
         else if(now -> type == 3 || now -> type == -3)/*顶端弹幕*/ 
         {
@@ -1581,7 +1576,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", now->text);
+            fprintf(opF, "}%s", EscapedText);
         }
         else if(now -> type == 4 || now -> type == -4)/*底端弹幕*/ 
         {
@@ -1646,7 +1641,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", now->text);
+            fprintf(opF, "}%s", EscapedText);
         }
         else if(now -> type == 5 || now -> type == -5)/*特殊弹幕*/
         {
@@ -1685,8 +1680,7 @@ int writeAssDanmakuPart(FILE *opF,
             printTime(opF, now->time, ",");
             printTime(opF, now->time + n7ExistTime, ",");
             fprintf(opF, "SP,,0000,0000,0000,,{");
-            if( (n7StartX - 1 < EPS && n7StartX > 0) || (n7EndX - 1 < EPS && n7EndX > 0)||
-                (n7StartY - 1 < EPS && n7StartY > 0) || (n7EndY - 1 < EPS && n7EndY > 0) )
+            if( n7StartX < 1+EPS && n7EndX < 1+EPS && n7StartY < 1+EPS && n7EndY < 1+EPS )
             {
                 n7StartX *= resX;
                 n7EndX *= resX;
@@ -1753,55 +1747,14 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\fn%s", now -> special -> fontName);
             }
             
-            /*换行符替换并写到文件 '\n' -> "\N"(ass强制换行) */
-            int numOfEnter = 0;
-            char *sourcePtr = now -> text;
-            while (*sourcePtr != '\0')
-            {/*计算换行符个数*/
-                if (*sourcePtr == '\n')
-                {
-                    numOfEnter++;
-                }
-                sourcePtr++;
-            }
-            
-            if (numOfEnter > 0)
+            /*特殊字符替换*/
             {
-                char *destText, *destPtr;
-                if ((destText = (char *)malloc((strlen(now -> text) + numOfEnter + 1) * sizeof(char))) == NULL)
-                {
-                    fclose(opF);
-                    return 8;
-                }
-                
-                sourcePtr = now -> text;
-                destPtr = destText;
-                while (*sourcePtr != '\0')
-                {
-                    if (*sourcePtr == '\n')
-                    {
-                        *destPtr = '\\';
-                        destPtr++;
-                        *destPtr = 'N';
-                    }
-                    else
-                    {
-                        *destPtr = *sourcePtr;
-                    }
-                    destPtr++;
-                    sourcePtr++;
-                }
-                *destPtr = '\0';
-                
-                fprintf(opF, "}%s", destText);
-                free(destText);
+                char tempText[MAX_TEXT_LENGTH];
+                strrpl(now -> text, tempText, " ", "\\h", MAX_TEXT_LENGTH);
+                strrpl(tempText, EscapedText, "\n", "\\N", MAX_TEXT_LENGTH);
             }
-            else
-            {
-                fprintf(opF, "}%s", now -> text);
-            }
-            
-            
+
+            fprintf(opF, "}%s", EscapedText);
         }
         else if(now -> type == 8)/*代码弹幕*/ 
         {
@@ -2730,43 +2683,13 @@ static char *toHexColor(int decColor, char *hexColor)
     {
         for(j = 1; j >= 0; j--)
         {
-            switch(decColor % 16)
+            if (decColor % 16 < 10)
             {
-                default:
-                {
-                    hexColor[2 * i + j] = decColor % 16 + '0';
-                    break;
-                }
-                case 10:
-                {
-                    hexColor[2 * i + j] = 'A';
-                    break;
-                }
-                case 11:
-                {
-                    hexColor[2 * i + j] = 'B';
-                    break;
-                }
-                case 12:
-                {
-                    hexColor[2 * i + j] = 'C';
-                    break;
-                }
-                case 13:
-                {
-                    hexColor[2 * i + j] = 'D';
-                    break;
-                }
-                case 14:
-                {
-                    hexColor[2 * i + j] = 'E';
-                    break;
-                }
-                case 15:
-                {
-                    hexColor[2 * i + j] = 'F';
-                    break;
-                }
+                hexColor[2 * i + j] = decColor % 16 + '0';
+            }
+            else
+            {
+                hexColor[2 * i + j] = decColor % 16 - 10 + 'A';
             }
             decColor /= 16;
         }
@@ -2783,43 +2706,13 @@ static char *toHexOpacity(int decOpacity, char *hexOpacity)
     int cnt;
     for(cnt = 1; cnt >=0; cnt--)
     {
-        switch(decOpacity % 16)
+        if (decOpacity % 16 < 10)
         {
-            default:
-            {
-                hexOpacity[cnt] = decOpacity % 16 + '0';
-                break;
-            }
-            case 10:
-            {
-                hexOpacity[cnt] = 'A';
-                break;
-            }
-            case 11:
-            {
-                hexOpacity[cnt] = 'B';
-                break;
-            }
-            case 12:
-            {
-                hexOpacity[cnt] = 'C';
-                break;
-            }
-            case 13:
-            {
-                hexOpacity[cnt] = 'D';
-                break;
-            }
-            case 14:
-            {
-                hexOpacity[cnt] = 'E';
-                break;
-            }
-            case 15:
-            {
-                hexOpacity[cnt] = 'F';
-                break;
-            }
+            hexOpacity[cnt] = decOpacity % 16 + '0';
+        }
+        else
+        {
+            hexOpacity[cnt] = decOpacity % 16 - 10 + 'A';
         }
         decOpacity /= 16;
     }

@@ -1,5 +1,5 @@
 /*
-Copyright 2019 TIKM(github:HITIKM)
+Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -457,4 +457,113 @@ char *strSafeCopy(char *destination, const char *const source, size_t count)
     returnPtr = strncpy(destination, source, count);
     destination[count - 1] = '\0';
     return returnPtr;
+}
+
+/*
+ * 获取匹配次数
+ * 参数：主串/模式串
+ * 返回值：模式串在主串中出现的次数/错误返回-1 
+ * 两次匹配不能有重复字符，如 主aaa 模式aa 返回匹配次数是1次 
+ * 因为在本项目中模式串长度是1或者2，故直接暴力匹配 
+ */
+int match(char *mainStr, char *patternStr)
+{
+    /*合法性检查*/
+    if (mainStr == NULL || patternStr == NULL || patternStr[0] == '\0')
+    {
+        return -1;
+    }
+    
+    char *mainPtr, *mainCmpPtr, *patternPtr;
+    mainPtr = mainCmpPtr = mainStr;
+    patternPtr = patternStr;
+    
+    int matchTimes = 0;
+    while (*mainPtr != '\0') {
+        patternPtr = patternStr; 
+        while (*patternPtr != '\0') {
+            if (*mainCmpPtr != *patternPtr) {
+                break;
+            }
+            mainCmpPtr++;
+            patternPtr++;
+        }
+        
+        if (*patternPtr == '\0') {
+            matchTimes++;
+            mainPtr = mainCmpPtr;
+        } else {
+            mainCmpPtr = ++mainPtr;
+        }
+    }
+    
+    return matchTimes;
+}
+
+/*
+ * 字符串替换 
+ * 参数：输入串/输出串/待替换串/需替换成串 
+ * 返回值：输出串指针/错误返回NULL 
+ * 两次匹配不能有重复字符，如 主aaa 模式aa 返回匹配次数是1次
+ * 因为在本项目中模式串长度是1或者2，故直接暴力匹配
+ */
+char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize)
+{
+    /*合法性检查*/
+    if (inStr == NULL || outStr == NULL || srcStr == NULL || srcStr[0] == '\0')
+    {
+        return NULL;
+    }
+    
+    int cnt = 0;
+    char *inPtr, *inCmpPtr, *inCopyPtr, *outPtr, *srcPtr, *dstPtr;
+    inPtr = inCmpPtr = inCopyPtr = inStr;
+    outPtr = outStr;
+    srcPtr = srcStr;
+    
+    int matchTimes = 0;
+    while (*inPtr != '\0')
+    {
+        srcPtr = srcStr;
+        inCopyPtr = inCmpPtr;
+        while (*srcPtr != '\0')
+        {
+            if (*inCmpPtr != *srcPtr)
+            {
+                break;
+            }
+            inCmpPtr++;
+            srcPtr++;
+        }
+        
+        if (*srcPtr == '\0')
+        {
+            matchTimes++;
+            inPtr = inCmpPtr;
+            
+            /*复制替换内容*/
+            dstPtr = dstStr;
+            while (cnt < outBuffSize && *dstPtr != '\0')
+            {
+                *outPtr = *dstPtr;
+                cnt++;
+                outPtr++;
+                dstPtr++;
+            } 
+        }
+        else
+        {
+            inCmpPtr = ++inPtr;
+            /*复制主串内容*/
+            if (cnt < outBuffSize)
+            {
+                *outPtr = *inCopyPtr;
+                cnt++;
+                outPtr++;
+            }
+        }
+    }
+    
+    *outPtr = '\0';
+    return outStr;
 }

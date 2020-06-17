@@ -1,3 +1,19 @@
+/*
+Copyright 2019-2020 hkm(github:hihkm)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #ifdef _MSC_VER
 
 #include <io.h>
@@ -22,7 +38,7 @@ char *getFormat(char *outFormat, const char *const fileName, int maxLen);
 char *getPath(char *outPath, const char *const fileName, int maxLen);
 double getArgVal(int argc, char **argv, const int optIndex, const char *const optName, const double errorReturnValue);
 
-void pause();
+void toPause();
 BOOL isContinue();
 
 static CONFIG defauleConfig =
@@ -34,7 +50,7 @@ static CONFIG defauleConfig =
     0,              /*弹幕密度*/
     38,             /*字号*/
                     /*字体*/
-    "Microsoft YaHei Light", 
+    "Microsoft YaHei", 
     180,            /*不透明度*/ 
     0,              /*描边*/ 
     1,              /*阴影*/ 
@@ -61,12 +77,12 @@ int main(int argc, char **argv)
     outfile.isSet = FALSE;
 
     /*打印程序版本信息*/
-    printf("DanamkuFactory "VERSION" by TIKM (hkm@tikm.org)\n"
-           "https://github.com/HITIKM/DanmakuFactory\n"
+    printf("DanamkuFactory "VERSION" by hkm (hkm@tikm.org)\n"
+           "https://github.com/hihkm/DanmakuFactory\n"
           );
     
     /*获取配置文件路径*/
-    getPath(configFilePath, _pgmptr, MAX_TEXT_LENGTH);
+    getPath(configFilePath, argv[0], MAX_TEXT_LENGTH);
     strncat(configFilePath, "\\"CONFIG_FILE_NAME, MAX_TEXT_LENGTH);
     configFilePath[MAX_TEXT_LENGTH - 1] = '\0';
     if (strstr(configFilePath, CONFIG_FILE_NAME) == NULL)
@@ -77,7 +93,7 @@ int main(int argc, char **argv)
                "\nFail to get config file path, because the path is too long\n");
         
         configFileErr = TRUE;
-        pause();
+        toPause();
     }
 
     /*解析参数*/
@@ -115,8 +131,8 @@ int main(int argc, char **argv)
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
-                        printf("\nERROR"
-                               "\nOutput file must be specified\n");
+                        fprintf(stderr, "\nERROR"
+                                        "\nOutput file must be specified\n");
                         return 0;
                         break;
                     case 1:
@@ -142,8 +158,8 @@ int main(int argc, char **argv)
                 /*合法性检查*/ 
                 if (!ISFORMAT(outfile.format))
                 {
-                    printf("\nERROR"
-                           "\nUnknow format %s\n", outfile.format);
+                    fprintf(stderr, "\nERROR"
+                                    "\nUnknow format %s\n", outfile.format);
                     
                     return 0;
                 }
@@ -155,8 +171,8 @@ int main(int argc, char **argv)
                 {
                     if ((infile = (FINFO *)realloc(infile, (infileNum+1) * sizeof(FINFO))) == NULL)
                     {
-                        printf("\nERROR"
-                               "\nOut of memory\n");
+                        fprintf(stderr, "\nERROR"
+                                        "\nOut of memory\n");
                         return 0;
                     }
                     
@@ -167,8 +183,8 @@ int main(int argc, char **argv)
                         
                         if (cnt >= num)
                         {
-                            printf("\nERROR"
-                                   "\nFormat must be followed by a filename\n");
+                            fprintf(stderr, "\nERROR"
+                                            "\nFormat must be followed by a filename\n");
                             return 0;
                         }
                         
@@ -187,8 +203,8 @@ int main(int argc, char **argv)
                     /*合法性检查*/ 
                     if (!ISFORMAT(infile[infileNum].format))
                     {
-                        printf("\nERROR"
-                               "\nUnknow format %s\n", infile[infileNum].format);
+                        fprintf(stderr, "\nERROR"
+                                        "\nUnknow format %s\n", infile[infileNum].format);
                         
                         return 0;
                     }
@@ -269,8 +285,8 @@ int main(int argc, char **argv)
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
-                        printf("\nERROR"
-                               "\nFontname must be specified\n");
+                        fprintf(stderr, "\nERROR"
+                                        "\nFontname must be specified\n");
                         return 0;
                         break;
                     case 1:
@@ -278,8 +294,8 @@ int main(int argc, char **argv)
                         deQuotMarks(config.fontname);
                         break;
                     default:
-                        printf("\nERROR"
-                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid argument %s\n", argv[argCnt+2]);
                         return 0;
                         break;
                 }
@@ -346,15 +362,15 @@ int main(int argc, char **argv)
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
-                        printf("\nERROR"
-                               "\nBlockmode must be specified\n");
+                        fprintf(stderr, "\nERROR"
+                                        "\nBlockmode must be specified\n");
                         return 0;
                         break;
                     case 1:
                         break;
                     default:
-                        printf("\nERROR"
-                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid argument %s\n", argv[argCnt+2]);
                         return 0; 
                         break;
                 }
@@ -416,8 +432,8 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        printf("\nERROR"
-                               "\nInvalid type-name %s\n", tempStr);
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid type-name %s\n", tempStr);
                         return 0;
                     }
                 }
@@ -429,15 +445,15 @@ int main(int argc, char **argv)
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
-                        printf("\nERROR"
-                               "\nStatmode must be specified\n");
+                        fprintf(stderr, "\nERROR"
+                                        "\nStatmode must be specified\n");
                         return 0;
                         break;
                     case 1:
                         break;
                     default:
-                        printf("\nERROR"
-                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid argument %s\n", argv[argCnt+2]);
                         return 0; 
                         break;
                 }
@@ -479,8 +495,8 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        printf("\nERROR"
-                               "\nInvalid type-name %s\n", tempStr);
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid type-name %s\n", tempStr);
                         return 0; 
                     }
                 }
@@ -492,15 +508,15 @@ int main(int argc, char **argv)
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
-                        printf("\nERROR"
-                               "\nSaveblocked must be specified\n");
+                        fprintf(stderr, "\nERROR"
+                                        "\nSaveblocked must be specified\n");
                         return 0;
                         break;
                     case 1:
                         break;
                     default:
-                        printf("\nERROR"
-                               "\nInvalid argument %s\n", argv[argCnt+2]);
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid argument %s\n", argv[argCnt+2]);
                         return 0; 
                         break;
                 }
@@ -517,8 +533,8 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    printf("\nERROR"
-                           "\nInvalid value %s\n", argv[argCnt+1]);
+                    fprintf(stderr, "\nERROR"
+                                    "\nInvalid value %s\n", argv[argCnt+1]);
                     return 0;
                 }
                 
@@ -534,8 +550,8 @@ int main(int argc, char **argv)
             }
             else
             {
-                printf("\nERROR"
-                       "\nInvalid argument %s\n", argv[argCnt]);
+                fprintf(stderr, "\nERROR"
+                                "\nInvalid argument %s\n", argv[argCnt]);
                 return 0;
             }
         }
@@ -550,10 +566,10 @@ int main(int argc, char **argv)
                 {
                     if (argCnt >= argc || !ISNUMBERIC(argv[argCnt]))
                     {
-                        printf("\nERROR"
-                               "\nToo few values in option timeshift(-t, --timeshift)");
-                        printf("\nNOTE"
-                               "\n%d filenames are provided, but only %d timeshift value.\n",
+                        fprintf(stderr, "\nERROR"
+                                        "\nToo few values in option timeshift(-t, --timeshift)");
+                        fprintf(stderr, "\nNOTE"
+                                        "\n%d filenames are provided, but only %d timeshift value.\n",
                                infileNum, cnt);
                         return 0;
                     }
@@ -568,10 +584,10 @@ int main(int argc, char **argv)
                 /*有更多的数字意味着语法错误*/
                 if (argCnt < argc && ISNUMBERIC(argv[argCnt]))
                 {
-                    printf("\nERROR"
-                           "\nToo many values in option timeshift(-t, --timeshift)");
-                    printf("\nNOTE"
-                           "\nOnly %d filename(s) are provided, but more than %d timeshift values.\n",
+                    fprintf(stderr, "\nERROR"
+                                    "\nToo many values in option timeshift(-t, --timeshift)");
+                    fprintf(stderr, "\nNOTE"
+                                    "\nOnly %d filename(s) are provided, but more than %d timeshift values.\n",
                            infileNum, infileNum);
                     return 0;
                 }
@@ -594,78 +610,78 @@ int main(int argc, char **argv)
         /*分辨率宽*/
         if (config.resx <= 0)
         {
-            printf("\nERROR"
-                    "\nResolution width must be an integer greater than 0");
+            fprintf(stderr, "\nERROR"
+                            "\nResolution width must be an integer greater than 0");
             return 0;
         }
         /*分辨率高*/
         if (config.resy <= 0)
         {
-            printf("\nERROR"
-                    "\nResolution height must be an integer greater than 0");
+            fprintf(stderr, "\nERROR"
+                            "\nResolution height must be an integer greater than 0");
             return 0;
         }
         /*滚动时间*/
         if (config.scrolltime < EPS)
         {
-            printf("\nERROR"
-                    "\nScroll time must be a real number greater than 0.00");
+            fprintf(stderr, "\nERROR"
+                            "\nScroll time must be a real number greater than 0.00");
             return 0;
         }
         /*固定时间*/
         if (config.fixtime < EPS)
         {
-            printf("\nERROR"
-                    "\nFix time must be a real number greater than 0.00");
+            fprintf(stderr, "\nERROR"
+                            "\nFix time must be a real number greater than 0.00");
             return 0;
         }
         /*密度*/
         if (config.density < -1)
         {
-            printf("\nERROR"
-                    "\nDensity must be an integer greater than or equal to -1");
+            fprintf(stderr, "\nERROR"
+                            "\nDensity must be an integer greater than or equal to -1");
             return 0;
         }
         /*字号*/
         if (config.fontsize <= 0)
         {
-            printf("\nERROR"
-                    "\nFontsize must be an integer greater than 0");
+            fprintf(stderr, "\nERROR"
+                            "\nFontsize must be an integer greater than 0");
             return 0;
         }
         /*不透明度*/
         if (config.opacity <= 0 || config.opacity > 255)
         {
-            printf("\nERROR"
-                    "\nOpacity must be an integer greater than 0 and less than or equal to 255");
+            fprintf(stderr, "\nERROR"
+                            "\nOpacity must be an integer greater than 0 and less than or equal to 255");
             return 0;
         }
         /*描边*/
         if (config.outline < 0 || config.outline > 4)
         {
-            printf("\nERROR"
-                    "\nOutline must be an integer greater than or equal to 0 and less than or equal to 4");
+            fprintf(stderr, "\nERROR"
+                            "\nOutline must be an integer greater than or equal to 0 and less than or equal to 4");
             return 0;
         }
         /*阴影*/
         if (config.shadow < 0 || config.shadow > 4)
         {
-            printf("\nERROR"
-                    "\nShadow must be an integer greater than or equal to 0 and less than or equal to 4");
+            fprintf(stderr, "\nERROR"
+                            "\nShadow must be an integer greater than or equal to 0 and less than or equal to 4");
             return 0;
         }
         /*显示区域*/
         if (config.displayarea < EPS || fabs(config.displayarea-1.0) > EPS)
         {
-            printf("\nERROR"
-                    "\nDisplay area must be a real number greater than 0.0 and less than or equal to 1.0");
+            fprintf(stderr, "\nERROR"
+                            "\nDisplay area must be a real number greater than 0.0 and less than or equal to 1.0");
             return 0;
         }
         /*滚动区域*/
         if (config.scrollarea < EPS || fabs(config.scrollarea-1.0) > EPS)
         {
-            printf("\nERROR"
-                    "\nScroll area must be a real number greater than 0.0 and less than or equal to 1.0");
+            fprintf(stderr, "\nERROR"
+                            "\nScroll area must be a real number greater than 0.0 and less than or equal to 1.0");
             return 0;
         }
         /*字体*/
@@ -676,15 +692,13 @@ int main(int argc, char **argv)
             {/*ascii 非可打印字符范围*/
                 printf("\nWARNING"
                     "\nSome characters of fontname are non-ASCII characters, which may cause the garbled problem\n");
-                pause();
+                toPause();
                 break;
             }
 
             tempPtr++;
         }
     }
-
-    
     
     /*保存配置文件*/
     if (saveConfig == TRUE && configFileErr == FALSE)
@@ -698,7 +712,7 @@ int main(int argc, char **argv)
             printf("\nWARNING"
                    "\nFailed to write the configuration file!\n");
             
-            pause();
+            toPause();
         }
     }
     
@@ -710,18 +724,18 @@ int main(int argc, char **argv)
     /*显示文件信息*/
     if (outfile.isSet == FALSE)
     {
-        printf("\nERROR"
-               "\nOutput file must be specified");
-        printf("\nNOTE"
-               "\nUse -o or --output to specify.\n");
+        fprintf(stderr, "\nERROR"
+                        "\nOutput file must be specified");
+        fprintf(stderr, "\nNOTE"
+                        "\nUse -o or --output to specify.\n");
         return 0;
     }
     if (infileNum == 0)
     {
-        printf("\nERROR"
-               "\nInput file must be specified");
-        printf("\nNOTE"
-               "\nUse -i or --input to specify.\n");
+        fprintf(stderr, "\nERROR"
+                        "\nInput file must be specified");
+        fprintf(stderr, "\nNOTE"
+                        "\nUse -i or --input to specify.\n");
         return 0;
     }
     
@@ -750,16 +764,16 @@ int main(int argc, char **argv)
         /*检查文件是否存在*/
         if (access(infile[cnt].fileName, F_OK) != 0)
         {
-            printf ("\nERROR"
-                    "\nNo such file.\n");
+            fprintf(stderr, "\nERROR"
+                            "\nNo such file.\n");
             return 0;
         }
 
         /*权限检查*/
         if (access(infile[cnt].fileName, R_OK) != 0)
         {
-            printf ("\nERROR"
-                    "\nPermission denied.\n");
+            fprintf(stderr, "\nERROR"
+                            "\nPermission denied.\n");
             return 0;
         }
         
@@ -772,8 +786,8 @@ int main(int argc, char **argv)
                 case 0:
                     break;
                 case 1:
-                    printf("\nERROR [code rx%d]"
-                           "\nFailed to open file %s\n",
+                    fprintf(stderr, "\nERROR [code rx%d]"
+                                    "\nFailed to open file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
@@ -781,8 +795,8 @@ int main(int argc, char **argv)
                 case 2:
                 case 3:
                 case 4:
-                    printf("\nERROR [code rx%d]"
-                           "\nFailed to read file %s\n",
+                    fprintf(stderr, "\nERROR [code rx%d]"
+                                    "\nFailed to read file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
@@ -790,8 +804,8 @@ int main(int argc, char **argv)
                 case 5:
                 case 6:
                 case 7:
-                    printf("\nERROR [code rx%d]"
-                           "\nOut of memory\n",
+                    fprintf(stderr, "\nERROR [code rx%d]"
+                                    "\nOut of memory\n",
                            returnValue
                           );
                     return 0;
@@ -809,8 +823,8 @@ int main(int argc, char **argv)
                     }
                     break;
                 default:
-                    printf("\nERROR [code rx%d]"
-                           "\nUndefined Error\n",
+                    fprintf(stderr, "\nERROR [code rx%d]"
+                                    "\nUndefined Error\n",
                            returnValue
                           );
                     break;
@@ -825,8 +839,8 @@ int main(int argc, char **argv)
                 case 0:
                     break;
                 case 1:
-                    printf("\nERROR [code rj%d]"
-                           "\nFailed to open file %s\n",
+                    fprintf(stderr, "\nERROR [code rj%d]"
+                                    "\nFailed to open file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
@@ -834,16 +848,16 @@ int main(int argc, char **argv)
                 case 2:
                 case 3:
                 case 4:
-                    printf("\nERROR [code rj%d]"
-                           "\nFailed to read file %s\n",
+                    fprintf(stderr, "\nERROR [code rj%d]"
+                                    "\nFailed to read file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
                     break;
                 case 5:
                 case 6:
-                    printf("\nERROR [code rj%d]"
-                           "\nOut of memory\n",
+                    fprintf(stderr, "\nERROR [code rj%d]"
+                                    "\nOut of memory\n",
                            returnValue
                           );
                     return 0;
@@ -861,8 +875,8 @@ int main(int argc, char **argv)
                     }
                     break;
                 default:
-                    printf("\nERROR [code rj%d]"
-                           "\nUndefined Error\n",
+                    fprintf(stderr, "\nERROR [code rj%d]"
+                                    "\nUndefined Error\n",
                            returnValue
                           );
                     break;
@@ -877,8 +891,8 @@ int main(int argc, char **argv)
                 case 0:
                     break;
                 case 1:
-                    printf("\nERROR [code ra%d]"
-                           "\nFailed to open file %s\n",
+                    fprintf(stderr, "\nERROR [code ra%d]"
+                                    "\nFailed to open file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
@@ -886,15 +900,15 @@ int main(int argc, char **argv)
                 case 2:
                 case 3:
                 case 4:
-                    printf("\nERROR [code ra%d]"
-                           "\nOut of memory\n",
+                    fprintf(stderr, "\nERROR [code ra%d]"
+                                    "\nOut of memory\n",
                            returnValue
                           );
                     return 0;
                     break;
                 default:
-                    printf("\nERROR [code ra%d]"
-                           "\nUndefined Error\n",
+                    fprintf(stderr, "\nERROR [code ra%d]"
+                                    "\nUndefined Error\n",
                            returnValue
                           );
                     break;
@@ -910,15 +924,15 @@ int main(int argc, char **argv)
                 case 4:
                 case 5:
                 case 6:
-                    printf("\nERROR [code ra%d]"
-                           "\nOut of memory\n",
+                    fprintf(stderr, "\nERROR [code ra%d]"
+                                    "\nOut of memory\n",
                            returnValue
                           );
                     return 0;
                     break;
                 default:
-                    printf("\nERROR [code ra%d]"
-                           "\nUndefined Error\n",
+                    fprintf(stderr, "\nERROR [code ra%d]"
+                                    "\nUndefined Error\n",
                            returnValue
                           );
                     break;
@@ -949,15 +963,15 @@ int main(int argc, char **argv)
         case 0:
             break;
         case 2:
-            printf("\nERROR [code s%d]"
-                   "\nOut of memory\n",
+            fprintf(stderr, "\nERROR [code s%d]"
+                            "\nOut of memory\n",
                    returnValue
                   );
             return 0;
             break;
         default:
-            printf("\nERROR [code s%d]"
-                   "\nUndefined Error\n",
+            fprintf(stderr, "\nERROR [code s%d]"
+                            "\nUndefined Error\n",
                    returnValue
                   );
             break;
@@ -977,8 +991,8 @@ int main(int argc, char **argv)
         /*权限检查*/
         if (access(outfile.fileName, W_OK) != 0)
         {
-            printf ("\nERROR"
-                    "\nPermission denied.\n");
+            fprintf(stderr, "\nERROR"
+                            "\nPermission denied.\n");
             return 0;
         }
     }
@@ -997,15 +1011,15 @@ int main(int argc, char **argv)
             case 0:
                 break;
             case 100:
-                printf("\nERROR [code wa%d]"
-                       "\nFailed to create file %s\n",
+                fprintf(stderr, "\nERROR [code wa%d]"
+                                "\nFailed to create file %s\n",
                        returnValue, outfile.fileName
                       );
                 return 0;
                 break;
             default:
-                printf("\nERROR [code wa%d]"
-                       "\nUndefined Error\n",
+                fprintf(stderr, "\nERROR [code wa%d]"
+                                "\nUndefined Error\n",
                        returnValue
                       );
                 break;
@@ -1022,22 +1036,22 @@ int main(int argc, char **argv)
             case 6:
             case 7:
             case 8:
-                printf("\nERROR [code wa%d]"
-                       "\nOut of memory\n",
+                fprintf(stderr, "\nERROR [code wa%d]"
+                                "\nOut of memory\n",
                        returnValue
                       );
                 return 0;
                 break;
             case 9:
-                    printf("\nERROR [code wa%d]"
-                           "\nFailed to write file %s\n",
+                    fprintf(stderr, "\nERROR [code wa%d]"
+                                    "\nFailed to write file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
                     break;
             default:
-                printf("\nERROR [code wa%d]"
-                       "\nUndefined Error\n",
+                fprintf(stderr, "\nERROR [code wa%d]"
+                                "\nUndefined Error\n",
                        returnValue
                       );
                 break;
@@ -1052,22 +1066,22 @@ int main(int argc, char **argv)
             case 0:
                 break;
             case 2:
-                printf("\nERROR [code wx%d]"
-                       "\nFailed to create file %s\n",
+                fprintf(stderr, "\nERROR [code wx%d]"
+                                "\nFailed to create file %s\n",
                        returnValue, outfile.fileName
                       );
                 return 0;
                 break;
             case 3:
-                    printf("\nERROR [code wx%d]"
-                           "\nFailed to write file %s\n",
+                    fprintf(stderr, "\nERROR [code wx%d]"
+                                    "\nFailed to write file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
                     break;
             default:
-                printf("\nERROR [code wx%d]"
-                       "\nUndefined Error\n",
+                fprintf(stderr, "\nERROR [code wx%d]"
+                                "\nUndefined Error\n",
                        returnValue
                       );
                 break;
@@ -1081,22 +1095,22 @@ int main(int argc, char **argv)
             case 0:
                 break;
             case 2:
-                printf("\nERROR [code wj%d]"
-                       "\nFailed to create file %s\n",
+                fprintf(stderr, "\nERROR [code wj%d]"
+                                "\nFailed to create file %s\n",
                        returnValue, outfile.fileName
                       );
                 return 0;
                 break;
             case 3:
-                    printf("\nERROR [code wj%d]"
-                           "\nFailed to write file %s\n",
+                    fprintf(stderr, "\nERROR [code wj%d]"
+                                    "\nFailed to write file %s\n",
                            returnValue, infile[cnt].fileName
                           );
                     return 0;
                     break;
             default:
-                printf("\nERROR [code wj%d]"
-                       "\nUndefined Error\n",
+                fprintf(stderr, "\nERROR [code wj%d]"
+                                "\nUndefined Error\n",
                        returnValue
                       );
                 break;
@@ -1350,15 +1364,15 @@ double getArgVal(int argc, char **argv, const int optIndex, const char *const op
     double value;
     if (optIndex+1 >= argc)
     {
-        printf("ERROR\n"
-               "%s must be specified\n", optName);
+        fprintf(stderr, "ERROR\n"
+                        "%s must be specified\n", optName);
         return errorReturnValue;
     }
     
     if (!ISNUMBERIC(argv[optIndex+1]))
     {
-        printf("ERROR\n"
-               "Invalid argument %s\n", argv[optIndex+1]);
+        fprintf(stderr, "ERROR\n"
+                        "Invalid argument %s\n", argv[optIndex+1]);
         return errorReturnValue;
     }
     
@@ -1371,8 +1385,8 @@ double getArgVal(int argc, char **argv, const int optIndex, const char *const op
             value = atof(argv[optIndex+1]);
             break;
         default:
-            printf("ERROR\n"
-                   "Invalid argument %s\n", argv[optIndex+2]);
+            fprintf(stderr, "ERROR\n"
+                            "Invalid argument %s\n", argv[optIndex+2]);
             return errorReturnValue;
             break;
     }
@@ -1381,7 +1395,7 @@ double getArgVal(int argc, char **argv, const int optIndex, const char *const op
 }
 
 /*暂停 按回车继续*/
-void pause()
+void toPause()
 {
     printf("\nPress ENTER to continue.\n");
     fflush(stdin);

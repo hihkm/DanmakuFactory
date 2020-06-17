@@ -1,5 +1,5 @@
 /*
-Copyright 2019-2020 TIKM(github:HITIKM)
+Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ limitations under the License.
 #ifndef __CLIDEF_H__
 #define __CLIDEF_H__
 
-#define VERSION "1.41 CLI Beta"
+#define VERSION "1.41 CLI Release"
 #define CONFIG_FILE_NAME "DanmakuFactoryConfig.json"
 #define FILENAME_LEN 512
 #define FORMAT_LEN 16
