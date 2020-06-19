@@ -36,7 +36,13 @@ git clone git@github.com:hihkm/DanmakuFactory.git
 cd DanmakuFactory
 ```
 
-3. 编译，可执行文件为DanmakuFactory
+3. 创建临时文件夹
+
+```shell
+mkdir temp
+```
+
+4. 编译，可执行文件为DanmakuFactory
 
 ```shell
 make
@@ -118,8 +124,8 @@ DanmakuFactory -o [输出文件格式] 输出文件名 -i [输入文件1格式] 
 | **-s,--scrolltime** | 指定滚动弹幕通过时间（秒）                       | 实数(>0.0)                                                   | -s 12.0              |
 | **-f, --fixtime**   | 指定固定弹幕出现时间（秒）                       | 实数(>0.0)                                                   | -f 5.0               |
 | **-d, --density**   | 指定弹幕密度（条）                               | 整数(>=-1) **-1**表示不重叠  **0** 表示无限制  **其他**表示限定条数 | -d -1                |
-| **-S, --fontsize**  | 指定文字大小                                     | 整数 (>=-0)                                                  | -S “Microsoft YaHei” |
-| **-N, --fontname**  | 指定字体（注意编码问题）                         | 字符串                                                       | -N 38                |
+| **-S, --fontsize**  | 指定文字大小                                     | 整数 (>=-0)                                                  | -S 38                |
+| **-N, --fontname**  | 指定字体（注意编码问题）                         | 字符串                                                       | -N “Microsoft YaHei” |
 | **-O, --opacity**   | 指定不透明度，越小越透明                         | 整数(1-255)                                                  | -O 255               |
 | **-L, --outline**   | 指定描边程度                                     | 整数(0-4)  **0** 表示不使用                                  | -L 0                 |
 | **-D, --shadow**    | 指定阴影深度                                     | 整数(0-4)  **0** 表示不使用                                  | -D 1                 |

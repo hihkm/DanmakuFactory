@@ -96,7 +96,6 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     /*入桶*/ 
     while(*listHead != NULL)
     {
-        static int cccnnnttt = 0;
         index = (now -> time - min) / (max - min + 1) * bucketNum;
 
         *listHead = (*listHead) -> next;
