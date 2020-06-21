@@ -1236,7 +1236,8 @@ int writeAssDanmakuPart(FILE *opF,
     
     DANMAKU *now = NULL;
     int cnt;
-    char EscapedText[MAX_TEXT_LENGTH];
+    char escapedText[MAX_TEXT_LENGTH];
+    char tempText[MAX_TEXT_LENGTH];
     
     DANMAKU *signPtr = head, *scanPtr = head;
     
@@ -1383,11 +1384,19 @@ int writeAssDanmakuPart(FILE *opF,
         textLen = getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
         textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
 
-        /*特殊字符替换 特殊弹幕单独处理*/
-        if (abs(now -> type) != 5)
+        /*特殊字符替换*/
+        if (*(now->text) == ' ')
         {
-            strrpl(now -> text, EscapedText, " ", "\\h", MAX_TEXT_LENGTH);
+            strcpy(escapedText, "\\h");
+            strcat_s(escapedText, MAX_TEXT_LENGTH, now->text);
         }
+        else
+        {
+            strSafeCopy(escapedText, now->text, MAX_TEXT_LENGTH);
+        }
+
+        strrpl(escapedText, tempText, "\n ", "\\N\\h", MAX_TEXT_LENGTH);
+        strrpl(tempText, escapedText, "\n", "\\N", MAX_TEXT_LENGTH);
         
         if(now -> type == 1 || now -> type == -1)/*右左弹幕*/ 
         {
@@ -1440,7 +1449,7 @@ int writeAssDanmakuPart(FILE *opF,
             fprintf(opF, "R2L,,0000,0000,0000,,{\\move(%d,%d,%d,%d)\\q2",
                     resX + textLen/2, PositionY, -1 * textLen / 2, PositionY);
             
-            if(now -> fontSize != 25)
+            if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -1451,7 +1460,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", EscapedText);
+            fprintf(opF, "}%s", escapedText);
         }
         else if(now -> type == 2 || now -> type == -2)/*左右弹幕*/ 
         {
@@ -1505,7 +1514,7 @@ int writeAssDanmakuPart(FILE *opF,
             fprintf(opF, "L2R,,0000,0000,0000,,{\\move(%d,%d,%d,%d)\\q2",
                     -1 * textLen / 2, PositionY, resX + textLen/2, PositionY);
             
-            if(now -> fontSize != 25)
+            if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -1516,7 +1525,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", EscapedText);
+            fprintf(opF, "}%s", escapedText);
         }
         else if(now -> type == 3 || now -> type == -3)/*顶端弹幕*/ 
         {
@@ -1565,7 +1574,7 @@ int writeAssDanmakuPart(FILE *opF,
             printTime(opF, now->time + holdTime, ",");
             fprintf(opF, "TOP,,0000,0000,0000,,{\\pos(%d,%d)\\q2", resX / 2, PositionY);
             
-            if(now -> fontSize != 25)
+            if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -1576,7 +1585,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", EscapedText);
+            fprintf(opF, "}%s", escapedText);
         }
         else if(now -> type == 4 || now -> type == -4)/*底端弹幕*/ 
         {
@@ -1630,7 +1639,7 @@ int writeAssDanmakuPart(FILE *opF,
             fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)\\q2",
                     resX / 2, PositionY - textHei + 2);
             
-            if(now -> fontSize != 25)
+            if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -1641,7 +1650,7 @@ int writeAssDanmakuPart(FILE *opF,
                 fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
             }
             
-            fprintf(opF, "}%s", EscapedText);
+            fprintf(opF, "}%s", escapedText);
         }
         else if(now -> type == 5 || now -> type == -5)/*特殊弹幕*/
         {
@@ -1714,7 +1723,7 @@ int writeAssDanmakuPart(FILE *opF,
             
             if(now -> fontSize != 25)
             {/*字号*/ 
-                fprintf(opF, "\\fs%d", fontSize + (now -> fontSize - 25));
+                fprintf(opF, "\\fs%d", now -> fontSize);
             }
             
             if(now -> color != 0xFFFFFF)
@@ -1746,15 +1755,8 @@ int writeAssDanmakuPart(FILE *opF,
             {/*字体*/ 
                 fprintf(opF, "\\fn%s", now -> special -> fontName);
             }
-            
-            /*特殊字符替换*/
-            {
-                char tempText[MAX_TEXT_LENGTH];
-                strrpl(now -> text, tempText, " ", "\\h", MAX_TEXT_LENGTH);
-                strrpl(tempText, EscapedText, "\n", "\\N", MAX_TEXT_LENGTH);
-            }
 
-            fprintf(opF, "}%s", EscapedText);
+            fprintf(opF, "}%s", escapedText);
         }
         else if(now -> type == 8)/*代码弹幕*/ 
         {

@@ -266,7 +266,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             
             /*文本部分*/
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
-            strGetLeftPart(textPart, &textPtr, '\"', MAX_TEXT_LENGTH);
+            strGetLeftPart(tempText, &textPtr, '\"', MAX_TEXT_LENGTH);
+            strrpl(tempText, textPart, "/n", "\n", MAX_TEXT_LENGTH);//远古弹幕转义换行符
             strGetLeftPart(NULL, &textPtr, ',', MAX_TEXT_LENGTH);
             
             now->special->frZ = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));

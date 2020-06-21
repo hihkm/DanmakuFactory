@@ -10,13 +10,13 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持ass
 
 ##### Windows
 
-[DanmakuFactory_1.41_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
+[DanmakuFactory_1.42_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
 
-[DanmakuFactory_1.41_CLI  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+[DanmakuFactory_1.42_CLI  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
 
 [DanmakuFactory_GUI(~~在做了在做了~~)]()
 
-[1.31  Release](Compiled/release/DanmakuFactory_1.31_release.zip)
+[1.31  Release(有指引的控制台应用)](Compiled/release/DanmakuFactory_1.31_release.zip)
 
 
 
@@ -174,34 +174,18 @@ DanmakuFactory -o [输出文件格式] 输出文件名 -i [输入文件1格式] 
 ##### 1.40
 
 - 增加了ass弹幕读入功能，并兼容第三方软件生成的ass弹幕文件
-
 - 增加了xml弹幕写出功能
-
 - 增加了json弹幕读入功能（实验）
-
 - 增加了json弹幕写出功能（实验）
-
 - 增加了写出ass文件时屏蔽弹幕以注释方式保留
-
 - 增加了xml弹幕转义符解析
-
 - 增加了多文件弹幕合并
-
-  
-
 - 修复了特殊弹幕不换行的问题
-
 - 修复了特殊弹幕解析有概率崩溃的问题
-
 - 修复了普通弹幕过长可能导致的崩溃问题
 
-  
-
 - 优化了部分模块，执行效率有所提高
-
 - 改用json文件存储配置信息，便于修改查看
-
-  
 
 - 去除了原本不稳定的编码转换模块（后续可能会使用第三方库）
 
@@ -211,3 +195,11 @@ DanmakuFactory -o [输出文件格式] 输出文件名 -i [输入文件1格式] 
 - 修复了部分xml特殊弹幕无法正常解析的问题
 - 修复了ass输出后空格失效的问题
 - 优化排序，对于原本正序的输入无需重新排序
+
+**1.42**
+
+- 修复了部分xml特殊弹幕无法正常解析的问题
+
+- 修复了部分xml特殊弹幕回车或空格显示错误问题
+
+- 取消了特殊弹幕等比缩放

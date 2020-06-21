@@ -17,7 +17,7 @@ limitations under the License.
 #ifndef __CLIDEF_H__
 #define __CLIDEF_H__
 
-#define VERSION "1.41 CLI Release"
+#define VERSION "1.42 CLI Beta"
 #define CONFIG_FILE_NAME "DanmakuFactoryConfig.json"
 #define FILENAME_LEN 512
 #define FORMAT_LEN 16
