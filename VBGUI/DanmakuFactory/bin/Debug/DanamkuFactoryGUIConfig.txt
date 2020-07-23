@@ -1,0 +1,1 @@
+resX:1922;resY:1077;displayarea:1;scrollarea:0.94;scrolltime:14;fixtime:5;density:37;fontname:Microsoft YaHei;fontsize:43;opacity:215;outline:3;shadow:2;blockR2L:False;blockL2R:False;blockTop:True;blockBtm:False;blockSpecial:True;blockColor:True;blockRepeat:False;statTable:True;statHistogram:False;

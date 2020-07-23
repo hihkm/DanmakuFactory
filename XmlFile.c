@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,29 +12,29 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #include "CDanmakuFactory.h"
 
 static char *xmlUnescape(char *const str);
 static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 
-/*弹幕类型重定义规范*/
-/*+-------------+---------+*/
-/*|  类型名称   |  编号   |*/
-/*+-------------+---------+*/
-/*|  右左滚动   |    1    |*/
-/*+-------------+---------+*/
-/*|  左右滚动   |    2    |*/
-/*+-------------+---------+*/
-/*|  上方固定   |    3    |*/
-/*+-------------+---------+*/
-/*|  下方固定   |    4    |*/
-/*+-------------+---------+*/
-/*| B站特殊弹幕 |    5    |*/
-/*+-------------+---------+*/
+/* 弹幕类型重定义规范 */
+/* +-------------+---------+ */
+/* |  类型名称   |  编号   | */
+/* +-------------+---------+ */
+/* |  右左滚动   |    1    | */
+/* +-------------+---------+ */
+/* |  左右滚动   |    2    | */
+/* +-------------+---------+ */
+/* |  上方固定   |    3    | */
+/* +-------------+---------+ */
+/* |  下方固定   |    4    | */
+/* +-------------+---------+ */
+/* | B站特殊弹幕 |    5    | */
+/* +-------------+---------+ */
 
-/*
+/* 
  * 读取xml文件加入弹幕池 
  * 参数：
  * 文件名/链表头/读取模式（"n"清空新建 / "a"尾部追加）/时轴偏移量 
@@ -44,14 +44,14 @@ static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
  * 2 3 4 读取文件发生错误
  * 5 6 7 内存空间申请失败
  * 8 文件未能按正确格式读入
- */
+  */
 int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status)
 {
     FILE *ipF;
     DANMAKU *now = NULL, *last = NULL;
     int cnt;
     
-    /*刷新status*/
+    /* 刷新status */
     if (status != NULL)
     {
         status -> function = (void *)readXml;
@@ -59,7 +59,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         status -> isDone = FALSE;
     }
     
-    /*打开文件*/
+    /* 打开文件 */
     if ((ipF = fopen(ipFile, "r")) == NULL)
     {
         #if PRINT_ERR == TRUE
@@ -68,14 +68,14 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         return 1;
     }
     
-    /*判断读入方式*/
+    /* 判断读入方式 */
     if (*head == NULL || *mode == 'n')
-    {/*新建模式*/
+    {/* 新建模式 */
         freeList(*head);
         *head = NULL;
     }
     else if (*mode == 'a')
-    {/*追加模式*/
+    {/* 追加模式 */
         now = last = *head;
         if((*head) -> next != NULL)
         {
@@ -88,7 +88,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
     }
     
-    /*读取xml文件*/
+    /* 读取xml文件 */
     float t_time;
     short t_type;
     short t_fontSize;
@@ -99,7 +99,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     
     while (!feof(ipF))
     {
-        /*寻找每条弹幕的开始*/
+        /* 寻找每条弹幕的开始 */
         while (fgetc(ipF) != '<' || fgetc(ipF) != 'd')
         {
             if (feof(ipF))
@@ -118,7 +118,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         
         fscanf(ipF, " p=\"%f,%hd,%hd,%d,", &t_time, &t_type, &t_fontSize, &t_color);
         
-        /*寻找文本部分的开头*/
+        /* 寻找文本部分的开头 */
         while (fgetc(ipF) != '>')
         {
             if (feof(ipF))
@@ -135,7 +135,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
         }
         
-        /*读取文本部分*/ 
+        /* 读取文本部分 */ 
         cnt = 0;
         while ((ch = fgetc(ipF)) != '<' && cnt < MAX_TEXT_LENGTH - 1)
         {
@@ -156,7 +156,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
         t_text[cnt] = '\0';
         
-        /*申请一个节点的空间*/
+        /* 申请一个节点的空间 */
         if ((now = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
         {
             errorExit(ipF, *head, last);
@@ -166,7 +166,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             return 5;
         }
         
-        /*申请文本部分空间*/
+        /* 申请文本部分空间 */
         if ((now -> text = (char *)malloc((strlen(t_text) + 1) * sizeof(char))) == NULL)
         {
             errorExit(ipF, *head, now);
@@ -181,21 +181,21 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             *head = last = now;
         }
         
-        /*+----------+-----------+-----------+*/
-        /*| 类型名称 | 原类型编号| 新类型编号|*/
-        /*+----------+-----------+-----------+*/
-        /*| 右左滚动 |     1     |     1     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 左右滚动 |     6     |     2     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 上方固定 |     5     |     3     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 下方固定 |     4     |     4     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 特殊弹幕 |     7     |     5     |*/
-        /*+----------+-----------+-----------+*/
+        /* +----------+-----------+-----------+ */
+        /* | 类型名称 | 原类型编号| 新类型编号| */
+        /* +----------+-----------+-----------+ */
+        /* | 右左滚动 |     1     |     1     | */
+        /* +----------+-----------+-----------+ */
+        /* | 左右滚动 |     6     |     2     | */
+        /* +----------+-----------+-----------+ */
+        /* | 上方固定 |     5     |     3     | */
+        /* +----------+-----------+-----------+ */
+        /* | 下方固定 |     4     |     4     | */
+        /* +----------+-----------+-----------+ */
+        /* | 特殊弹幕 |     7     |     5     | */
+        /* +----------+-----------+-----------+ */
         switch (t_type)
-        {/*将xml定义的类型编号转换为程序统一定义的类型编号（如上表）*/ 
+        {/* 将xml定义的类型编号转换为程序统一定义的类型编号（如上表） */ 
             case 1:
             {
                 now -> type = 1;
@@ -228,7 +228,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
         }
         
-        /*如果时间加偏移量是负数则置0*/
+        /* 如果时间加偏移量是负数则置0 */
         if (t_time + timeShift < EPS)
         {
             now -> time = 0.00;
@@ -240,12 +240,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         now -> fontSize = t_fontSize;
         now -> color = t_color;
         now -> special = NULL;
-        xmlUnescape(t_text);/*文本内容反转义*/
+        xmlUnescape(t_text);/* 文本内容反转义 */
         
-        /*特殊弹幕文本解析*/
+        /* 特殊弹幕文本解析 */
         if (t_type == 7)
         {
-            /*申请特殊弹幕部分的空间*/ 
+            /* 申请特殊弹幕部分的空间 */ 
             if ((now -> special = (SPPART *)malloc(sizeof(SPPART))) == NULL)
             {
                 errorExit(ipF, *head, now);
@@ -256,7 +256,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             char textPart[MAX_TEXT_LENGTH];
             textPtr = t_text;
-            /*[0,0.17,"1-1",7,"文本部分内容",0,0,0,0.17,500,0,true,"微软雅黑",1]*/
+            /* [0,0.17,"1-1",7,"文本部分内容",0,0,0,0.17,500,0,true,"微软雅黑",1] */
             strGetLeftPart(NULL, &textPtr, '[', MAX_TEXT_LENGTH);
             now->special->startX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             now->special->startY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
@@ -264,7 +264,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             now->special->fadeEnd = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,',',MAX_TEXT_LENGTH)))) * 255);
             now->special->existTime = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             
-            /*文本部分*/
+            /* 文本部分 */
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
             strGetLeftPart(tempText, &textPtr, '\"', MAX_TEXT_LENGTH);
             strrpl(tempText, textPart, "/n", "\n", MAX_TEXT_LENGTH);//远古弹幕转义换行符
@@ -277,7 +277,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             now->special->moveTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             now->special->pauseTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             
-            /*字体部分*/ 
+            /* 字体部分 */ 
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
             strGetLeftPart(now->special->fontName, &textPtr, '\"', MAX_TEXT_LENGTH);
             deQuotMarks(now->special->fontName);
@@ -288,13 +288,13 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         last -> next = now;
         last = now;
         
-        /*更新状态*/
+        /* 更新状态 */
         if (status != NULL)
         {
             (status->totalNum)++;
             (status->completedNum)++;
         }
-    }/*结束 while*/
+    }/* 结束 while */
     ENDREAD:
     if (now != NULL)
     {
@@ -310,7 +310,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     
     fclose(ipF);
     
-    /*刷新status*/
+    /* 刷新status */
     if (status != NULL)
     {
         status -> isDone = TRUE;
@@ -318,7 +318,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     return 0;
 }
 
-/*
+/* 
  * 写xml文件
  * 参数：文件名/弹幕池/状态
  * 返回值：
@@ -326,10 +326,10 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
  * 1 弹幕池为空
  * 2 创建文件失败
  * 3 写文件发生错误
- */
+  */
 int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const status)
 {
-    /*刷新status*/
+    /* 刷新status */
     if (status != NULL)
     {
         status -> function = (void *)writeXml;
@@ -367,19 +367,19 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
     
     while (ptr != NULL)
     {
-        /*+----------+-----------+-----------+*/
-        /*| 类型名称 | 原类型编号| 新类型编号|*/
-        /*+----------+-----------+-----------+*/
-        /*| 右左滚动 |     1     |     1     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 左右滚动 |     6     |     2     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 上方固定 |     5     |     3     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 下方固定 |     4     |     4     |*/
-        /*+----------+-----------+-----------+*/
-        /*| 特殊弹幕 |     7     |     5     |*/
-        /*+----------+-----------+-----------+*/
+        /* +----------+-----------+-----------+ */
+        /* | 类型名称 | 原类型编号| 新类型编号| */
+        /* +----------+-----------+-----------+ */
+        /* | 右左滚动 |     1     |     1     | */
+        /* +----------+-----------+-----------+ */
+        /* | 左右滚动 |     6     |     2     | */
+        /* +----------+-----------+-----------+ */
+        /* | 上方固定 |     5     |     3     | */
+        /* +----------+-----------+-----------+ */
+        /* | 下方固定 |     4     |     4     | */
+        /* +----------+-----------+-----------+ */
+        /* | 特殊弹幕 |     7     |     5     | */
+        /* +----------+-----------+-----------+ */
         if (IS_R2L(ptr))
         {
             typeInXml = 1;
@@ -441,7 +441,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
             return 3;
         }
         
-        /*刷新status*/
+        /* 刷新status */
         if (status != NULL)
         {
             (status -> completedNum)++;
@@ -452,7 +452,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
     
     fclose(opF);
     
-    /*刷新status*/
+    /* 刷新status */
     if (status != NULL)
     {
         status -> isDone = TRUE;
@@ -461,7 +461,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
 }
 
 
-/*
+/* 
  * xml转义字符反转义
  * 
  * 对照： 
@@ -471,7 +471,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
  *    &amp;       &
  *    &apos;      '
  *    &quot;      " 
- */
+  */
 static char *xmlUnescape(char *const str)
 {
     char *leftPtr, *rightPtr, *reWritePtr;
@@ -553,11 +553,11 @@ static char *xmlUnescape(char *const str)
     return str;
 }
 
-/*
+/* 
  * 出错后程序退出前的处理
  * 参数： 
  * 文件指针/链表头指针/最后一个未结尾节点指针/
- */
+  */
 static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr)
 {
     fclose(ipF);

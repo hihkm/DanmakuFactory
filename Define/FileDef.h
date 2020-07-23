@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #ifndef __FILEFEF_H__
 #define __FILEFEF_H__
@@ -27,9 +27,9 @@ extern "C" {
 #define ASS_SCRIPT_TYPE_LEN 16
 #define ASS_COLLISIONS_LEN 16
 
-/*
+/* 
 ASS文件 
-*/
+ */
 struct AssSubtitleFile
 {
     char title[ASS_TITLE_LEN];       //标题
@@ -43,13 +43,13 @@ struct AssSubtitleFile
     struct AssSubtitleFileEvents *events;  //事件链表 
 };
 
-/*
+/* 
 Styles部分 23个字段
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour,
         OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut,
         ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow,
         Alignment, MarginL, MarginR, MarginV, Encoding
-*/
+ */
 
 #define ASS_STYLE_NAME_LEN 64
 #define ASS_STYLE_FONTNAME_LEN 128

@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +12,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #ifndef __CLIDEF_H__
 #define __CLIDEF_H__
 
-#define VERSION "1.42 CLI Beta"
+
+//#define GUI_SUPPORT       //给GUI版本提供一些特殊的功能支持
+
+#define VERSION "1.43"
+#define EDITION "CLI Beta"
 #define CONFIG_FILE_NAME "DanmakuFactoryConfig.json"
 #define FILENAME_LEN 512
 #define FORMAT_LEN 16

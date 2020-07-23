@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,38 +12,38 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #include "DanmakuFactoryString.h"
 
-/*
+/* 
  * 计算字符串高度
  * 参数： 
  * 字符串指针/字号/字体
  * 返回值：
  * 高度（像素）
- */
+  */
 int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName)
 {
     return fontSizeSet + (fontSizeInFile - 25);
 }
 
-/*
+/* 
  * 计算字符串宽度
  * 参数：
  * 字符串指针/字号/字体
  * 返回值：
  * 宽度（像素） 
- */
+  */
 int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName)
 {
     
     int cnt = 0; 
     
-    /*判断字符串编码*/
+    /* 判断字符串编码 */
     if (isUtf8(str) == TRUE)
     {
-        /*
+        /* 
          * 目前仅支持utf-8 
          * 首字节          空间占用           起始 
          * 0--- ----        1 byte            0x00 
@@ -52,7 +52,7 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
          * 1111 0---        4 byte            0xF0
          * 1111 10--        5 byte            0xF8 
          * 1111 110-        6 byte            0xFC
-         */
+          */
         while (*str != '\0')
         {
             if (*str >= 0xC0)
@@ -74,10 +74,10 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
     return (fontSizeSet + (fontSizeInFile - 25)) / 2 * cnt;
 }
 
-/*
+/* 
  * 以指定精度的最小数位将浮点数转换为字符串 
  * 参数：输出字符数组/输入浮点数/精度 
- */ 
+  */ 
 char *floatToStr(char *const outputStr, const double input, const int accuracy)
 {
     int cnt;
@@ -86,14 +86,14 @@ char *floatToStr(char *const outputStr, const double input, const int accuracy)
     sprintf(tempStr, "%lf", input);
     tempPtr = strchr(tempStr, '.');
     
-    /*整数*/
+    /* 整数 */
     if (tempPtr == NULL)
     {
         strcpy(outputStr, tempPtr);
         return outputStr;
     }
     
-    /*小数*/ 
+    /* 小数 */ 
     for (cnt = 0; cnt <= accuracy; cnt++)
     {
         if (*tempPtr == '\0')
@@ -103,13 +103,13 @@ char *floatToStr(char *const outputStr, const double input, const int accuracy)
         tempPtr++;
     }
     
-    /*寻找末尾第一位非0位*/ 
+    /* 寻找末尾第一位非0位 */ 
     while (*(tempPtr-1) == '0')
     {
         tempPtr--;
     }
     
-    /*去除小数点*/ 
+    /* 去除小数点 */ 
     if (*(tempPtr-1) == '.')
     {
         tempPtr--;
@@ -120,12 +120,12 @@ char *floatToStr(char *const outputStr, const double input, const int accuracy)
     return outputStr;
 }
 
-/*
+/* 
  * 得到字符串左边部分，并移动指针至截断位置后一个字符
  * 参数：输出字符串/输入字符串指针地址/截断位置/ 
  * 返回值：结果字符串地址 
  * 输出字符串为NULL时 将单纯移动指针 
- */
+  */
 char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, const int maxLen)
 {
     int copiedLen = 0;
@@ -133,19 +133,19 @@ char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, co
     char *opPtr = (char *)opStr;
     leftPtr = rightPtr = (char *)*ipStr;
     
-    /*移动指针到指定字符位置*/
+    /* 移动指针到指定字符位置 */
     while (*rightPtr != '\0' && *rightPtr != cutCh && copiedLen < maxLen)
     {
         rightPtr++;
     }
     
-    /*字符串中无指定字符*/ 
+    /* 字符串中无指定字符 */ 
     if (*rightPtr == '\0')
     {
         leftPtr = rightPtr;
     }
     
-    /*执行拷贝*/ 
+    /* 执行拷贝 */ 
     if (opStr != NULL)
     {
         while (leftPtr < rightPtr)
@@ -158,7 +158,7 @@ char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, co
         *opPtr = '\0';
     }
     
-    /*移动指针到下一个位置*/ 
+    /* 移动指针到下一个位置 */ 
     if (*rightPtr != '\0')
     {
         rightPtr++;
@@ -168,16 +168,16 @@ char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, co
     return opStr;
 }
 
-/*
+/* 
  * 除去字符串左右空白字符 
  * 参数：
  * 要去除空白字符的字符串/
  * 返回值：
  * 结果字符串/ 
- */
+  */
 char *trim(char *const str)
 {
-    /*非法检查*/
+    /* 非法检查 */
     if (str == NULL)
     {
         return NULL;
@@ -185,7 +185,7 @@ char *trim(char *const str)
     
     char *leftPtr, *rightPtr, *reWritePtr;
     leftPtr = str;
-    /*寻找左边的第一个非空字符*/
+    /* 寻找左边的第一个非空字符 */
     while (*leftPtr == ' ' || *leftPtr == '\n' || *leftPtr == '\t' || *leftPtr == '\r')
     {
         if (*leftPtr == '\0')
@@ -195,7 +195,7 @@ char *trim(char *const str)
         leftPtr++;
     }
     
-    /*寻找右边的最后一个非空字符*/
+    /* 寻找右边的最后一个非空字符 */
     rightPtr = leftPtr;
     while (*rightPtr != '\0')
     {
@@ -211,7 +211,7 @@ char *trim(char *const str)
         rightPtr--;
     }
     
-    /*拷贝左右指针之间的内容*/
+    /* 拷贝左右指针之间的内容 */
     reWritePtr = (char *)str; 
     
     while (leftPtr <= rightPtr)
@@ -226,22 +226,22 @@ char *trim(char *const str)
     return str; 
 }
 
-/*
+/* 
  * 去字符串一重左右引号(单双引号)，没有的话则不处理
  * 返回值：输入的指针 
- */
+  */
 char *deQuotMarks(char *const str)
 {
     char *strPtr = (char *)str; 
     
-    /*非法检查*/
+    /* 非法检查 */
     if (str == NULL)
     {
         return NULL;
     }
     
-    trim(str);/*去空白字符*/
-    /*去前引号*/
+    trim(str);/* 去空白字符 */
+    /* 去前引号 */
     if (*strPtr == '\"' || *strPtr == '\'')
     {
         while(*(strPtr+1) != '\0')
@@ -258,7 +258,7 @@ char *deQuotMarks(char *const str)
         }
     }
     
-    /*去后引号*/
+    /* 去后引号 */
     if (strPtr != (char *)str && (*(strPtr-1) == '\"' || *(strPtr-1) == '\''))
     {
         strPtr--;
@@ -268,14 +268,14 @@ char *deQuotMarks(char *const str)
     return str;
 }
 
-/*
+/* 
  * 转换成小写字母
  * 参数：
  * 输出字符串地址/输入字符串地址/ 
  * 返回值：
  * 结果字符串地址
  * 若输出字符串地址为NULL，则将直接修改输入字符串
- */
+  */
 char *toLower(char *output, char *input)
 {
     char *ptr;
@@ -305,17 +305,17 @@ char *toLower(char *output, char *input)
     return output;
 }
 
-/*
+/* 
  * 获取字符在字符串最后出现的位置
  * 参数：被查找的字符串/目标字符
  * 返回值：从0开始的索引
  * -2 字符串超长
  * -1 未找到 
- */
+  */
 int lastChr(const char *const str, const char chr)
 {
     if (strlen(str) > MAX_TEXT_LENGTH)
-    {/*字符串长度合法性检查*/
+    {/* 字符串长度合法性检查 */
         return -2;
     }
     
@@ -335,11 +335,11 @@ int lastChr(const char *const str, const char chr)
     }
 }
 
-/*
+/* 
  * 判断字符是否是指定字符之一
  * 参数：输入字符/包含指定字符的字符串
  * 返回值：是否是指定字符之一
- */
+  */
 BOOL isDesignatedChar(char ch, const char *designatedChar)
 {
     char *ptr = (char *)designatedChar;
@@ -355,11 +355,11 @@ BOOL isDesignatedChar(char ch, const char *designatedChar)
     return FALSE;
 }
 
-/*
+/* 
  * 判断字符串中字符是否都是指定字符
  * 参数：输入字符串/包含指定字符的字符串
  * 返回值：是否是指定字符串
- */
+  */
 BOOL isDesignatedStr(char *str, char *designatedChar)
 {
     int cnt = 0;
@@ -385,14 +385,14 @@ BOOL isDesignatedStr(char *str, char *designatedChar)
     }
 }
 
-/*
+/* 
  * 判断一个字符串是否是utf-8编码
  * 参数:要检测的字符串
  * 返回值:是否是utf-8编码 
- */
+  */
 BOOL isUtf8(char const *const str)
 {
-    /*非法检查*/
+    /* 非法检查 */
     if (str == NULL)
     {
         return FALSE;
@@ -446,11 +446,11 @@ BOOL isUtf8(char const *const str)
     return TRUE;
 }
 
-/* 
+/*  
  * 安全的字符串复制
  * 参数：目的字符串/源字符串/最大长度
  * 返回值：目的字符串指针
- */
+  */
 char *strSafeCopy(char *destination, const char *const source, size_t count)
 {
     char *returnPtr;
@@ -459,16 +459,16 @@ char *strSafeCopy(char *destination, const char *const source, size_t count)
     return returnPtr;
 }
 
-/*
+/* 
  * 获取匹配次数
  * 参数：主串/模式串
  * 返回值：模式串在主串中出现的次数/错误返回-1 
  * 两次匹配不能有重复字符，如 主aaa 模式aa 返回匹配次数是1次 
  * 因为在本项目中模式串长度是1或者2，故直接暴力匹配 
- */
+  */
 int match(char *mainStr, char *patternStr)
 {
-    /*合法性检查*/
+    /* 合法性检查 */
     if (mainStr == NULL || patternStr == NULL || patternStr[0] == '\0')
     {
         return -1;
@@ -500,16 +500,16 @@ int match(char *mainStr, char *patternStr)
     return matchTimes;
 }
 
-/*
+/* 
  * 字符串替换 
  * 参数：输入串/输出串/待替换串/需替换成串 
  * 返回值：输出串指针/错误返回NULL 
  * 两次匹配不能有重复字符，如 主aaa 模式aa 返回匹配次数是1次
  * 因为在本项目中模式串长度是1或者2，故直接暴力匹配
- */
+  */
 char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize)
 {
-    /*合法性检查*/
+    /* 合法性检查 */
     if (inStr == NULL || outStr == NULL || srcStr == NULL || srcStr[0] == '\0')
     {
         return NULL;
@@ -541,7 +541,7 @@ char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffS
             matchTimes++;
             inPtr = inCmpPtr;
             
-            /*复制替换内容*/
+            /* 复制替换内容 */
             dstPtr = dstStr;
             while (cnt < outBuffSize && *dstPtr != '\0')
             {
@@ -554,7 +554,7 @@ char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffS
         else
         {
             inCmpPtr = ++inPtr;
-            /*复制主串内容*/
+            /* 复制主串内容 */
             if (cnt < outBuffSize)
             {
                 *outPtr = *inCopyPtr;

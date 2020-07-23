@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #ifndef __C_DANMAKU_FACTORY_H__
 #define __C_DANMAKU_FACTORY_H__
@@ -32,15 +32,15 @@ extern "C" {
 #include "String/DanmakuFactoryString.h"
 #include "List/DanmakuFactoryList.h"
 
-/*xml*/
+/* xml */
 extern int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status);
 extern int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const status);
 
-/*json*/
+/* json */
 extern int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status);
 extern int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const status); 
 
-/*ass*/
+/* ass */
 extern int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode, ASSFILE *assSub, const float timeShift,
                    STATUS *const status
                   );
@@ -48,7 +48,7 @@ extern int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                     const CONFIG config, const ASSFILE *const subPart, STATUS *const status
                    );
 
-/*不常用的ass操作函数*/
+/* 不常用的ass操作函数 */
 extern int readAssFile(ASSFILE *assFile, const char *const fileName);
 extern int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode, ASSFILE *outputSub, const float timeShift,
                             STATUS *const status

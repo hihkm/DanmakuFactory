@@ -10,13 +10,11 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持ass
 
 ##### Windows
 
-[DanmakuFactory_1.42_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
+[DanmakuFactory_1.43_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
 
-[DanmakuFactory_1.42_CLI  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+[DanmakuFactory_1.43_GUI  Beta(蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
 
-[DanmakuFactory_GUI(~~在做了在做了~~)]()
-
-[1.31  Release(有指引的控制台应用)](Compiled/release/DanmakuFactory_1.31_release.zip)
+[DanmakuFactory_1.43  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
 
 
 
@@ -70,6 +68,7 @@ make
 2.支持ass以注释的形式保存已经被屏蔽的弹幕，下次重新读取时可重新调整设置
 
 3.支持特殊弹幕！支持特殊弹幕！支持特殊弹幕！
+
 <img src="images/02.png" alt="pic02" style="zoom:38%;" />
 *完美支持b站的特殊弹幕，如图为av810872的效果*
 
@@ -94,6 +93,16 @@ make
 - 支持特殊弹幕的转换
 - 统计模式，显示统计弹幕数量表格以及弹幕分布直方图
 - 纯C代码，完全使用标准库，强大的可移植性
+
+
+
+#### 图形界面展示
+
+图形界面部分用的是VB.NET编写
+
+<img src="images/04.png" alt="pic04" style="zoom:90%;" />
+
+<img src="images/05.png" alt="pic05" style="zoom:70%;" />
 
 
 
@@ -199,7 +208,13 @@ DanmakuFactory -o [输出文件格式] 输出文件名 -i [输入文件1格式] 
 **1.42**
 
 - 修复了部分xml特殊弹幕无法正常解析的问题
-
 - 修复了部分xml特殊弹幕回车或空格显示错误问题
-
 - 取消了特殊弹幕等比缩放
+
+**1.43**
+
+- 增加了GUI版本
+
+- 修复了显示范围无法定义的问题
+
+- 修复了按类型屏蔽设置无法保存的问题

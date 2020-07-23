@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #ifdef _MSC_VER
 
@@ -38,27 +38,27 @@ char *getFormat(char *outFormat, const char *const fileName, int maxLen);
 char *getPath(char *outPath, const char *const fileName, int maxLen);
 double getArgVal(int argc, char **argv, const int optIndex, const char *const optName, const double errorReturnValue);
 
-void toPause();
-BOOL isContinue();
+void toPause(BOOL skip);
+BOOL isContinue(BOOL skip);
 
 static CONFIG defauleConfig =
 {
-    1920,           /*分辨率宽*/
-    1080,           /*分辨率高*/ 
-    12.0,           /*滚动时间*/ 
-    5.0,            /*固定时间*/ 
-    0,              /*弹幕密度*/
-    38,             /*字号*/
-                    /*字体*/
+    1920,           /* 分辨率宽 */
+    1080,           /* 分辨率高 */ 
+    12.0,           /* 滚动时间 */ 
+    5.0,            /* 固定时间 */ 
+    0,              /* 弹幕密度 */
+    38,             /* 字号 */
+                    /* 字体 */
     "Microsoft YaHei", 
-    180,            /*不透明度*/ 
-    0,              /*描边*/ 
-    1,              /*阴影*/ 
-    1.00,           /*显示区域*/ 
-    1.00,           /*滚动区域*/
-    TRUE,           /*是否保存屏蔽部分*/ 
-    0,              /*屏蔽模式*/ 
-    0,              /*统计模式*/
+    180,            /* 不透明度 */ 
+    0,              /* 描边 */ 
+    1,              /* 阴影 */ 
+    1.00,           /* 显示区域 */ 
+    1.00,           /* 滚动区域 */
+    TRUE,           /* 是否保存屏蔽部分 */ 
+    0,              /* 屏蔽模式 */ 
+    0,              /* 统计模式 */
 };
 
 int main(int argc, char **argv)
@@ -71,17 +71,18 @@ int main(int argc, char **argv)
     BOOL showConfig = FALSE;
     BOOL saveConfig = FALSE;
     BOOL configFileErr = FALSE;
+    BOOL ignoreWarnings = FALSE;
     CONFIG config;
     char tempStr[MAX_TEXT_LENGTH], *tempPtr;
     char configFilePath[MAX_TEXT_LENGTH];
     outfile.isSet = FALSE;
 
-    /*打印程序版本信息*/
-    printf("DanamkuFactory "VERSION" by hkm (hkm@tikm.org)\n"
+    /* 打印程序版本信息 */
+    printf("DanamkuFactory "VERSION" "EDITION" by hkm (hkm@tikm.org)\n"
            "https://github.com/hihkm/DanmakuFactory\n"
           );
     
-    /*获取配置文件路径*/
+    /* 获取配置文件路径 */
     getPath(configFilePath, argv[0], MAX_TEXT_LENGTH);
     strncat(configFilePath, "\\"CONFIG_FILE_NAME, MAX_TEXT_LENGTH);
     configFilePath[MAX_TEXT_LENGTH - 1] = '\0';
@@ -93,10 +94,10 @@ int main(int argc, char **argv)
                "\nFail to get config file path, because the path is too long\n");
         
         configFileErr = TRUE;
-        toPause();
+        toPause(ignoreWarnings);
     }
 
-    /*解析参数*/
+    /* 解析参数 */
     if (argc <= 1)
     {
         printHelpInfo();
@@ -104,10 +105,10 @@ int main(int argc, char **argv)
     }
     else
     {
-        /*读配置文件*/
+        /* 读配置文件 */
         config = readConfig(configFilePath, defauleConfig);
         
-        /*遍历参数*/ 
+        /* 遍历参数 */ 
         while (argCnt < argc)
         {
             if (!strcmp("-h", argv[argCnt]) || !strcmp("--help", argv[argCnt]))
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
                 argCnt += 1;
             }
             else if (!strcmp("-o", argv[argCnt]) || !strcmp("--output", argv[argCnt]))
-            {/*输出文件名*/
+            {/* 输出文件名 */
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
@@ -146,7 +147,7 @@ int main(int argc, char **argv)
                         argCnt += 3;
                         break;
                     default:
-                        /*传入未知参数丢给下一轮获取选项时报错*/
+                        /* 传入未知参数丢给下一轮获取选项时报错 */
                         argCnt += 3;
                         break;
                 }
@@ -155,7 +156,7 @@ int main(int argc, char **argv)
                 deQuotMarks(outfile.format);
                 outfile.isSet = TRUE;
                 
-                /*合法性检查*/ 
+                /* 合法性检查 */ 
                 if (!ISFORMAT(outfile.format))
                 {
                     fprintf(stderr, "\nERROR"
@@ -165,7 +166,7 @@ int main(int argc, char **argv)
                 }
             }
             else if (!strcmp("-i", argv[argCnt]) || !strcmp("--input", argv[argCnt]))
-            {/*输入文件名*/ 
+            {/* 输入文件名 */ 
                 int num = getArgNum(argc, argv, argCnt);
                 for (cnt = 0; cnt < num; cnt++)
                 {
@@ -200,7 +201,7 @@ int main(int argc, char **argv)
                     deQuotMarks(infile[infileNum].fileName);
                     deQuotMarks(infile[infileNum].format);
                     
-                    /*合法性检查*/ 
+                    /* 合法性检查 */ 
                     if (!ISFORMAT(infile[infileNum].format))
                     {
                         fprintf(stderr, "\nERROR"
@@ -215,7 +216,7 @@ int main(int argc, char **argv)
                 argCnt += num + 1;
             }
             else if (!strcmp("-x", argv[argCnt]) || !strcmp("--resx", argv[argCnt]))
-            {/*分辨率宽*/
+            {/* 分辨率宽 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Resolution width", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -226,7 +227,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-y", argv[argCnt]) || !strcmp("--resy", argv[argCnt]))
-            {/*分辨率高*/
+            {/* 分辨率高 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Resolution height", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -237,7 +238,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-s", argv[argCnt]) || !strcmp("--scrolltime", argv[argCnt]))
-            {/*滚动时间*/
+            {/* 滚动时间 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Scroll time", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -248,7 +249,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-f", argv[argCnt]) || !strcmp("--fixtime", argv[argCnt]))
-            {/*固定时间*/
+            {/* 固定时间 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Fix time", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -259,7 +260,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-d", argv[argCnt]) || !strcmp("--density", argv[argCnt]))
-            {/*弹幕密度*/
+            {/* 弹幕密度 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Density", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -270,7 +271,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-S", argv[argCnt]) || !strcmp("--fontsize", argv[argCnt]))
-            {/*字号*/
+            {/* 字号 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Fontsize", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -281,7 +282,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-N", argv[argCnt]) || !strcmp("--fontname", argv[argCnt]))
-            {/*字号*/
+            {/* 字号 */
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
@@ -303,7 +304,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-O", argv[argCnt]) || !strcmp("--opacity", argv[argCnt]))
-            {/*不透明度*/
+            {/* 不透明度 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Opacity", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -314,7 +315,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-L", argv[argCnt]) || !strcmp("--outline", argv[argCnt]))
-            {/*描边*/
+            {/* 描边 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Outline", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -325,7 +326,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-D", argv[argCnt]) || !strcmp("--shadow", argv[argCnt]))
-            {/*阴影*/
+            {/* 阴影 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Shadow", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -336,7 +337,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("--displayarea", argv[argCnt]))
-            {/*显示区域*/
+            {/* 显示区域 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Display area", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -347,7 +348,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("--scrollarea", argv[argCnt]))
-            {/*滚动区域*/
+            {/* 滚动区域 */
                 double returnValue = getArgVal(argc, argv, argCnt, "Scroll area", -256.00);
                 if (fabs(returnValue - (-256.0)) < EPS)
                 {
@@ -358,7 +359,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("-b", argv[argCnt]) || !strcmp("--blockmode", argv[argCnt]))
-            {/*屏蔽模式*/
+            {/* 屏蔽模式 */
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
@@ -441,7 +442,7 @@ int main(int argc, char **argv)
                 argCnt += 2;
             }
             else if (!strcmp("--statmode", argv[argCnt]))
-            {/*统计模式*/
+            {/* 统计模式 */
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
@@ -471,7 +472,7 @@ int main(int argc, char **argv)
                 {
                     tempPtr = tempStr;
                     while (*argPtr != '\0' && *argPtr != '-' && cnt < MAX_TEXT_LENGTH)
-                    {/*拷贝 - 之前的字符*/
+                    {/* 拷贝 - 之前的字符 */
                         *tempPtr = *argPtr;
                         tempPtr++;
                         argPtr++;
@@ -482,7 +483,7 @@ int main(int argc, char **argv)
                         argPtr++;
                     }
                     *tempPtr = '\0';
-                    /*字符串比对*/
+                    /* 字符串比对 */
                     deQuotMarks(tempStr);
                     toLower(NULL, tempStr);
                     if (!strcmp("table", tempStr))
@@ -504,7 +505,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!strcmp("--saveblocked", argv[argCnt]))
-            {/*是否保存屏蔽部分*/
+            {/* 是否保存屏蔽部分 */
                 switch (getArgNum(argc, argv, argCnt))
                 {
                     case 0:
@@ -548,6 +549,18 @@ int main(int argc, char **argv)
                     argCnt++;
                 }
             }
+            else if (!(strcmp("--ignore-warnings", argv[argCnt])))
+            {// 跳过全部警告
+                ignoreWarnings = TRUE;
+                argCnt++;
+            }
+#ifdef GUI_SUPPORT
+            /* 为GUI提供程序版本确认 如果是错误的版本将会报非法参数错误 */
+            else if (!(strcmp("--check-version-"VERSION, argv[argCnt])))
+            {
+                argCnt++;
+            }
+#endif
             else
             {
                 fprintf(stderr, "\nERROR"
@@ -556,7 +569,7 @@ int main(int argc, char **argv)
             }
         }
         
-        /*寻找并解析时间平移量*/ 
+        /* 寻找并解析时间平移量 */ 
         for (argCnt = 0; argCnt < argc; argCnt++)
         {
             if (!strcmp("-t", argv[argCnt]) || !strcmp("--timeshift", argv[argCnt]))
@@ -581,7 +594,7 @@ int main(int argc, char **argv)
                     argCnt++;
                 }
                 
-                /*有更多的数字意味着语法错误*/
+                /* 有更多的数字意味着语法错误 */
                 if (argCnt < argc && ISNUMBERIC(argv[argCnt]))
                 {
                     fprintf(stderr, "\nERROR"
@@ -592,107 +605,106 @@ int main(int argc, char **argv)
                     return 0;
                 }
                 
-                /*解析完毕即跳出循环*/
+                /* 解析完毕即跳出循环 */
                 break;
             }
-        }
-            
+        }  
     }
     
-    /*显示配置信息*/
+    /* 显示配置信息 */
     if (showConfig == TRUE)
     {
         printConfigInfo(config);
     }
 
-    /*配置项合法性检查*/
+    /* 配置项合法性检查 */
     {
-        /*分辨率宽*/
+        /* 分辨率宽 */
         if (config.resx <= 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nResolution width must be an integer greater than 0");
             return 0;
         }
-        /*分辨率高*/
+        /* 分辨率高 */
         if (config.resy <= 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nResolution height must be an integer greater than 0");
             return 0;
         }
-        /*滚动时间*/
+        /* 滚动时间 */
         if (config.scrolltime < EPS)
         {
             fprintf(stderr, "\nERROR"
                             "\nScroll time must be a real number greater than 0.00");
             return 0;
         }
-        /*固定时间*/
+        /* 固定时间 */
         if (config.fixtime < EPS)
         {
             fprintf(stderr, "\nERROR"
                             "\nFix time must be a real number greater than 0.00");
             return 0;
         }
-        /*密度*/
+        /* 密度 */
         if (config.density < -1)
         {
             fprintf(stderr, "\nERROR"
                             "\nDensity must be an integer greater than or equal to -1");
             return 0;
         }
-        /*字号*/
+        /* 字号 */
         if (config.fontsize <= 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nFontsize must be an integer greater than 0");
             return 0;
         }
-        /*不透明度*/
+        /* 不透明度 */
         if (config.opacity <= 0 || config.opacity > 255)
         {
             fprintf(stderr, "\nERROR"
                             "\nOpacity must be an integer greater than 0 and less than or equal to 255");
             return 0;
         }
-        /*描边*/
+        /* 描边 */
         if (config.outline < 0 || config.outline > 4)
         {
             fprintf(stderr, "\nERROR"
                             "\nOutline must be an integer greater than or equal to 0 and less than or equal to 4");
             return 0;
         }
-        /*阴影*/
+        /* 阴影 */
         if (config.shadow < 0 || config.shadow > 4)
         {
             fprintf(stderr, "\nERROR"
                             "\nShadow must be an integer greater than or equal to 0 and less than or equal to 4");
             return 0;
         }
-        /*显示区域*/
-        if (config.displayarea < EPS || fabs(config.displayarea-1.0) > EPS)
+        /* 显示区域 */
+        if (config.displayarea < EPS || config.displayarea > 1.0 + EPS)
         {
             fprintf(stderr, "\nERROR"
                             "\nDisplay area must be a real number greater than 0.0 and less than or equal to 1.0");
             return 0;
         }
-        /*滚动区域*/
-        if (config.scrollarea < EPS || fabs(config.scrollarea-1.0) > EPS)
+        /* 滚动区域 */
+        if (config.scrollarea < EPS || config.scrollarea > 1.0 + EPS)
         {
             fprintf(stderr, "\nERROR"
                             "\nScroll area must be a real number greater than 0.0 and less than or equal to 1.0");
             return 0;
         }
-        /*字体*/
+        /* 字体 */
         tempPtr = config.fontname;
         while (*tempPtr != '\0')
-        {/*验证是否全部为可打印的ascii字符*/
+        {/* 验证是否全部为可打印的ascii字符 */
             if (*tempPtr < 0x20 || *tempPtr > 0x7e)
-            {/*ascii 非可打印字符范围*/
+            {/* ascii 非可打印字符范围 */
                 printf("\nWARNING"
                     "\nSome characters of fontname are non-ASCII characters, which may cause the garbled problem\n");
-                toPause();
+                toPause(ignoreWarnings);
                 break;
             }
 
@@ -700,7 +712,7 @@ int main(int argc, char **argv)
         }
     }
     
-    /*保存配置文件*/
+    /* 保存配置文件 */
     if (saveConfig == TRUE && configFileErr == FALSE)
     {
         if (writeConfig(configFilePath, config) == TRUE)
@@ -712,7 +724,7 @@ int main(int argc, char **argv)
             printf("\nWARNING"
                    "\nFailed to write the configuration file!\n");
             
-            toPause();
+            toPause(ignoreWarnings);
         }
     }
     
@@ -721,7 +733,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    /*显示文件信息*/
+    /* 显示文件信息 */
     if (outfile.isSet == FALSE)
     {
         fprintf(stderr, "\nERROR"
@@ -750,7 +762,7 @@ int main(int argc, char **argv)
     printf("\nFormat|FileName");
     printf("\n%6s|%s\n", outfile.format, outfile.fileName);
     
-    /*读取文件*/
+    /* 读取文件 */
     printf("\nLoading files...\n");
     
     int returnValue;
@@ -761,7 +773,7 @@ int main(int argc, char **argv)
     for (cnt = 0; cnt < infileNum; cnt++)
     {
         printf("Loading file %s\n", infile[cnt].fileName);
-        /*检查文件是否存在*/
+        /* 检查文件是否存在 */
         if (access(infile[cnt].fileName, F_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
@@ -769,7 +781,7 @@ int main(int argc, char **argv)
             return 0;
         }
 
-        /*权限检查*/
+        /* 权限检查 */
         if (access(infile[cnt].fileName, R_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
@@ -817,7 +829,7 @@ int main(int argc, char **argv)
                           );
                     printf("\nNOTE"
                            "\nCould not load file %s as a xml file.\n", infile[cnt].fileName);
-                    if (isContinue() == FALSE)
+                    if (isContinue(ignoreWarnings) == FALSE)
                     {
                         return 0;
                     }
@@ -869,7 +881,7 @@ int main(int argc, char **argv)
                           );
                     printf("\nNOTE"
                            "\nCould not load file %s as a xml file.\n", infile[cnt].fileName);
-                    if (isContinue() == FALSE)
+                    if (isContinue(ignoreWarnings) == FALSE)
                     {
                         return 0;
                     }
@@ -885,7 +897,7 @@ int main(int argc, char **argv)
         else if (!strcmp("ass", infile[cnt].format))
         {
             returnValue = readAss(infile[cnt].fileName, &danmakuPool, "a", NULL, infile[cnt].timeShift, &status);
-            /*解析十位错误码*/
+            /* 解析十位错误码 */
             switch (returnValue / 10)
             {
                 case 0:
@@ -913,7 +925,7 @@ int main(int argc, char **argv)
                           );
                     break;
             }
-            /*解析个位*/
+            /* 解析个位 */
             switch (returnValue % 10)
             {
                 case 0:
@@ -940,10 +952,10 @@ int main(int argc, char **argv)
         }
     }
 
-    /*屏蔽*/
+    /* 屏蔽 */
     blockByType(danmakuPool, config.blockmode, NULL);
     
-    /*读完成提示*/
+    /* 读完成提示 */
     printf("\nFile Loading Complete");
     if (status.totalNum != 0)
     {
@@ -955,7 +967,7 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    /*排序*/
+    /* 排序 */
     printf ("\nSorting...\n");
     returnValue = sortList(&danmakuPool, NULL);
     switch (returnValue)
@@ -977,18 +989,18 @@ int main(int argc, char **argv)
             break;
     }
     
-    /*写文件*/
+    /* 写文件 */
     printf ("\nWritting file %s\n", outfile.fileName);
     if (access(outfile.fileName, F_OK) == 0)
-    {/*检查文件是否存在*/
+    {/* 检查文件是否存在 */
         printf ("\nWARNING"
                 "\nFile %s already exists, it will be overwritten when continue.\n", outfile.fileName);
-        if (isContinue() == FALSE)
+        if (isContinue(ignoreWarnings) == FALSE)
         {
             return 0;
         }
         
-        /*权限检查*/
+        /* 权限检查 */
         if (access(outfile.fileName, W_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
@@ -999,13 +1011,13 @@ int main(int argc, char **argv)
     
     if (!strcmp("ass", outfile.format))
     {
-        returnValue = writeAss(outfile.fileName,/*输出文件名*/
-                               danmakuPool,/*弹幕池的头指针*/
+        returnValue = writeAss(outfile.fileName,/* 输出文件名 */
+                               danmakuPool,/* 弹幕池的头指针 */
                                config,
-                               NULL,/*字幕部分*/ 
-                               NULL/*状态*/
+                               NULL,/* 字幕部分 */ 
+                               NULL/* 状态 */
                               );
-        /*解析百位*/
+        /* 解析百位 */
         switch (returnValue / 100)
         {
             case 0:
@@ -1024,7 +1036,7 @@ int main(int argc, char **argv)
                       );
                 break;
         }
-        /*解析十位*/
+        /* 解析十位 */
         returnValue -= returnValue % 100;
         switch (returnValue % 10)
         {
@@ -1056,7 +1068,7 @@ int main(int argc, char **argv)
                       );
                 break;
         }
-        /*个位函数错误信息已经被以上过滤完毕 无需重新报错*/
+        /* 个位函数错误信息已经被以上过滤完毕 无需重新报错 */
     }
     else if (!strcmp("xml", outfile.format))
     {
@@ -1122,7 +1134,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-/*打印配置信息*/
+/* 打印配置信息 */
 void printConfigInfo(CONFIG config)
 {
     printf("\n"
@@ -1233,7 +1245,7 @@ void printConfigInfo(CONFIG config)
     return;
 }
 
-/*打印帮助信息*/
+/* 打印帮助信息 */
 void printHelpInfo()
 {
     printf("\n"
@@ -1282,7 +1294,7 @@ void printHelpInfo()
     return;
 }
 
-/*获取指定下标选项参数个数*/
+/* 获取指定下标选项参数个数 */
 int getArgNum(int argc, char **argv, const int optionIndex)
 {
     int cnt;
@@ -1296,7 +1308,7 @@ int getArgNum(int argc, char **argv, const int optionIndex)
     return cnt - optionIndex - 1;
 }
 
-/*获取文件格式*/
+/* 获取文件格式 */
 char *getFormat(char *outFormat, const char *const fileName, int maxLen)
 {
     char *ptr;
@@ -1318,24 +1330,24 @@ char *getFormat(char *outFormat, const char *const fileName, int maxLen)
     return outFormat;
 }
 
-/* 
+/*  
  * 获取文件路径部分（包含最后一个斜杠） 
  * 参数：输出文件路径/完整文件名/最大长度 
  * 返回值：输出文件路径
- */
+  */
 char *getPath(char *outPath, const char *const fileName, int maxLen)
 {
     int pathLen;
     char *inPtr = (char *)fileName;
     char *outPtr = outPath;
 
-    /*移动指针到末尾*/
+    /* 移动指针到末尾 */
     while (*inPtr != '\0')
     {
         inPtr++;
     }
 
-    /*向前寻找斜杠*/
+    /* 向前寻找斜杠 */
     while (inPtr != fileName)
     {
         if (*inPtr == '\\' || *inPtr == '/')
@@ -1351,14 +1363,14 @@ char *getPath(char *outPath, const char *const fileName, int maxLen)
         return outPath;
     }
     
-    pathLen = inPtr - fileName + 2;/*包含斜杠与结束符*/
+    pathLen = inPtr - fileName + 2;/* 包含斜杠与结束符 */
 
     strSafeCopy(outPtr, fileName, maxLen > pathLen ? pathLen : maxLen);
 
     return outPath;
 }
 
-/*获取一个实数参数*/
+/* 获取一个实数参数 */
 double getArgVal(int argc, char **argv, const int optIndex, const char *const optName, const double errorReturnValue)
 {
     double value;
@@ -1378,7 +1390,7 @@ double getArgVal(int argc, char **argv, const int optIndex, const char *const op
     
     switch (getArgNum(argc, argv, optIndex))
     {
-        /*0个代表后一个参数为负数被解释成选项*/
+        /* 0个代表后一个参数为负数被解释成选项 */
         case 0:
         case 1:
             deQuotMarks(argv[optIndex+1]);
@@ -1394,17 +1406,27 @@ double getArgVal(int argc, char **argv, const int optIndex, const char *const op
     return value;
 }
 
-/*暂停 按回车继续*/
-void toPause()
+/* 暂停 按回车继续 */
+void toPause(BOOL skip)
 {
+    if (skip)
+    {
+        printf("\nSkip!\n");
+        return;
+    }
     printf("\nPress ENTER to continue.\n");
     fflush(stdin);
     getchar();
 }
 
-/*是否继续*/
-BOOL isContinue()
+/* 是否继续 */
+BOOL isContinue(BOOL skip)
 {
+    if (skip)
+    {
+        printf("\nSkip!\n");
+        return TRUE;
+    }
     printf("\nPress 'Y' or 'y' to continue, any other key to exit.\n");
     printf("> ");
     fflush(stdin);

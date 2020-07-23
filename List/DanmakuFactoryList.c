@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 #include "DanmakuFactoryList.h"
 
-/*
+/* 
  * 排序整个链表（桶排序）
  * 参数：要排序的链表头
  * 返回值：
  * 0 正常退出
  * 1 弹幕池为空
  * 2 桶空间申请失败
- */
+  */
 int sortList(DANMAKU **listHead, STATUS *const status)
 {
-    /*刷新status*/
+    /* 刷新status */
     if (status != NULL)
     {
         status -> function = (void *)sortList;
@@ -47,7 +47,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     float max, min;
     BOOL isSorted = TRUE;
     
-    /*统计弹幕数量并找出最大最小值*/
+    /* 统计弹幕数量并找出最大最小值 */
     now = *listHead;
     while(now != NULL)
     {
@@ -75,13 +75,13 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         now = now -> next;
     }
 
-    /*如果本来就排序好了直接退出*/
+    /* 如果本来就排序好了直接退出 */
     if (isSorted == TRUE)
     {
         return 0;
     }
     
-    /*申请桶空间并清0*/
+    /* 申请桶空间并清0 */
     now = *listHead;
     bucketNum = danmakuNum / 128 + 1;
     if((bucket = (DANMAKU **)malloc(sizeof(DANMAKU *) * bucketNum)) == NULL)
@@ -93,14 +93,14 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     }
     memset(bucket, 0, sizeof(DANMAKU *) * bucketNum);
     
-    /*入桶*/ 
+    /* 入桶 */ 
     while(*listHead != NULL)
     {
         index = (now -> time - min) / (max - min + 1) * bucketNum;
 
         *listHead = (*listHead) -> next;
         if(bucket[index] == NULL)
-        {/*如果该桶为空则将新节点指针填入*/ 
+        {/* 如果该桶为空则将新节点指针填入 */ 
             bucket[index] = now;
             now -> next = NULL;
         }
@@ -108,7 +108,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         {
             ptr = last = bucket[index];
             if(now -> time < ptr -> time)
-            {/*判断是否为该桶最小值*/ 
+            {/* 判断是否为该桶最小值 */ 
                 now -> next = ptr;
                 bucket[index] = now;
             }
@@ -116,7 +116,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
             {
                 ptr = ptr -> next;
                 while(ptr != NULL && now -> time > ptr -> time - EPS)
-                {/*即ptr != NULL && now->time >= ptr->time*/
+                {/* 即ptr != NULL && now->time >= ptr->time */
                     last = ptr;
                     ptr = ptr -> next;
                 }
@@ -126,14 +126,14 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         }
         now = *listHead;
         
-        /*刷新status*/
+        /* 刷新status */
         if (status != NULL)
         {
             (status -> completedNum)++;
         }
-    }/*结束 while*/
+    }/* 结束 while */
     
-    /*出桶*/
+    /* 出桶 */
     now = *listHead = NULL;
     for(cnt = 0; cnt < bucketNum; cnt++)
     {
@@ -158,7 +158,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     }
     free(bucket);
     
-    /*刷新status*/
+    /* 刷新status */
     if (status != NULL)
     {
         status -> isDone = TRUE;
@@ -166,7 +166,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     return 0; 
 }
 
-/*
+/* 
  * 弹幕按类型屏蔽
  * 参数：弹幕链表头/屏蔽模式/屏蔽关键字串集
  * 返回值：空
@@ -177,7 +177,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
  * BLK_BOTTOM      屏蔽底端固定 
  * BLK_SPECIAL     屏蔽特殊弹幕 
  * BLK_COLOR       屏蔽非白色弹幕 
- */
+  */
 void blockByType(DANMAKU *const danmakuHead, const int mode, const char **const keyStrings)
 {
     if (mode == 0)
@@ -236,18 +236,18 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, const char **const 
     }
 }
 
-/*
+/* 
  * 释放整个链表
  * 参数：
  * 要释放的链表头
- */
+  */
 void freeList(DANMAKU *listHead)
 {
     DANMAKU *ptr = listHead;
     while(ptr != NULL)
     {
         listHead = ptr -> next;
-        free(ptr -> text);/*释放文本部分的空间*/ 
+        free(ptr -> text);/* 释放文本部分的空间 */ 
         free(ptr);
         ptr = listHead;
     }
