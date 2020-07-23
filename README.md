@@ -10,7 +10,7 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持ass
 
 ##### Windows
 
-[DanmakuFactory_1.43_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
+[DanmakuFactory_1.43_CLI  Beta(蓝奏云)](https://www.lanzoux.com/b01hgf1xe)
 
 [DanmakuFactory_1.43_GUI  Beta(蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
 
