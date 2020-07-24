@@ -53,10 +53,12 @@ Public Class ProcessingDlg
             '输出文件名
             Dim outputFileName As String
             If outputPath = "" Then
-                outputFileName = fileList.GetFileName(cnt) + "." + outputTemplate.ToLower
+                outputFileName = Path.GetDirectoryName(fileList.GetFileName(cnt)) + "\" +
+                Path.GetFileNameWithoutExtension(fileList.GetFileName(cnt)) + "." +
+                outputTemplate.ToLower()
             Else
-                outputFileName = outputPath + "/" +
-                System.IO.Path.GetFileName(fileList.GetFileName(cnt)) +
+                outputFileName = outputPath + "\" +
+                Path.GetFileNameWithoutExtension(fileList.GetFileName(cnt)) +
                 "." + outputTemplate.ToLower
             End If
 

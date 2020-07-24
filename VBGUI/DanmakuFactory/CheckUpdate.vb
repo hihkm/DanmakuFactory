@@ -18,7 +18,7 @@
         Dim getStr As String
         Dim client As New System.Net.WebClient()
         Try
-            Dim res As Byte() = client.DownloadData("http://1.api.tikm.org/checkupdate?ver=1.43")
+            Dim res As Byte() = client.DownloadData("http://1.api.tikm.org/checkupdate/?ver=1.43_1")
             getStr = System.Text.Encoding.UTF8.GetString(res)
 
             If Not getStr.Equals("Lastest") Then
