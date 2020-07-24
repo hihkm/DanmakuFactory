@@ -52,14 +52,33 @@ Public Class ProcessingDlg
                       )
             '输出文件名
             Dim outputFileName As String
+
             If outputPath = "" Then
-                outputFileName = Path.GetDirectoryName(fileList.GetFileName(cnt)) + "\" +
-                Path.GetFileNameWithoutExtension(fileList.GetFileName(cnt)) + "." +
-                outputTemplate.ToLower()
+                '没有输入路径
+                Dim indexOfDot As Integer = fileList.GetFileName(cnt).LastIndexOf(".")
+                If (indexOfDot = -1) Then
+                    '文件没有后缀
+                    outputFileName = fileList.GetFileName(cnt) + "." +
+                                     outputTemplate.ToLower()
+                Else
+                    '文件有后缀
+                    outputFileName = fileList.GetFileName(cnt).Substring(0, indexOfDot) + "." +
+                                     outputTemplate.ToLower()
+                End If
             Else
-                outputFileName = outputPath + "\" +
-                Path.GetFileNameWithoutExtension(fileList.GetFileName(cnt)) +
-                "." + outputTemplate.ToLower
+                '输入了路径
+                If (outputPath.LastIndexOf("\") = outputPath.Length - 1) Or
+                   (outputPath.LastIndexOf("/") = outputPath.Length - 1) Then
+                    '后面带斜杠
+                    outputFileName = outputPath +
+                        Path.GetFileNameWithoutExtension(fileList.GetFileName(cnt)) + "." +
+                        outputTemplate.ToLower
+                Else
+                    '后面不带斜杠
+                    outputFileName = outputPath + "\" +
+                                    Path.GetFileNameWithoutExtension(fileList.GetFileName(cnt)) + "." +
+                                    outputTemplate.ToLower()
+                End If
             End If
 
             '检查输出文件是否存在
