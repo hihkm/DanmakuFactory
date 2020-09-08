@@ -1,4 +1,8 @@
 ﻿Public Class Config
+    '不保存的配置
+    Public timeShift As Double = 0.00
+
+    '保存的配置
     Public resx As Integer = 1920
     Public resy As Integer = 1080
     Public displayarea As Double = 1.0
@@ -12,6 +16,7 @@
     Public opacity As Integer = 200
     Public outline As Integer = 0
     Public shadow As Integer = 1
+    Public bold As Boolean = False
 
     Public blockR2L As Boolean = False
     Public blockL2R As Boolean = False
@@ -68,6 +73,8 @@
                     outline = Convert.ToInt32(value)
                 ElseIf key = "shadow" Then
                     shadow = Convert.ToInt32(value)
+                ElseIf key = "bold" Then
+                    bold = Convert.ToBoolean(value)
                 ElseIf key = "blockr2l" Then
                     blockR2L = Convert.ToBoolean(value)
                 ElseIf key = "blockl2r" Then
@@ -105,6 +112,7 @@
                  "opacity:" + opacity.ToString() + ";" +
                  "outline:" + outline.ToString() + ";" +
                  "shadow:" + shadow.ToString() + ";" +
+                 "bold:" + bold.ToString() + ";" +
                  "blockR2L:" + blockR2L.ToString() + ";" +
                  "blockL2R:" + blockL2R.ToString() + ";" +
                  "blockTop:" + blockTop.ToString() + ";" +

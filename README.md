@@ -10,11 +10,13 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持多
 
 ##### Windows
 
-[DanmakuFactory_1.43_GUI  Beta(推荐 - 蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
+[DanmakuFactory_GUI  Beta(推荐 - 更新到1.50 - 蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
 
-[DanmakuFactory_1.50_CLI  Beta(蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
+[DanmakuFactory_CLI  Beta(更新到1.50 - 蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
 
 [DanmakuFactory_1.43  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+
+*1.50CLI版本目前在测试阶段，存在不稳定性，如果对稳定性要求较高请下载旧版本
 
 
 
@@ -63,7 +65,7 @@ make
 
 #### 特性
 
-1. 1.50版本支持自定义输入模板，此功能的初衷是让用户能够制作自己的弹幕文件，比如影视工作者想要在自己的视频上加入弹幕的效果，而剪辑软件做出来的弹幕非常地生硬，就可用利用此功能来按照需求快速地设计自己的弹幕文件。
+1. **1.50版本支持自定义输入模板，此功能的初衷是让用户能够制作自己的弹幕文件，比如影视工作者想要在自己的视频上加入弹幕的效果，而剪辑软件做出来的弹幕非常地生硬，就可用利用此功能来按照需求快速地设计自己的弹幕文件。**
 
 2. 回炉重造，支持读取经过转换后的ass文件，并兼容第三方软件输出的ass文件
 

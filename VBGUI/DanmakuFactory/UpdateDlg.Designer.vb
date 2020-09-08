@@ -41,12 +41,12 @@ Partial Class UpdateDlg
         Me.TableLayoutPanel1.ColumnCount = 3
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.5618!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.4382!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 116.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 117.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 2, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.ReCheck_Botton, 0, 0)
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(243, 415)
-        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -58,7 +58,7 @@ Partial Class UpdateDlg
         Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Cancel_Button.Location = New System.Drawing.Point(238, 4)
-        Me.Cancel_Button.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Cancel_Button.Margin = New System.Windows.Forms.Padding(4)
         Me.Cancel_Button.Name = "Cancel_Button"
         Me.Cancel_Button.Size = New System.Drawing.Size(100, 26)
         Me.Cancel_Button.TabIndex = 1
@@ -68,16 +68,16 @@ Partial Class UpdateDlg
         '
         Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.OK_Button.Location = New System.Drawing.Point(120, 4)
-        Me.OK_Button.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.OK_Button.Margin = New System.Windows.Forms.Padding(4)
         Me.OK_Button.Name = "OK_Button"
-        Me.OK_Button.Size = New System.Drawing.Size(106, 26)
+        Me.OK_Button.Size = New System.Drawing.Size(105, 26)
         Me.OK_Button.TabIndex = 0
         Me.OK_Button.Text = "获取"
         '
         'ReCheck_Botton
         '
         Me.ReCheck_Botton.Location = New System.Drawing.Point(4, 4)
-        Me.ReCheck_Botton.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ReCheck_Botton.Margin = New System.Windows.Forms.Padding(4)
         Me.ReCheck_Botton.Name = "ReCheck_Botton"
         Me.ReCheck_Botton.Size = New System.Drawing.Size(108, 26)
         Me.ReCheck_Botton.TabIndex = 2
@@ -112,7 +112,7 @@ Partial Class UpdateDlg
         Me.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
         Me.PictureBox1.InitialImage = CType(resources.GetObject("PictureBox1.InitialImage"), System.Drawing.Image)
         Me.PictureBox1.Location = New System.Drawing.Point(20, 15)
-        Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(99, 85)
         Me.PictureBox1.TabIndex = 3
@@ -126,7 +126,7 @@ Partial Class UpdateDlg
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(573, 112)
         Me.Label1.TabIndex = 4
-        Me.Label1.Text = "作者 HKM" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "版本 1.43GUI Beta(200724)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本软件仅在Github与吾爱论坛发布，其他网站均非本人发布，无法保证程序安全性" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本程序开源并永" &
+        Me.Label1.Text = "作者 HKM" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "版本 1.50GUI Beta(200908)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本软件仅在Github与吾爱论坛发布，其他网站均非本人发布，无法保证程序安全性" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本程序开源并永" &
     "久免费，请勿用于商业用途" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "https://github.com/hihkm/DanmakuFactory"
         '
         'UpdateDlg
@@ -142,7 +142,7 @@ Partial Class UpdateDlg
         Me.Controls.Add(Me.VersionLabel)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "UpdateDlg"

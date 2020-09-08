@@ -106,11 +106,12 @@ Public Class ProcessingDlg
             Dim Proc As New Process
             Dim arg As String
 
-            arg = "--check-version-1.43 --ignore-warnings -i """ + fileList.GetFileName(cnt) +
+            arg = "--check-version-1.50 --ignore-warnings -i """ + fileList.GetFileName(cnt) +
                             """ -o """ + outputFileName +
                             """ -N """ + config.fontname +
                             """ -x " + config.resx.ToString +
                             " -y " + config.resy.ToString +
+                            " -t " + config.timeShift.ToString +
                             " -s " + config.scrolltime.ToString +
                             " -f " + config.fixtime.ToString +
                             " -d " + config.density.ToString +
@@ -118,6 +119,7 @@ Public Class ProcessingDlg
                             " -O " + config.opacity.ToString +
                             " -L " + config.outline.ToString +
                             " -D " + config.shadow.ToString +
+                            " -B " + config.bold.ToString +
                             " --displayarea " + config.displayarea.ToString +
                             " --scrollarea " + config.scrollarea.ToString
             If Not config.ToBlockString.Equals("") Then
@@ -127,7 +129,7 @@ Public Class ProcessingDlg
                 arg += " --statmode " + config.ToStatString
             End If
 
-            Proc.StartInfo.FileName = ".\DF1.43CLI.exe"
+            Proc.StartInfo.FileName = ".\DF1.50CLI.exe"
             Proc.StartInfo.RedirectStandardError = True
             Proc.StartInfo.UseShellExecute = False
             Proc.StartInfo.CreateNoWindow = True
@@ -179,15 +181,21 @@ Public Class ProcessingDlg
         Next
 
         '完成
+        Dim title As String
+        If failedNum = 0 Then
+            title = "已完成"
+        Else
+            title = "已完成 - 有错误"
+        End If
         Me.Invoke(New UpdateProcUI(AddressOf UpdateUI),
-                      "已完成",'状态大标题
-                      "已完成 " + doneNum.ToString,'已完成标签
-                      "总计 " + totalNum.ToString,'总计标签
-                      "失败 " + failedNum.ToString,'失败标签
-                      100,'进度条比例
-                      "任务结束",'当前执行标签
-                      "退出"'按钮
-                      )
+                title,'状态大标题
+                "已完成 " + doneNum.ToString,'已完成标签
+                "总计 " + totalNum.ToString,'总计标签
+                "失败 " + failedNum.ToString,'失败标签
+                100,'进度条比例
+                "任务结束",'当前执行标签
+                "退出"'按钮
+                )
     End Sub
 
     Sub UpdateUI(statusLabelStr As String, doneLabelStr As String, totalLabelStr As String,

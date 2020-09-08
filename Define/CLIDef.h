@@ -18,7 +18,7 @@ limitations under the License.
 #define __CLIDEF_H__
 
 
-//#define GUI_SUPPORT       //给GUI版本提供一些特殊的功能支持
+#define GUI_SUPPORT       //给GUI版本提供一些特殊的功能支持
 
 #define VERSION "1.50"
 #define EDITION "CLI Beta"

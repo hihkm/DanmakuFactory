@@ -21,12 +21,16 @@ Public Class DanmakuSettingDlg
         config.shadow = ShadowNUD.Value
         config.outline = OutlineNUD.Value
         config.opacity = OpacityNUD.Value * 255.0 / 100
+        config.timeShift = TimeshiftUpDown.Value
         config.scrolltime = ScrollTimeNUD.Value
         config.fixtime = FixTimeNUD.Value
         config.scrollarea = ScrollAreaNUD.Value / 100.0
         config.displayarea = DisplayAreaNUD.Value / 100.0
         config.resx = ResXNUD.Value
         config.resy = ResYNUD.Value
+
+        '复选框部分
+        config.bold = BoldCheckBox.Checked
 
         '密度部分
         If DensityRadioButton1.Checked Then
@@ -83,6 +87,9 @@ Public Class DanmakuSettingDlg
         ResXNUD.Value = config.resx
         ResYNUD.Value = config.resy
 
+        '复选框部分
+        BoldCheckBox.Checked = config.bold
+
         '密度部分
         If config.density = 0 Then
             DensityRadioButton1.Select()
@@ -108,5 +115,9 @@ Public Class DanmakuSettingDlg
         '调试部分
         StatHistogramCheckBox.Checked = config.statHistogram
         StatTableCheckBox.Checked = config.statTable
+    End Sub
+
+    Private Sub SaveCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles SaveCheckBox.CheckedChanged
+
     End Sub
 End Class

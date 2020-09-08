@@ -811,7 +811,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
     /* 释放内存 */
     for (cnt = 0; cnt < format.strTableLen; cnt++)
     {
-        //free(format.strTable[cnt]);
+        free(format.strTable[cnt]);
     }
 
     fclose(ipfptr);
