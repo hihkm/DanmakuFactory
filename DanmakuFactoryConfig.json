@@ -1,0 +1,17 @@
+{
+    "resx": 1920,
+    "resy": 1080,
+    "scrolltime": 12.000000,
+    "fixtime": 5.000000,
+    "density": 0,
+    "fontname": "Microsoft YaHei",
+    "fontsize": 38,
+    "opacity": 180,
+    "outline": 0,
+    "shadow": 1,
+    "displayarea": 1.000000,
+    "scrollarea": 1.000000,
+    "bold": false, 
+    "blockmode": [],
+    "statmode": []
+}

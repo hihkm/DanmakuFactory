@@ -1088,37 +1088,48 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                );
         char hexOpacity[3];
         char primaryColour[ASS_COLOR_LEN];
+        int bold = 0;
         toHexOpacity(255 - config.opacity, hexOpacity);
         sprintf(primaryColour, "&H%sFFFFFF", hexOpacity);
+
+        if (config.bold == TRUE)
+        {
+            bold = 1;
+        }
+        else
+        {
+            bold = 0;
+        }
+        
         
         /* 样式设定 */
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "R2L", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "L2R", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "TOP", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "BTM", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "SP", config.fontname, config.fontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
                      0, 0, 0, 1
                );
         
@@ -1126,7 +1137,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
         {
             fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "danmakuFactory_stat", config.fontname, config.fontsize, "&H35FFFFFF", "&H35FFFFFF", "&H35000000", "&H356A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 0, 0, 0, 5,
+                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 0, 1, 0, 5,
                      0, 0, 0, 1
                     );
         }

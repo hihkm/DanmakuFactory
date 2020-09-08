@@ -53,7 +53,8 @@ static CONFIG defauleConfig =
     "Microsoft YaHei", 
     180,            /* 不透明度 */ 
     0,              /* 描边 */ 
-    1,              /* 阴影 */ 
+    1,              /* 阴影 */
+    FALSE,          /* 是否加粗 */ 
     1.00,           /* 显示区域 */ 
     1.00,           /* 滚动区域 */
     TRUE,           /* 是否保存屏蔽部分 */ 
@@ -74,6 +75,7 @@ int main(int argc, char **argv)
     BOOL ignoreWarnings = FALSE;
     CONFIG config;
     char tempStr[MAX_TEXT_LENGTH], *tempPtr;
+    char programPath[MAX_TEXT_LENGTH];
     char configFilePath[MAX_TEXT_LENGTH];
     outfile.isSet = FALSE;
 
@@ -83,8 +85,8 @@ int main(int argc, char **argv)
           );
     
     /* 获取配置文件路径 */
-    getPath(configFilePath, argv[0], MAX_TEXT_LENGTH);
-    strncat(configFilePath, "\\"CONFIG_FILE_NAME, MAX_TEXT_LENGTH);
+    getPath(programPath, argv[0], MAX_TEXT_LENGTH);
+    sprintf_s(configFilePath, MAX_TEXT_LENGTH, "%s%s", programPath, "\\"CONFIG_FILE_NAME);
     configFilePath[MAX_TEXT_LENGTH - 1] = '\0';
     if (strstr(configFilePath, CONFIG_FILE_NAME) == NULL)
     {
@@ -96,7 +98,7 @@ int main(int argc, char **argv)
         configFileErr = TRUE;
         toPause(ignoreWarnings);
     }
-
+    
     /* 解析参数 */
     if (argc <= 1)
     {
@@ -138,11 +140,11 @@ int main(int argc, char **argv)
                         break;
                     case 1:
                         strSafeCopy(outfile.fileName, argv[argCnt+1], FILENAME_LEN);
-                        getFormat(outfile.format, outfile.fileName, FORMAT_LEN);
+                        getFormat(outfile.template, outfile.fileName, FORMAT_LEN);
                         argCnt += 2;
                         break;
                     case 2:
-                        strSafeCopy(outfile.format,   argv[argCnt+1], FORMAT_LEN);
+                        strSafeCopy(outfile.template,   argv[argCnt+1], FORMAT_LEN);
                         strSafeCopy(outfile.fileName, argv[argCnt+2], FILENAME_LEN);
                         argCnt += 3;
                         break;
@@ -153,14 +155,14 @@ int main(int argc, char **argv)
                 }
                 
                 deQuotMarks(outfile.fileName);
-                deQuotMarks(outfile.format);
+                deQuotMarks(outfile.template);
                 outfile.isSet = TRUE;
                 
                 /* 合法性检查 */ 
-                if (!ISFORMAT(outfile.format))
+                if (!ISFORMAT(outfile.template))
                 {
                     fprintf(stderr, "\nERROR"
-                                    "\nUnknow format %s\n", outfile.format);
+                                    "\nUnknow format %s\n", outfile.template);
                     
                     return 0;
                 }
@@ -177,15 +179,26 @@ int main(int argc, char **argv)
                         return 0;
                     }
                     
-                    if (ISFORMAT(argv[argCnt + cnt + 1]))
+                    strSafeCopy(tempStr, argv[argCnt + cnt + 1], MAX_TEXT_LENGTH);
+                    deQuotMarks(tempStr);
+
+                    if (ISFORMAT(tempStr))
                     {
-                        strcpy(infile[infileNum].format, argv[argCnt + cnt + 1]);
+                        strcpy(infile[infileNum].template, tempStr);
+                    }
+                    else
+                    {
+                        sprintf_s(infile[infileNum].template, FILENAME_LEN, "%stemplates\\%s.txt", programPath, tempStr);
+                        (infile[infileNum].template)[FILENAME_LEN-1] = '\0';
+                    }
+
+                    if (ISFORMAT(tempStr) || access(infile[infileNum].template, F_OK) == 0)
+                    {
                         cnt++;
-                        
                         if (cnt >= num)
                         {
                             fprintf(stderr, "\nERROR"
-                                            "\nFormat must be followed by a filename\n");
+                                            "\nTemplate must be followed by a filename\n");
                             return 0;
                         }
                         
@@ -194,22 +207,20 @@ int main(int argc, char **argv)
                     else
                     {
                         strcpy(infile[infileNum].fileName, argv[argCnt + cnt + 1]);
-                        getFormat(infile[infileNum].format, infile[infileNum].fileName, FORMAT_LEN);
+                        getFormat(infile[infileNum].template, infile[infileNum].fileName, FORMAT_LEN);
+
+                        /* 合法性检查 */
+                        if (!ISFORMAT(infile[infileNum].template))
+                        {
+                            fprintf(stderr, "\nERROR"
+                                            "\nUnknow Template %s\n", infile[infileNum].template);
+                            return 0;
+                        }
                     }
                     
                     infile[infileNum].timeShift = 0.00;
                     deQuotMarks(infile[infileNum].fileName);
-                    deQuotMarks(infile[infileNum].format);
-                    
-                    /* 合法性检查 */ 
-                    if (!ISFORMAT(infile[infileNum].format))
-                    {
-                        fprintf(stderr, "\nERROR"
-                                        "\nUnknow format %s\n", infile[infileNum].format);
-                        
-                        return 0;
-                    }
-                    
+
                     infileNum++;
                 }
                 
@@ -333,6 +344,43 @@ int main(int argc, char **argv)
                     return 0;
                 }
                 config.shadow = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("-B", argv[argCnt]) || !strcmp("--bold", argv[argCnt]))
+            {/* 是否保存屏蔽部分 */
+                switch (getArgNum(argc, argv, argCnt))
+                {
+                    case 0:
+                        fprintf(stderr, "\nERROR"
+                                        "\nBold must be specified\n");
+                        return 0;
+                        break;
+                    case 1:
+                        break;
+                    default:
+                        fprintf(stderr, "\nERROR"
+                                        "\nInvalid argument %s\n", argv[argCnt+2]);
+                        return 0; 
+                        break;
+                }
+                
+                deQuotMarks(argv[argCnt+1]);
+                toLower(NULL, argv[argCnt+1]);
+                if (!strcmp("true", argv[argCnt+1]))
+                {
+                    config.bold = TRUE;
+                }
+                else if (!strcmp("false", argv[argCnt+1]))
+                {
+                    config.bold = FALSE;
+                }
+                else
+                {
+                    fprintf(stderr, "\nERROR"
+                                    "\nInvalid value %s\n", argv[argCnt+1]);
+                    return 0;
+                }
                 
                 argCnt += 2; 
             }
@@ -752,15 +800,21 @@ int main(int argc, char **argv)
     }
     
     printf("\nInput file(s):");
-    printf("\nNumber|Format|TimeShift|FileName\n");
+    printf("\nNumber|Template     |TimeShift|FileName\n");
     for (cnt = 0; cnt < infileNum; cnt++)
     {
-        printf("%6d|%6s|%8.3fs|%s\n", cnt+1, infile[cnt].format, infile[cnt].timeShift, infile[cnt].fileName);
+        strSafeCopy(tempStr, infile[cnt].template, MAX_TEXT_LENGTH);
+        if (strlen(infile[cnt].template) > 10)
+        {
+            strcpy(tempStr + 10, "...");
+            
+        }
+        printf("%6d|%-13s|%8.3fs|%s\n", cnt+1, tempStr, infile[cnt].timeShift, infile[cnt].fileName);
     }
     
     printf("\nOutput file:");
     printf("\nFormat|FileName");
-    printf("\n%6s|%s\n", outfile.format, outfile.fileName);
+    printf("\n%6s|%s\n", outfile.template, outfile.fileName);
     
     /* 读取文件 */
     printf("\nLoading files...\n");
@@ -789,7 +843,7 @@ int main(int argc, char **argv)
             return 0;
         }
         
-        if (!strcmp("xml", infile[cnt].format))
+        if (!strcmp("xml", infile[cnt].template))
         {
             returnValue = readXml(infile[cnt].fileName, &danmakuPool, "a", infile[cnt].timeShift, &status);
             
@@ -839,10 +893,11 @@ int main(int argc, char **argv)
                                     "\nUndefined Error\n",
                            returnValue
                           );
+                    return 0;
                     break;
             }
         }
-        else if (!strcmp("json", infile[cnt].format))
+        else if (!strcmp("json", infile[cnt].template))
         {
             returnValue = readJson(infile[cnt].fileName, &danmakuPool, "a", infile[cnt].timeShift, &status);
             
@@ -880,7 +935,7 @@ int main(int argc, char **argv)
                            returnValue
                           );
                     printf("\nNOTE"
-                           "\nCould not load file %s as a xml file.\n", infile[cnt].fileName);
+                           "\nCould not load file %s as a json file.\n", infile[cnt].fileName);
                     if (isContinue(ignoreWarnings) == FALSE)
                     {
                         return 0;
@@ -891,10 +946,11 @@ int main(int argc, char **argv)
                                     "\nUndefined Error\n",
                            returnValue
                           );
+                    return 0;
                     break;
             }
         }
-        else if (!strcmp("ass", infile[cnt].format))
+        else if (!strcmp("ass", infile[cnt].template))
         {
             returnValue = readAss(infile[cnt].fileName, &danmakuPool, "a", NULL, infile[cnt].timeShift, &status);
             /* 解析十位错误码 */
@@ -923,6 +979,7 @@ int main(int argc, char **argv)
                                     "\nUndefined Error\n",
                            returnValue
                           );
+                    return 0;
                     break;
             }
             /* 解析个位 */
@@ -947,9 +1004,64 @@ int main(int argc, char **argv)
                                     "\nUndefined Error\n",
                            returnValue
                           );
+                    return 0;
                     break;
             }
         }
+        else
+        {/* 使用用户自定义模板 */
+            readAss(infile[cnt].fileName, &danmakuPool, "a", NULL, infile[cnt].timeShift, &status);
+            returnValue = readTemplateFile(infile[cnt].fileName, infile[cnt].template, &danmakuPool, "a", infile[cnt].timeShift,
+                             &status, tempStr, MAX_TEXT_LENGTH);
+            
+            if (returnValue > 0)
+            {
+                switch (returnValue)
+                {
+                case 1:
+                case 3:
+                    /* 程序内部错误 */
+                    fprintf(stderr, "\nERROR [code rt%d]"
+                                    "\nFailed to open template file %s\n",
+                            returnValue, infile[cnt].template
+                            );
+                    return 0;
+                    break;
+                case 2:
+                case 4:
+                case 5:
+                    /* 程序内部错误 */
+                    fprintf(stderr, "\nERROR [code rt%d]"
+                                    "\nOut of memory\n",
+                            returnValue
+                            );
+                    return 0;
+                    break;
+                default:
+                    /* 程序内部错误 */
+                    fprintf(stderr, "\nERROR [code rt%d]"
+                                    "\nUndefined Error\n",
+                            returnValue
+                            );
+                    return 0;
+                    break;
+                }
+            }
+            else if (returnValue < 0)
+            {
+                /* 模板文件语法错误 */
+                /* 程序内部错误 */
+                fprintf(stderr, "\nERROR [code rt%d]"
+                                "\nFormat File Syntax error"
+                                "\nFilename: %s"
+                                "\n%s",
+                        returnValue, infile[cnt].template, tempStr
+                        );
+                printf("\nexit...");
+                return 0;
+            }
+        }
+        
     }
 
     /* 屏蔽 */
@@ -1009,7 +1121,7 @@ int main(int argc, char **argv)
         }
     }
     
-    if (!strcmp("ass", outfile.format))
+    if (!strcmp("ass", outfile.template))
     {
         returnValue = writeAss(outfile.fileName,/* 输出文件名 */
                                danmakuPool,/* 弹幕池的头指针 */
@@ -1070,7 +1182,7 @@ int main(int argc, char **argv)
         }
         /* 个位函数错误信息已经被以上过滤完毕 无需重新报错 */
     }
-    else if (!strcmp("xml", outfile.format))
+    else if (!strcmp("xml", outfile.template))
     {
         returnValue = writeXml(outfile.fileName, danmakuPool, NULL);
         switch (returnValue)
@@ -1099,7 +1211,7 @@ int main(int argc, char **argv)
                 break;
         }
     }
-    else if (!strcmp("json", outfile.format))
+    else if (!strcmp("json", outfile.template))
     {
         returnValue = writeJson(outfile.fileName, danmakuPool, NULL);
         switch (returnValue)
@@ -1163,6 +1275,16 @@ void printConfigInfo(CONFIG config)
     if (config.shadow == 0)
     {
         printf("(disable)");
+    }
+
+    printf(" | Bold: ");
+    if (config.bold == FALSE)
+    {
+        printf("false");
+    }
+    else
+    {
+        printf("true");
     }
     
     printf(" | DisplayArea: %.3f", config.displayarea);
@@ -1249,11 +1371,13 @@ void printConfigInfo(CONFIG config)
 void printHelpInfo()
 {
     printf("\n"
-           "./DanmakuFactory -o [outfile_format] outfile -i [infile1_format] infile1 [infile2_format] infile2 ... "
+           "./DanmakuFactory -o [outfile_format] outfile -i [infile1_template] infile1 [infile2_template] infile2 ... "
            "[-t infile1_timeshift ...] [configuration value] ...\n"
            "\n"
            "format:\n"
            "xml, json, ass\n"
+           "template:\n"
+           "xml, json, ass or a template name"
            "\n"
            "configurations:\n"
            "-x, --resx          specify the value of resolution width\n"
@@ -1268,6 +1392,8 @@ void printHelpInfo()
            "-O, --opacity       specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)\n"
            "-L, --outline       specify the width of outline for each danmaku(range: 0-4)\n"
            "-D, --shadow        specify the depth of shadow for each danmaku(range: 0-4)\n"
+           "-B, --Bold          specify whether the font should be boldface\n"
+           "                    available value: TRUE, FALSE\n"
            "\n"
            "--displayarea       specify the percent of display area on the screen(range: 0.0-1.0)\n"
            "--scrollarea        specify the percent of scroll area of rolling danmaku on the screen(range: 0.0-1.0)\n"

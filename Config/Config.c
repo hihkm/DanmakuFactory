@@ -214,6 +214,18 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         {
             configOnfile.shadow = atoi(value);
         }
+        else if (strcmp("bold", key) == 0)
+        {
+            toLower(NULL, value);
+            if (strcmp("false", value) == 0)
+            {
+                configOnfile.bold = FALSE;
+            }
+            else
+            {
+                configOnfile.bold = TRUE;
+            }
+        }
         else if (strcmp("displayarea", key) == 0)
         {
             configOnfile.displayarea = atof(value);
@@ -283,6 +295,17 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.scrollarea
            );
     
+    /* 是否加粗 */
+    if (newConfigCopy.bold == TRUE)
+    {
+        fprintf(fptr, "    \"bold\": true, \n");
+    }
+    else
+    {
+        fprintf(fptr, "    \"bold\": false, \n");
+    }
+    
+
     /* 写是否保存屏蔽部分 */
     if (newConfigCopy.saveBlockedPart == FALSE)
     {

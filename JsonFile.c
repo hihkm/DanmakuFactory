@@ -113,7 +113,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
             }
         }
         /* 时间轴，颜色，类型，字号，uid(?)，时间戳，?，文本内容 */
-        /* {"c":"343,16777215,1,25,3441491,1540706089,f0f857ec-c3c8-4f5f-b09e-b611e5b666f7","m":"2333333333"}, */
+        /* {"c":"343,16777215,1,25,1234567,1540706080,f11e5b6c-c3c8-4f5f-b09e-b660f857e6f7","m":"2333333333"}, */
         
         fscanf(ipF, ":\"%f,%d,%hd,%hd,", &t_time, &t_color, &t_type, &t_fontSize);
         

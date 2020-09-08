@@ -31,6 +31,12 @@ extern "C" {
 
 #define PRINT_ERR FALSE
 
+#define R2L 1
+#define L2R 2
+#define TOP 3
+#define BOTTOM 4
+#define SPECIAL 5
+
 #define BLK_R2L     1
 #define BLK_L2R     2
 #define BLK_TOP     4

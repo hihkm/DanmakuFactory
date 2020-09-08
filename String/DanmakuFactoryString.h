@@ -25,6 +25,17 @@ extern "C" {
 #include <string.h>
 #include "../Define/DanmakuDef.h"
 
+#define CHAR_IS_BLANK(ch) (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')
+#define STR_IS_EMPTY(str) (str[0] == '\0')
+#define STR_IS_BLANK(str) (isDesignatedStr(str, " \n\t\r"))
+#define TO_STR_END(ptr)   (ptr += strlen(ptr))
+
+/*移动字符指针向后跳到距离为字符串prefix的长度的位置*/
+#define STR_PTR_JUMP(strPtr, prefix)         \
+{                                            \
+    strPtr += strlen(prefix) * sizeof(char); \
+}
+
 extern int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName);
 extern int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName);
 extern char *floatToStr(char *const outputStr, const double input, const int accuracy);
@@ -39,6 +50,8 @@ extern BOOL isUtf8(char const *const str);
 extern char *strSafeCopy(char *destination, const char *const source, size_t count);
 extern int match(char *mainStr, char *patternStr);
 extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
+extern BOOL isStartWith(const char *const mainStr, const char *const prefixStr);
+extern char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMovePtr);
 
 #ifdef __cplusplus
 }

@@ -44,6 +44,7 @@ struct Configurations
     int opacity;       /* 不透明度 */
     int outline;       /* 描边 */
     int shadow;        /* 阴影 */
+    BOOL bold;         /* 是否加粗 */
     float displayarea; /* 显示区域 */
     float scrollarea;  /* 滚动区域 */
     BOOL saveBlockedPart;  /* 是否保存屏蔽部分 */

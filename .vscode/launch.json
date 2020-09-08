@@ -1,25 +1,25 @@
 {
     "version": "0.2.0",
     "configurations": [{
-        "name": "(gdb) Launch", // ÅäÖÃÃû³Æ£¬½«»áÔÚÆô¶¯ÅäÖÃµÄÏÂÀ­²Ëµ¥ÖĞÏÔÊ¾
-        "type": "cppdbg", // ÅäÖÃÀàĞÍ£¬cppdbg¶ÔÓ¦cpptoolsÌá¹©µÄµ÷ÊÔ¹¦ÄÜ£»¿ÉÒÔÈÏÎª´Ë´¦Ö»ÄÜÊÇcppdbg
-        "request": "launch", // ÇëÇóÅäÖÃÀàĞÍ£¬¿ÉÒÔÎªlaunch£¨Æô¶¯£©»òattach£¨¸½¼Ó£©
+        "name": "(gdb) Launch", // é…ç½®åç§°ï¼Œå°†ä¼šåœ¨å¯åŠ¨é…ç½®çš„ä¸‹æ‹‰èœå•ä¸­æ˜¾ç¤º
+        "type": "cppdbg", // é…ç½®ç±»å‹ï¼Œcppdbgå¯¹åº”cpptoolsæä¾›çš„è°ƒè¯•åŠŸèƒ½ï¼›å¯ä»¥è®¤ä¸ºæ­¤å¤„åªèƒ½æ˜¯cppdbg
+        "request": "launch", // è¯·æ±‚é…ç½®ç±»å‹ï¼Œå¯ä»¥ä¸ºlaunchï¼ˆå¯åŠ¨ï¼‰æˆ–attachï¼ˆé™„åŠ ï¼‰
         "program": "${fileDirname}/DanmakuFactory.exe",
-        "args": ["-o", "C:\\Users\\13458\\Desktop\\t.xml", "-i", "C:\\Users\\13458\\Desktop\\testass.ass"],
-        "stopAtEntry": false, // ÉèÎªtrueÊ±³ÌĞò½«ÔİÍ£ÔÚ³ÌĞòÈë¿Ú´¦£¬Ïàµ±ÓÚÔÚmainÉÏ´ò¶Ïµã
-        "cwd": "${workspaceFolder}", // µ÷ÊÔ³ÌĞòÊ±µÄ¹¤×÷Ä¿Â¼£¬´ËÎª¹¤×÷ÇøÎÄ¼ş¼Ğ£»¸Ä³É${fileDirname}¿É±äÎªÎÄ¼şËùÔÚÄ¿Â¼
-        "environment": [], // »·¾³±äÁ¿
-        "externalConsole": false, // ÎªtrueÊ±Ê¹ÓÃµ¥¶ÀµÄcmd´°¿Ú£¬ÓëÆäËüIDEÒ»ÖÂ£»18Äê10ÔÂºóÉèÎªfalse¿Éµ÷ÓÃVSCÄÚÖÃÖÕ¶Ë
-        "internalConsoleOptions": "neverOpen", // Èç¹û²»ÉèÎªneverOpen£¬µ÷ÊÔÊ±»áÌøµ½¡°µ÷ÊÔ¿ØÖÆÌ¨¡±Ñ¡Ïî¿¨
-        "MIMode": "gdb", // Ö¸¶¨Á¬½ÓµÄµ÷ÊÔÆ÷£¬¿ÉÒÔÎªgdb»òlldb¡£µ«ÎÒÃ»ÊÔ¹ılldb
-        "miDebuggerPath": "gdb.exe", // µ÷ÊÔÆ÷Â·¾¶£¬WindowsÏÂºó×º²»ÄÜÊ¡ÂÔ£¬LinuxÏÂÔò²»Òª
+        "args": ["-i", "demo", "C:\\Users\\13458\\Desktop\\test.xml", "-o", "C:\\Users\\13458\\Desktop\\testass.ass"],
+        "stopAtEntry": false, // è®¾ä¸ºtrueæ—¶ç¨‹åºå°†æš‚åœåœ¨ç¨‹åºå…¥å£å¤„ï¼Œç›¸å½“äºåœ¨mainä¸Šæ‰“æ–­ç‚¹
+        "cwd": "${workspaceFolder}", // è°ƒè¯•ç¨‹åºæ—¶çš„å·¥ä½œç›®å½•ï¼Œæ­¤ä¸ºå·¥ä½œåŒºæ–‡ä»¶å¤¹ï¼›æ”¹æˆ${fileDirname}å¯å˜ä¸ºæ–‡ä»¶æ‰€åœ¨ç›®å½•
+        "environment": [], // ç¯å¢ƒå˜é‡
+        "externalConsole": false, // ä¸ºtrueæ—¶ä½¿ç”¨å•ç‹¬çš„cmdçª—å£ï¼Œä¸å…¶å®ƒIDEä¸€è‡´ï¼›18å¹´10æœˆåè®¾ä¸ºfalseå¯è°ƒç”¨VSCå†…ç½®ç»ˆç«¯
+        "internalConsoleOptions": "neverOpen", // å¦‚æœä¸è®¾ä¸ºneverOpenï¼Œè°ƒè¯•æ—¶ä¼šè·³åˆ°â€œè°ƒè¯•æ§åˆ¶å°â€é€‰é¡¹å¡
+        "MIMode": "gdb", // æŒ‡å®šè¿æ¥çš„è°ƒè¯•å™¨ï¼Œå¯ä»¥ä¸ºgdbæˆ–lldbã€‚ä½†æˆ‘æ²¡è¯•è¿‡lldb
+        "miDebuggerPath": "gdb.exe", // è°ƒè¯•å™¨è·¯å¾„ï¼ŒWindowsä¸‹åç¼€ä¸èƒ½çœç•¥ï¼ŒLinuxä¸‹åˆ™ä¸è¦
         "setupCommands": [
-            { // Ä£°å×Ô´ø£¬ºÃÏñ¿ÉÒÔ¸üºÃµØÏÔÊ¾STLÈİÆ÷µÄÄÚÈİ£¬¾ßÌå×÷ÓÃ×ÔĞĞGoogle
+            { // æ¨¡æ¿è‡ªå¸¦ï¼Œå¥½åƒå¯ä»¥æ›´å¥½åœ°æ˜¾ç¤ºSTLå®¹å™¨çš„å†…å®¹ï¼Œå…·ä½“ä½œç”¨è‡ªè¡ŒGoogle
                 "description": "Enable pretty-printing for gdb",
                 "text": "-enable-pretty-printing",
                 "ignoreFailures": false
             }
         ],
-        "preLaunchTask": "Compile" // µ÷ÊÔ»á»°¿ªÊ¼Ç°Ö´ĞĞµÄÈÎÎñ£¬Ò»°ãÎª±àÒë³ÌĞò¡£Óëtasks.jsonµÄlabelÏà¶ÔÓ¦
+        "preLaunchTask": "Compile" // è°ƒè¯•ä¼šè¯å¼€å§‹å‰æ‰§è¡Œçš„ä»»åŠ¡ï¼Œä¸€èˆ¬ä¸ºç¼–è¯‘ç¨‹åºã€‚ä¸tasks.jsonçš„labelç›¸å¯¹åº”
     }]
 }

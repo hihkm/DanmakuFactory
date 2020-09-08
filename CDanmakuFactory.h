@@ -29,6 +29,7 @@ extern "C" {
 #include "Define/FileDef.h"
 #include "Define/Status.h"
 #include "Config/Config.h"
+#include "TemplateFile/TemplateFile.h"
 #include "String/DanmakuFactoryString.h"
 #include "List/DanmakuFactoryList.h"
 
@@ -47,6 +48,10 @@ extern int readAss(const char *const fileName, DANMAKU **danmakuHead, const char
 extern int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                     const CONFIG config, const ASSFILE *const subPart, STATUS *const status
                    );
+
+extern int readTemplateFile(const char *const ipFile, const char *const templateFile, 
+                     DANMAKU **danmakuHead, const char *mode, const float timeShift, 
+                     STATUS *const status, char *errMsg, int msgLen);
 
 /* 不常用的ass操作函数 */
 extern int readAssFile(ASSFILE *assFile, const char *const fileName);

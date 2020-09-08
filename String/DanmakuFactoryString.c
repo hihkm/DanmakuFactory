@@ -124,8 +124,8 @@ char *floatToStr(char *const outputStr, const double input, const int accuracy)
  * 得到字符串左边部分，并移动指针至截断位置后一个字符
  * 参数：输出字符串/输入字符串指针地址/截断位置/ 
  * 返回值：结果字符串地址 
- * 输出字符串为NULL时 将单纯移动指针 
-  */
+ * 输出字符串为NULL时 将单纯移动指针
+ */
 char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, const int maxLen)
 {
     int copiedLen = 0;
@@ -566,4 +566,86 @@ char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffS
     
     *outPtr = '\0';
     return outStr;
+}
+
+/* 
+ * 字符串是否是以指定子字符串开头
+ * 参数：待判断字符串/指定字符串
+ * 返回值：布尔值
+ */
+BOOL isStartWith(const char *const mainStr, const char *const prefixStr)
+{
+    int index = 0;
+    while (mainStr[index] != '\0' && prefixStr[index] != '\0')
+    {
+        if (mainStr[index] != prefixStr[index])
+        {
+            return FALSE;
+        }
+        index++;
+    }
+
+    if (prefixStr[index] == '\0')
+    {
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
+}
+
+/* 
+ * 从下一个非空白字符开始读取直到下一个空白字符或指定字符结束
+ * 参数：字符串指针/输出字符串/输出字符串最大长度/提前结束字符（不含，'\0'表示任意空白字符结束）\是否移动指针到结束位置的下一个字符
+ * 返回值：输出字符串
+ * 当输出字符串长度达到 maxLen-1 时结束并补'\0'
+ * 即便是指定了结束字符，遇到空白字符仍然会结束 
+ */
+char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMovePtr)
+{
+    int cnt = 1;
+    char *ipPtr = *ptr, *opPtr = buf;
+    
+    /* 参数合法性检查 */
+    if (*ptr == NULL || buf == NULL || maxLen < 2)
+    {
+        return NULL;
+    }
+    
+    /* 跳过前面的空白字符 */
+    while (*ipPtr != '\0' && CHAR_IS_BLANK(*ipPtr))
+    {
+        ipPtr++;
+    }
+    
+    /* 拷贝字符串 */
+    while (*ipPtr != '\0')
+    {
+        *opPtr = *ipPtr;
+        
+        ipPtr++;
+        opPtr++;
+        cnt++;
+        
+        /* 检查结束条件 */ 
+        if (cnt == maxLen)
+        {/* 字串超过容器最大长度 */
+            break;
+        }
+        else if (*ipPtr == endBefore || CHAR_IS_BLANK(*ipPtr))
+        {/* 检查是否为结束字符 */
+            break;
+        }
+    }
+    
+    *opPtr = '\0';
+    buf[maxLen-1] = '\0';
+    
+    /* 是否移动指针 */
+    if (isMovePtr == TRUE)
+    {
+        *ptr = ipPtr; 
+    }
+    return buf;
 }

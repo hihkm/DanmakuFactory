@@ -20,10 +20,10 @@ limitations under the License.
 
 //#define GUI_SUPPORT       //给GUI版本提供一些特殊的功能支持
 
-#define VERSION "1.43"
+#define VERSION "1.50"
 #define EDITION "CLI Beta"
 #define CONFIG_FILE_NAME "DanmakuFactoryConfig.json"
-#define FILENAME_LEN 512
+#define FILENAME_LEN 1024
 #define FORMAT_LEN 16
 
 #define ISFORMAT(str) (!strcmp("ass", str) || !strcmp("xml", str) || !strcmp("json", str))
@@ -32,7 +32,7 @@ limitations under the License.
 struct fileInfo
 {
     char fileName[FILENAME_LEN];
-    char format[FORMAT_LEN];
+    char template[FILENAME_LEN];
     float timeShift;
     BOOL isSet;
 };
