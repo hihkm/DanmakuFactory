@@ -20,7 +20,7 @@ limitations under the License.
 
 #define GUI_SUPPORT       //给GUI版本提供一些特殊的功能支持
 
-#define VERSION "1.50"
+#define VERSION "1.51"
 #define EDITION "CLI Beta"
 #define CONFIG_FILE_NAME "DanmakuFactoryConfig.json"
 #define FILENAME_LEN 1024

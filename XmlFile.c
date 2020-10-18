@@ -405,7 +405,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
             ptr = ptr -> next;
             continue;
         }
-        fprintf(opF, "\n    <d p=\"%s,%d,%d,%d,,0,,\">",
+        fprintf(opF, "\n    <d p=\"%s,%d,%d,%d,,0,NULL,\">",
                      floatToStr(tempText, ptr -> time, 3),
                      typeInXml, ptr->fontSize, ptr->color
                );

@@ -110,8 +110,8 @@ Public Class MainWindow
         End If
 
         '检查程序是否存在
-        If Not My.Computer.FileSystem.FileExists(".\DF1.50CLI.exe") Then
-            MessageBox.Show("找不到依赖程序 DF1.50CLI.exe")
+        If Not My.Computer.FileSystem.FileExists(".\DF1.51CLI.exe") Then
+            MessageBox.Show("找不到依赖程序 DF1.51CLI.exe")
             Exit Sub
         End If
 

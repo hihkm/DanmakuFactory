@@ -126,7 +126,7 @@ Partial Class UpdateDlg
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(573, 112)
         Me.Label1.TabIndex = 4
-        Me.Label1.Text = "作者 HKM" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "版本 1.50GUI Beta(200908)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本软件仅在Github与吾爱论坛发布，其他网站均非本人发布，无法保证程序安全性" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本程序开源并永" &
+        Me.Label1.Text = "作者 HKM" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "版本 1.51GUI Beta(201018)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本软件仅在Github与吾爱论坛发布，其他网站均非本人发布，无法保证程序安全性" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本程序开源并永" &
     "久免费，请勿用于商业用途" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "https://github.com/hihkm/DanmakuFactory"
         '
         'UpdateDlg
