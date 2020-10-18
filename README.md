@@ -10,11 +10,11 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持多
 
 ##### Windows
 
-[DanmakuFactory_GUI  Beta(推荐 - 更新到1.50 - 蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
+[DanmakuFactory_GUI  Beta(推荐 - 更新到1.51 - 蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
 
-[DanmakuFactory_CLI  Beta(更新到1.50 - 蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
+[DanmakuFactory_CLI  Beta(更新到1.51 - 蓝奏云)](https://hihkm.lanzous.com/i9pU4dsdl7c)
 
-[DanmakuFactory_1.43  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+[DanmakuFactory_1.51  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
 
 *1.50CLI版本目前在测试阶段，存在不稳定性，如果对稳定性要求较高请下载旧版本
 
@@ -180,3 +180,7 @@ make
 - 增加了用户自定义输入模板功能（CLI）
 
 - 修复了某些错误发生时程序仍继续执行的问题
+
+**1.51**
+
+- 修复了因发送者id缺失导致xml弹幕在某些播放器上的显示问题
