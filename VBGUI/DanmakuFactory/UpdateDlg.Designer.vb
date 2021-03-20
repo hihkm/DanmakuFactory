@@ -30,7 +30,7 @@ Partial Class UpdateDlg
         Me.VersionLabel = New System.Windows.Forms.Label()
         Me.UpdateInfoLabel = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.copyrightInfo = New System.Windows.Forms.Label()
         Me.TableLayoutPanel1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -41,7 +41,7 @@ Partial Class UpdateDlg
         Me.TableLayoutPanel1.ColumnCount = 3
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.5618!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.4382!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 117.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 119.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 2, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.ReCheck_Botton, 0, 0)
@@ -57,7 +57,7 @@ Partial Class UpdateDlg
         '
         Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Cancel_Button.Location = New System.Drawing.Point(238, 4)
+        Me.Cancel_Button.Location = New System.Drawing.Point(237, 4)
         Me.Cancel_Button.Margin = New System.Windows.Forms.Padding(4)
         Me.Cancel_Button.Name = "Cancel_Button"
         Me.Cancel_Button.Size = New System.Drawing.Size(100, 26)
@@ -67,10 +67,10 @@ Partial Class UpdateDlg
         'OK_Button
         '
         Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.OK_Button.Location = New System.Drawing.Point(120, 4)
+        Me.OK_Button.Location = New System.Drawing.Point(119, 4)
         Me.OK_Button.Margin = New System.Windows.Forms.Padding(4)
         Me.OK_Button.Name = "OK_Button"
-        Me.OK_Button.Size = New System.Drawing.Size(105, 26)
+        Me.OK_Button.Size = New System.Drawing.Size(104, 26)
         Me.OK_Button.TabIndex = 0
         Me.OK_Button.Text = "获取"
         '
@@ -79,7 +79,7 @@ Partial Class UpdateDlg
         Me.ReCheck_Botton.Location = New System.Drawing.Point(4, 4)
         Me.ReCheck_Botton.Margin = New System.Windows.Forms.Padding(4)
         Me.ReCheck_Botton.Name = "ReCheck_Botton"
-        Me.ReCheck_Botton.Size = New System.Drawing.Size(108, 26)
+        Me.ReCheck_Botton.Size = New System.Drawing.Size(107, 26)
         Me.ReCheck_Botton.TabIndex = 2
         Me.ReCheck_Botton.Text = "重新检查"
         Me.ReCheck_Botton.UseVisualStyleBackColor = True
@@ -118,16 +118,15 @@ Partial Class UpdateDlg
         Me.PictureBox1.TabIndex = 3
         Me.PictureBox1.TabStop = False
         '
-        'Label1
+        'copyrightInfo
         '
-        Me.Label1.Font = New System.Drawing.Font("黑体", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.Label1.Location = New System.Drawing.Point(12, 299)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(573, 112)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "作者 HKM" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "版本 1.51GUI Beta(201018)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本软件仅在Github与吾爱论坛发布，其他网站均非本人发布，无法保证程序安全性" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本程序开源并永" &
-    "久免费，请勿用于商业用途" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "https://github.com/hihkm/DanmakuFactory"
+        Me.copyrightInfo.Font = New System.Drawing.Font("黑体", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.copyrightInfo.Location = New System.Drawing.Point(12, 299)
+        Me.copyrightInfo.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.copyrightInfo.Name = "copyrightInfo"
+        Me.copyrightInfo.Size = New System.Drawing.Size(573, 112)
+        Me.copyrightInfo.TabIndex = 4
+        Me.copyrightInfo.Text = "作者 HKM" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "本程序开源并永久免费，请勿用于商业用途" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "https://github.com/hihkm/DanmakuFactory"
         '
         'UpdateDlg
         '
@@ -136,7 +135,7 @@ Partial Class UpdateDlg
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
         Me.ClientSize = New System.Drawing.Size(605, 462)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.copyrightInfo)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.UpdateInfoLabel)
         Me.Controls.Add(Me.VersionLabel)
@@ -161,6 +160,6 @@ Partial Class UpdateDlg
     Friend WithEvents VersionLabel As Label
     Friend WithEvents UpdateInfoLabel As Label
     Friend WithEvents PictureBox1 As PictureBox
-    Friend WithEvents Label1 As Label
+    Friend WithEvents copyrightInfo As Label
     Friend WithEvents ReCheck_Botton As Button
 End Class

@@ -29,8 +29,10 @@
     Public statTable As Boolean = False
     Public statHistogram As Boolean = False
 
+    Private configFileName As String = Application.StartupPath + "\" + "DanmakuFactoryGUIConfig.txt"
+
     Public Sub WriteConfig()
-        WriteConfig("./DanamkuFactoryGUIConfig.txt")
+        WriteConfig(configFileName)
     End Sub
 
     Public Sub WriteConfig(fileName As String)
@@ -39,7 +41,7 @@
     End Sub
 
     Public Sub ReadConfig()
-        ReadConfig("./DanamkuFactoryGUIConfig.txt")
+        ReadConfig(configFileName)
     End Sub
 
     Public Sub ReadConfig(fileName As String)

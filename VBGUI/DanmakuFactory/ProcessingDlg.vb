@@ -106,7 +106,7 @@ Public Class ProcessingDlg
             Dim Proc As New Process
             Dim arg As String
 
-            arg = "--check-version-1.51 --ignore-warnings -i """ + fileList.GetFileName(cnt) +
+            arg = "--check-version-" + Define.cliVersion + " --ignore-warnings -i """ + fileList.GetFileName(cnt) +
                             """ -o """ + outputFileName +
                             """ -N """ + config.fontname +
                             """ -x " + config.resx.ToString +
@@ -129,7 +129,7 @@ Public Class ProcessingDlg
                 arg += " --statmode " + config.ToStatString
             End If
 
-            Proc.StartInfo.FileName = ".\DF1.51CLI.exe"
+            Proc.StartInfo.FileName = Application.StartupPath + "\" + Define.cliProgramFileName
             Proc.StartInfo.RedirectStandardError = True
             Proc.StartInfo.UseShellExecute = False
             Proc.StartInfo.CreateNoWindow = True

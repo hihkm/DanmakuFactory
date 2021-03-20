@@ -42,6 +42,7 @@ Public Class MainWindow
     End Sub
 
     Private Sub MainWindow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Text = "DanmakuFactory " + Define.guiVersionText
         FileListButton.Enabled = False
         FileListButton.Text = "未打开任何文件"
         Try
@@ -52,6 +53,10 @@ Public Class MainWindow
 
         inputTemplate.Text = inputTemplate.Items(0)
         OutputTemplate.Text = OutputTemplate.Items(0)
+
+        If My.Computer.FileSystem.FileExists(Application.StartupPath + "\DanamkuFactoryGUIConfig.txt") Then
+            MessageBox.Show("抱歉，因为拼写疏忽，旧配置文件DanamkuFactoryGUIConfig.txt现不可用，请更名为DanmakuFactoryGUIConfig.txt")
+        End If
 
         '检查更新
         Dim updateThread As Thread
@@ -110,8 +115,8 @@ Public Class MainWindow
         End If
 
         '检查程序是否存在
-        If Not My.Computer.FileSystem.FileExists(".\DF1.51CLI.exe") Then
-            MessageBox.Show("找不到依赖程序 DF1.51CLI.exe")
+        If Not My.Computer.FileSystem.FileExists(Application.StartupPath + "\" + Define.cliProgramFileName) Then
+            MessageBox.Show("找不到依赖程序 " + Define.cliProgramFileName)
             Exit Sub
         End If
 

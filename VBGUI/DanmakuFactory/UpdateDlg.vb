@@ -47,6 +47,11 @@ Public Class UpdateDlg
     End Sub
 
     Private Sub UpdateDlg_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        copyrightInfo.Text = "作者 HKM" + vbCrLf +
+                             "版本 " + guiVersionText + vbCrLf +
+                             "本软件仅在Github与吾爱论坛发布，其他网站均非本人发布，无法保证程序安全性" + vbCrLf +
+                             "本程序开源并永久免费，请勿用于商业用途" + vbCrLf +
+                             "https://github.com/hihkm/DanmakuFactory"
         UpdateUIInfo()
     End Sub
 

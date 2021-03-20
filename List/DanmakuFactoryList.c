@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2019-2020 hkm(github:hihkm)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "DanmakuFactoryList.h"
 
-/* 
+/*
  * 排序整个链表（桶排序）
  * 参数：要排序的链表头
  * 返回值：
@@ -33,7 +33,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         (status -> completedNum) = 0;
         status -> isDone = FALSE;
     }
-    
+
     if(*listHead == NULL)
     {
         #if PRINT_ERR == TRUE
@@ -41,12 +41,12 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         #endif
         return 1;
     }
-    
+
     DANMAKU **bucket = NULL, *now = NULL, *last = NULL, *ptr = NULL;
     int cnt, index, danmakuNum = 0, bucketNum = 0;
     float max, min;
     BOOL isSorted = TRUE;
-    
+
     /* 统计弹幕数量并找出最大最小值 */
     now = *listHead;
     while(now != NULL)
@@ -80,7 +80,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     {
         return 0;
     }
-    
+
     /* 申请桶空间并清0 */
     now = *listHead;
     bucketNum = danmakuNum / 128 + 1;
@@ -92,15 +92,19 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         return 2;
     }
     memset(bucket, 0, sizeof(DANMAKU *) * bucketNum);
-    
-    /* 入桶 */ 
+
+    /* 入桶 */
     while(*listHead != NULL)
     {
-        index = (now -> time - min) / (max - min + 1) * bucketNum;
+        index = floor((now -> time - min) / (max - min + 1) * bucketNum);
+        if (index >= bucketNum || index < 0) {
+            /* 溢出非法索引处理 */
+            index = bucketNum - 1;
+        }
 
         *listHead = (*listHead) -> next;
         if(bucket[index] == NULL)
-        {/* 如果该桶为空则将新节点指针填入 */ 
+        {/* 如果该桶为空则将新节点指针填入 */
             bucket[index] = now;
             now -> next = NULL;
         }
@@ -108,7 +112,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         {
             ptr = last = bucket[index];
             if(now -> time < ptr -> time)
-            {/* 判断是否为该桶最小值 */ 
+            {/* 判断是否为该桶最小值 */
                 now -> next = ptr;
                 bucket[index] = now;
             }
@@ -125,20 +129,20 @@ int sortList(DANMAKU **listHead, STATUS *const status)
             }
         }
         now = *listHead;
-        
+
         /* 刷新status */
         if (status != NULL)
         {
             (status -> completedNum)++;
         }
     }/* 结束 while */
-    
+
     /* 出桶 */
     now = *listHead = NULL;
     for(cnt = 0; cnt < bucketNum; cnt++)
     {
         ptr = bucket[cnt];
-        
+
         if(ptr != NULL)
         {
             if(*listHead == NULL)
@@ -157,26 +161,26 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         }
     }
     free(bucket);
-    
+
     /* 刷新status */
     if (status != NULL)
     {
         status -> isDone = TRUE;
     }
-    return 0; 
+    return 0;
 }
 
-/* 
+/*
  * 弹幕按类型屏蔽
  * 参数：弹幕链表头/屏蔽模式/屏蔽关键字串集
  * 返回值：空
  * 附屏蔽模式：
- * BLK_R2L         屏蔽右左滚动 
- * BLK_L2R         屏蔽左右滚动 
- * BLK_TOP         屏蔽顶端固定 
- * BLK_BOTTOM      屏蔽底端固定 
- * BLK_SPECIAL     屏蔽特殊弹幕 
- * BLK_COLOR       屏蔽非白色弹幕 
+ * BLK_R2L         屏蔽右左滚动
+ * BLK_L2R         屏蔽左右滚动
+ * BLK_TOP         屏蔽顶端固定
+ * BLK_BOTTOM      屏蔽底端固定
+ * BLK_SPECIAL     屏蔽特殊弹幕
+ * BLK_COLOR       屏蔽非白色弹幕
   */
 void blockByType(DANMAKU *const danmakuHead, const int mode, const char **const keyStrings)
 {
@@ -184,7 +188,7 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, const char **const 
     {
         return;
     }
-    
+
     DANMAKU *ptr = (DANMAKU *)danmakuHead;
     while (ptr != NULL)
     {
@@ -230,13 +234,13 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, const char **const 
                 ptr -> type *= -1;
             }
         }
-        //TODO:关键字屏蔽以及正则匹配 
-        
+        //TODO:关键字屏蔽以及正则匹配
+
         ptr = ptr -> next;
     }
 }
 
-/* 
+/*
  * 释放整个链表
  * 参数：
  * 要释放的链表头
@@ -247,7 +251,7 @@ void freeList(DANMAKU *listHead)
     while(ptr != NULL)
     {
         listHead = ptr -> next;
-        free(ptr -> text);/* 释放文本部分的空间 */ 
+        free(ptr -> text);/* 释放文本部分的空间 */
         free(ptr);
         ptr = listHead;
     }
