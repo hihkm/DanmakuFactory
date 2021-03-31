@@ -48,6 +48,7 @@ extern BOOL isDesignatedChar(char ch, const char *designatedChar);
 extern BOOL isDesignatedStr(char *str, char *designatedChar);
 extern BOOL isUtf8(char const *const str);
 extern char *strSafeCopy(char *destination, const char *const source, size_t count);
+int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf);
 extern int match(char *mainStr, char *patternStr);
 extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
 extern BOOL isStartWith(const char *const mainStr, const char *const prefixStr);

@@ -86,8 +86,14 @@ int main(int argc, char **argv)
     
     /* 获取配置文件路径 */
     getPath(programPath, argv[0], MAX_TEXT_LENGTH);
-    sprintf_s(configFilePath, MAX_TEXT_LENGTH, "%s%s", programPath, "\\"CONFIG_FILE_NAME);
-    configFilePath[MAX_TEXT_LENGTH - 1] = '\0';
+    
+    // sprintf_s(configFilePath, MAX_TEXT_LENGTH, "%s%s", programPath, "\\"CONFIG_FILE_NAME);
+    // configFilePath[MAX_TEXT_LENGTH - 1] = '\0';
+
+    strSafeCopy(configFilePath, programPath, MAX_TEXT_LENGTH);
+    strSafeCat(configFilePath, MAX_TEXT_LENGTH, "\\"CONFIG_FILE_NAME);
+
+    
     if (strstr(configFilePath, CONFIG_FILE_NAME) == NULL)
     {
         printf("\nWARNING"
@@ -188,8 +194,13 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        sprintf_s(infile[infileNum].template, FILENAME_LEN, "%stemplates\\%s.txt", programPath, tempStr);
-                        (infile[infileNum].template)[FILENAME_LEN-1] = '\0';
+                        // sprintf_s(infile[infileNum].template, FILENAME_LEN, "%stemplates\\%s.txt", programPath, tempStr);
+                        // (infile[infileNum].template)[FILENAME_LEN-1] = '\0';
+
+                        strSafeCopy(infile[infileNum].template, programPath, FILENAME_LEN);
+                        strSafeCat(infile[infileNum].template, FILENAME_LEN, "templates\\");
+                        strSafeCat(infile[infileNum].template, FILENAME_LEN, tempStr);
+                        strSafeCat(infile[infileNum].template, FILENAME_LEN, ".txt");
                     }
 
                     if (ISFORMAT(tempStr) || access(infile[infileNum].template, F_OK) == 0)
@@ -1010,7 +1021,6 @@ int main(int argc, char **argv)
         }
         else
         {/* 使用用户自定义模板 */
-            readAss(infile[cnt].fileName, &danmakuPool, "a", NULL, infile[cnt].timeShift, &status);
             returnValue = readTemplateFile(infile[cnt].fileName, infile[cnt].template, &danmakuPool, "a", infile[cnt].timeShift,
                              &status, tempStr, MAX_TEXT_LENGTH);
             

@@ -96,7 +96,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     /* 入桶 */
     while(*listHead != NULL)
     {
-        index = floor((now -> time - min) / (max - min + 1) * bucketNum);
+        index = (int)((now -> time - min) / (max - min + 1) * bucketNum);
         if (index >= bucketNum || index < 0) {
             /* 溢出非法索引处理 */
             index = bucketNum - 1;

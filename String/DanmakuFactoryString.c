@@ -459,6 +459,57 @@ char *strSafeCopy(char *destination, const char *const source, size_t count)
     return returnPtr;
 }
 
+/*  
+ * 安全的字符串连接
+ * 参数：目的字符串/目的字符串最大长度/源字符串
+ * 返回值：目的字符串最终长度
+  */
+int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf)
+{
+    /* 合法性检查 */
+    if (dstBuf == NULL || srcBuf == NULL || dstSize <= 0)
+    {
+        return 0;
+    }
+    
+    int length = 0;
+    char *dstPtr;
+    const char *srcPtr;
+    dstPtr = dstBuf;
+    srcPtr = srcBuf;
+
+    /* 遍历目标容器 */
+    while (*dstPtr != '\0')
+    {
+        length++;
+        if (length >= dstSize)
+        {
+            *dstPtr = '\0';
+            return length;
+        }
+        
+        dstPtr++;
+    }
+    
+    /* 连接字符串 */
+    while (*srcPtr != '\0')
+    {
+        length++;
+        if (length >= dstSize)
+        {
+            break;
+        }
+
+        *dstPtr = *srcPtr;
+        
+        dstPtr++;
+        srcPtr++;
+    }
+
+    *dstPtr = '\0';
+    return length;
+}
+
 /* 
  * 获取匹配次数
  * 参数：主串/模式串

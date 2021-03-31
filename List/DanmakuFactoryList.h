@@ -24,6 +24,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <math.h>
 #include "../Define/DanmakuDef.h"
 #include "../Define/Status.h"
 

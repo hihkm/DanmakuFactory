@@ -1399,7 +1399,7 @@ int writeAssDanmakuPart(FILE *opF,
         if (*(now->text) == ' ')
         {
             strcpy(escapedText, "\\h");
-            strcat_s(escapedText, MAX_TEXT_LENGTH, now->text);
+            strSafeCat(escapedText, MAX_TEXT_LENGTH, now->text);
         }
         else
         {
