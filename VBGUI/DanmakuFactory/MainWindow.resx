@@ -117,12 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="StartButton.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="StartButton.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
   </data>
   <data name="StartButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>230, 251</value>
+    <value>256, 282</value>
   </data>
   <data name="StartButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>81, 32</value>
@@ -146,21 +150,23 @@
   <data name="&gt;&gt;StartButton.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
+  <data name="FileListButton.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
   <data name="FileListButton.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="FileListButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="FileListButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 19</value>
+    <value>111, 51</value>
   </data>
   <data name="FileListButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="FileListButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>120, 30</value>
+    <value>194, 30</value>
   </data>
   <data name="FileListButton.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -180,38 +186,14 @@
   <data name="&gt;&gt;FileListButton.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="inputTemplate.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 9pt</value>
-  </data>
-  <data name="inputTemplate.Items" xml:space="preserve">
-    <value>缺省</value>
-  </data>
-  <data name="inputTemplate.Location" type="System.Drawing.Point, System.Drawing">
-    <value>86, 63</value>
-  </data>
-  <data name="inputTemplate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>205, 28</value>
-  </data>
-  <data name="inputTemplate.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="&gt;&gt;inputTemplate.Name" xml:space="preserve">
-    <value>inputTemplate</value>
-  </data>
-  <data name="&gt;&gt;inputTemplate.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;inputTemplate.Parent" xml:space="preserve">
-    <value>InputGroupBox</value>
-  </data>
-  <data name="&gt;&gt;inputTemplate.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="FileOpenButton.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
   </data>
   <data name="FileOpenButton.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
   </data>
   <data name="FileOpenButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>86, 19</value>
+    <value>19, 51</value>
   </data>
   <data name="FileOpenButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -235,37 +217,7 @@
     <value>InputGroupBox</value>
   </data>
   <data name="&gt;&gt;FileOpenButton.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="Label2.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="Label2.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 10.5pt</value>
-  </data>
-  <data name="Label2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 64</value>
-  </data>
-  <data name="Label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>82, 24</value>
-  </data>
-  <data name="Label2.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="Label2.Text" xml:space="preserve">
-    <value>输入模板</value>
-  </data>
-  <data name="&gt;&gt;Label2.Name" xml:space="preserve">
-    <value>Label2</value>
-  </data>
-  <data name="&gt;&gt;Label2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;Label2.Parent" xml:space="preserve">
-    <value>InputGroupBox</value>
-  </data>
-  <data name="&gt;&gt;Label2.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>1</value>
   </data>
   <data name="Label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -274,7 +226,7 @@
     <value>微软雅黑, 10.5pt</value>
   </data>
   <data name="Label1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 22</value>
+    <value>15, 27</value>
   </data>
   <data name="Label1.Size" type="System.Drawing.Size, System.Drawing">
     <value>82, 24</value>
@@ -295,7 +247,7 @@
     <value>InputGroupBox</value>
   </data>
   <data name="&gt;&gt;Label1.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>2</value>
   </data>
   <data name="InputGroupBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 10.5pt</value>
@@ -304,7 +256,7 @@
     <value>12, 14</value>
   </data>
   <data name="InputGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>299, 100</value>
+    <value>325, 97</value>
   </data>
   <data name="InputGroupBox.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -334,7 +286,7 @@
     <value>NoControl</value>
   </data>
   <data name="Label3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 27</value>
+    <value>15, 27</value>
   </data>
   <data name="Label3.Size" type="System.Drawing.Size, System.Drawing">
     <value>274, 24</value>
@@ -358,13 +310,13 @@
     <value>5</value>
   </data>
   <data name="OutputDir.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 9pt</value>
+    <value>微软雅黑, 10.8pt</value>
   </data>
   <data name="OutputDir.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 58</value>
+    <value>19, 54</value>
   </data>
   <data name="OutputDir.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 27</value>
+    <value>219, 31</value>
   </data>
   <data name="OutputDir.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -381,6 +333,9 @@
   <data name="&gt;&gt;OutputDir.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
+  <data name="Button2.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
   <data name="Button2.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
   </data>
@@ -388,7 +343,10 @@
     <value>NoControl</value>
   </data>
   <data name="Button2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>229, 58</value>
+    <value>241, 54</value>
+  </data>
+  <data name="Button2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
   </data>
   <data name="Button2.Size" type="System.Drawing.Size, System.Drawing">
     <value>64, 28</value>
@@ -421,7 +379,7 @@
     <value>NoControl</value>
   </data>
   <data name="Label4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 91</value>
+    <value>15, 103</value>
   </data>
   <data name="Label4.Size" type="System.Drawing.Size, System.Drawing">
     <value>82, 24</value>
@@ -430,7 +388,7 @@
     <value>10</value>
   </data>
   <data name="Label4.Text" xml:space="preserve">
-    <value>输出模板</value>
+    <value>输出格式</value>
   </data>
   <data name="&gt;&gt;Label4.Name" xml:space="preserve">
     <value>Label4</value>
@@ -444,8 +402,11 @@
   <data name="&gt;&gt;Label4.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
+  <data name="OutputTemplate.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>System</value>
+  </data>
   <data name="OutputTemplate.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 9pt</value>
+    <value>微软雅黑, 10.8pt</value>
   </data>
   <data name="OutputTemplate.Items" xml:space="preserve">
     <value>ASS</value>
@@ -457,10 +418,10 @@
     <value>JSON</value>
   </data>
   <data name="OutputTemplate.Location" type="System.Drawing.Point, System.Drawing">
-    <value>92, 91</value>
+    <value>100, 99</value>
   </data>
   <data name="OutputTemplate.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 28</value>
+    <value>102, 32</value>
   </data>
   <data name="OutputTemplate.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -477,6 +438,9 @@
   <data name="&gt;&gt;OutputTemplate.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="SettingButton.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
   <data name="SettingButton.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 7.8pt</value>
   </data>
@@ -484,16 +448,16 @@
     <value>NoControl</value>
   </data>
   <data name="SettingButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>229, 89</value>
+    <value>227, 100</value>
   </data>
   <data name="SettingButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>64, 28</value>
+    <value>78, 30</value>
   </data>
   <data name="SettingButton.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
   </data>
   <data name="SettingButton.Text" xml:space="preserve">
-    <value>设置</value>
+    <value>弹幕设置</value>
   </data>
   <data name="&gt;&gt;SettingButton.Name" xml:space="preserve">
     <value>SettingButton</value>
@@ -511,10 +475,10 @@
     <value>微软雅黑, 10.8pt</value>
   </data>
   <data name="OutputGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 120</value>
+    <value>12, 117</value>
   </data>
   <data name="OutputGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>299, 125</value>
+    <value>325, 151</value>
   </data>
   <data name="OutputGroupBox.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -544,7 +508,7 @@
     <value>NoControl</value>
   </data>
   <data name="InfoLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 255</value>
+    <value>12, 286</value>
   </data>
   <data name="InfoLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>46, 24</value>
@@ -571,7 +535,7 @@
     <value>True</value>
   </metadata>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>318, 288</value>
+    <value>349, 326</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -1704,9 +1668,6 @@
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 </value>
-  </data>
-  <data name="$this.MaximumSize" type="System.Drawing.Size, System.Drawing">
-    <value>336, 335</value>
   </data>
   <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
     <value>336, 335</value>

@@ -26,12 +26,13 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 #include "Define/DanmakuDef.h"
-#include "Define/FileDef.h"
 #include "Define/Status.h"
 #include "Config/Config.h"
-#include "TemplateFile/TemplateFile.h"
 #include "String/DanmakuFactoryString.h"
 #include "List/DanmakuFactoryList.h"
+
+#include "TemplateFile/TemplateFile.h"
+#include "AssFile/AssFile.h"
 
 /* xml */
 extern int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status);
@@ -39,36 +40,7 @@ extern int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *co
 
 /* json */
 extern int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status);
-extern int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const status); 
-
-/* ass */
-extern int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode, ASSFILE *assSub, const float timeShift,
-                   STATUS *const status
-                  );
-extern int writeAss(const char *const fileName, DANMAKU *danmakuHead,
-                    const CONFIG config, const ASSFILE *const subPart, STATUS *const status
-                   );
-
-extern int readTemplateFile(const char *const ipFile, const char *const templateFile, 
-                     DANMAKU **danmakuHead, const char *mode, const float timeShift, 
-                     STATUS *const status, char *errMsg, int msgLen);
-
-/* 不常用的ass操作函数 */
-extern int readAssFile(ASSFILE *assFile, const char *const fileName);
-extern int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode, ASSFILE *outputSub, const float timeShift,
-                            STATUS *const status
-                           );
-extern void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles);
-extern int writeAssDanmakuPart(FILE *opF,
-                               DANMAKU *head, const int resX, const int resY, const int fontSize, const char *fontName,
-                               const float rollTime, const float holdTime, const float displayArea, const float rollArea,
-                               const int density, const int blockMode, const BOOL saveBlockedPart,
-                               STATUS *const status
-                              );
-extern int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, const int holdTime,
-                            const int density, const int blockMode);
-
-extern void freeAssFile(ASSFILE *assFile);
+extern int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const status);
 
 #ifdef __cplusplus
 }

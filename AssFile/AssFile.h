@@ -14,41 +14,46 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-#ifndef __FILEFEF_H__
-#define __FILEFEF_H__
+#ifndef __ASSFILE_H__
+#define __ASSFILE_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define ASS_MAX_LINE_LEN 4096
+#include "AssStringProcessing.h"
+#include "../CDanmakuFactory.h"
 
+#define ASS_MAX_LINE_LEN 4096
 #define ASS_TITLE_LEN 128
 #define ASS_SCRIPT_TYPE_LEN 16
 #define ASS_COLLISIONS_LEN 16
 
+#define TEMPBUF_SIZE 128
+#define MARKSTR_SIZE 12
+
 /* 
-ASS文件 
+ * ASS文件结构
  */
 struct AssSubtitleFile
 {
-    char title[ASS_TITLE_LEN];       //标题
-    char scriptType[ASS_SCRIPT_TYPE_LEN];   //版本号
+    char title[ASS_TITLE_LEN];             //标题
+    char scriptType[ASS_SCRIPT_TYPE_LEN];  //版本号
     char collisions[ASS_COLLISIONS_LEN];   //字幕冲撞时的决策 Normal 或 Reverse
-    int playResX;          //分辨率X
-    int playResY;          //分辨率Y
-    float timer;           //播放速度
-    int stylesNum;         //样式条数 
+    int playResX;                          //分辨率X
+    int playResY;                          //分辨率Y
+    float timer;                           //播放速度
+    int stylesNum;                         //样式条数 
     struct AssSubtitleFileStyles *styles;  //样式表 
     struct AssSubtitleFileEvents *events;  //事件链表 
 };
 
 /* 
-Styles部分 23个字段
-Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour,
-        OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut,
-        ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow,
-        Alignment, MarginL, MarginR, MarginV, Encoding
+ * Styles部分 23个字段
+ * Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour,
+ *         OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut,
+ *         ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow,
+ *         Alignment, MarginL, MarginR, MarginV, Encoding
  */
 
 #define ASS_STYLE_NAME_LEN 64
@@ -86,7 +91,9 @@ struct AssSubtitleFileStyles
 #define ASS_EVENT_STYLE_LEN 64
 #define ASS_EVENT_NAME_LEN 64
 #define ASS_EVENT_EFFECT_LEN 128
-
+/*
+ * Event 部分
+ */
 struct AssSubtitleFileEvents
 {
     char event[ASS_EVENT_TYPE_LEN];     //事件名称(Dialogue/Comment)
@@ -103,9 +110,48 @@ struct AssSubtitleFileEvents
     struct AssSubtitleFileEvents *next;
 };
 
+/*
+ * Message 队列
+ */
+struct MessageList
+{
+    DANMAKU *message;
+
+    BOOL isShown;
+    int height;
+    int width;
+    int posY;
+
+    struct MessageList *lastNode;
+    struct MessageList *nextNode;
+};
+
 typedef struct AssSubtitleFile ASSFILE;
 typedef struct AssSubtitleFileStyles STYLE;
 typedef struct AssSubtitleFileEvents EVENT;
+typedef struct MessageList MSGLIST;
+
+/* ass */
+extern int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode, ASSFILE *assSub, const float timeShift,
+                   STATUS *const status
+                  );
+extern int writeAss(const char *const fileName, DANMAKU *danmakuHead,
+    const CONFIG config, const ASSFILE *const subPart,
+    STATUS *const status
+);
+
+/* 不常用的ass操作函数 */
+extern int readAssFile(ASSFILE *assFile, const char *const fileName);
+extern int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode, ASSFILE *outputSub, const float timeShift,
+    STATUS *const status
+);
+extern void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles);
+extern int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const status);
+extern int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, const int holdTime,
+    const int density, const int blockMode
+);
+
+extern void freeAssFile(ASSFILE *assFile);
 
 #ifdef __cplusplus
 }

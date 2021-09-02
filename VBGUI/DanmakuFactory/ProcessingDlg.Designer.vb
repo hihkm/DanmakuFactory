@@ -35,6 +35,7 @@ Partial Class ProcessingDlg
         '
         'UtilButton
         '
+        Me.UtilButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.UtilButton.Location = New System.Drawing.Point(400, 276)
         Me.UtilButton.Margin = New System.Windows.Forms.Padding(4)
         Me.UtilButton.Name = "UtilButton"
@@ -44,6 +45,7 @@ Partial Class ProcessingDlg
         '
         'ViewErrMsgButton
         '
+        Me.ViewErrMsgButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ViewErrMsgButton.Location = New System.Drawing.Point(284, 276)
         Me.ViewErrMsgButton.Margin = New System.Windows.Forms.Padding(4)
         Me.ViewErrMsgButton.Name = "ViewErrMsgButton"
@@ -59,6 +61,7 @@ Partial Class ProcessingDlg
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(459, 26)
         Me.ProgressBar1.Step = 1
+        Me.ProgressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous
         Me.ProgressBar1.TabIndex = 1
         '
         'StatusLabel
@@ -127,12 +130,13 @@ Partial Class ProcessingDlg
         Me.ClearFileListCheckBox.AutoSize = True
         Me.ClearFileListCheckBox.Checked = True
         Me.ClearFileListCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ClearFileListCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.ClearFileListCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ClearFileListCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.ClearFileListCheckBox.Location = New System.Drawing.Point(35, 276)
         Me.ClearFileListCheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.ClearFileListCheckBox.MinimumSize = New System.Drawing.Size(0, 12)
         Me.ClearFileListCheckBox.Name = "ClearFileListCheckBox"
-        Me.ClearFileListCheckBox.Size = New System.Drawing.Size(194, 28)
+        Me.ClearFileListCheckBox.Size = New System.Drawing.Size(201, 29)
         Me.ClearFileListCheckBox.TabIndex = 7
         Me.ClearFileListCheckBox.Text = "结束后清空文件列表" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         Me.ClearFileListCheckBox.UseVisualStyleBackColor = True
@@ -143,7 +147,7 @@ Partial Class ProcessingDlg
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(529, 360)
+        Me.ClientSize = New System.Drawing.Size(529, 362)
         Me.ControlBox = False
         Me.Controls.Add(Me.UtilButton)
         Me.Controls.Add(Me.DoneLabel)

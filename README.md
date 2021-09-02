@@ -1,6 +1,6 @@
 ## DanmukuFactory
 
-DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持多格式互转，支持自定义输入模板，~~甚至可以原地tp~~
+DanmakuFactory是一款弹幕文件转换工具，支持弹幕姬的礼物读取，支持特殊弹幕，支持多格式互转，支持自定义输入模板，~~甚至可以原地tp~~
 
 <img src="images/01.png" alt="pic01" style="zoom: 38%;" />
 
@@ -10,11 +10,11 @@ DanmakuFactory是一款弹幕文件转换工具，支持特殊弹幕，支持多
 
 ##### Windows
 
-[DanmakuFactory_GUI  Beta(推荐 - 更新到1.52 - 蓝奏云)](https://hihkm.lanzous.com/b01hjk83e)
+[DanmakuFactory_1.62GUI  Release(蓝奏云)](https://hihkm.lanzoui.com/b01hjk83e)
 
-[DanmakuFactory_CLI  Beta(更新到1.52 - 蓝奏云)](https://hihkm.lanzoui.com/b01hgf1xe)
+[DanmakuFactory_1.62CLI  Release(蓝奏云)](https://hihkm.lanzoui.com/b01hgf1xe)
 
-[DanmakuFactory_1.52  Beta(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+[DanmakuFactory_1.62  Release(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
 
 
 
@@ -72,13 +72,14 @@ make
 4. 支持特殊弹幕！支持特殊弹幕！支持特殊弹幕！<img src="images/02.png" alt="pic02" style="zoom:38%;" /> 
    *完美支持b站的特殊弹幕，如图为av810872的效果*
 
-5. 强大的统计模式
+5. 支持录播姬导出弹幕中的礼物、SC、用户名显示等直播内容
+
+   <img src="images/06.png" alt="pic06" style="zoom:80%;" />
+
+6. 强大的统计模式
    <img src="images/03.png" alt="pic03" style="zoom:38%;" />
    *在调试模式中，你可以看到屏幕中各类型弹幕的数量，总共屏蔽掉了的数量，没有被屏蔽的弹幕数量以及总弹幕数量，当然还有一个弹幕分布图*
 
-6. 超高的转换效率
-
-   在7300HQ关闭调试模式与弹幕屏蔽的情况下，两个样本文件，3千条弹幕总耗时79ms，109万条弹幕总耗时51064ms。以上时间为老版本，仅作参考*
 
 
 
@@ -96,17 +97,17 @@ make
 
 
 
+#### 命令行展示
+
+*具体调用方法请参考打包内文档
+
+<img src="images/04.png" alt="pic04" style="zoom:80%;" />
+
 #### 图形界面展示
 
 图形界面部分用的是VB.NET编写
 
-<img src="images/04.png" alt="pic04" style="zoom:90%;" />
-
-<img src="images/05.png" alt="pic05" style="zoom:70%;" />
-
-
-
-*命令行调用请参考使用文档
+<img src="images/05.png" alt="pic04" style="zoom:90%;" />
 
 
 
@@ -188,3 +189,27 @@ make
 - 修复了小概率无输出文件无报错的问题
 - 修复了GUI版本配置文件名错误的问题
 - 修复了GUI版本非工作目录运行时找不到依赖程序的问题
+
+**1.60**
+
+- 增加消息框，支持录播姬导出弹幕的礼物、SC弹幕的滚动显示
+
+- 增加发送者ID显示，仅支持录播姬导出的弹幕
+
+- 优化了xml文件读取逻辑
+
+- 优化了部分显示
+
+- 修复了与ass文件互转时部分字符会出现异常的问题
+
+**1.61**
+
+- 新增按礼物最低价格屏蔽
+
+- 修复了配置文件读取目录异常的问题
+
+- 修复了GUI版本非工作目录运行时找不到依赖程序的问题
+
+**1.62**
+
+- 修复了部分文件转换会出现乱码的问题

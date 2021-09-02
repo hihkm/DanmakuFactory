@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "Config.h"
 
+static COORDIN jsonGetCoord(const char *const jsonStr);
+
 /* 
  * 从文件读配置文件
  * 参数:配置文件名/默认配置
@@ -174,13 +176,17 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
             }
             configOnfile.statmode = statmode;
         }
+        else if (strcmp("resolution", key) == 0)
+        {
+            configOnfile.resolution = jsonGetCoord(value);
+        }
         else if (strcmp("resx", key) == 0)
         {
-            configOnfile.resx = atoi(value);
+            configOnfile.resolution.x = atoi(value);
         }
         else if (strcmp("resy", key) == 0)
         {
-            configOnfile.resy = atoi(value);
+            configOnfile.resolution.y = atoi(value);
         }
         else if (strcmp("scrolltime", key) == 0)
         {
@@ -216,15 +222,7 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         }
         else if (strcmp("bold", key) == 0)
         {
-            toLower(NULL, value);
-            if (strcmp("false", value) == 0)
-            {
-                configOnfile.bold = FALSE;
-            }
-            else
-            {
-                configOnfile.bold = TRUE;
-            }
+            configOnfile.bold = strToBool(value);
         }
         else if (strcmp("displayarea", key) == 0)
         {
@@ -236,15 +234,31 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         }
         else if (strcmp("saveblocked", key) == 0)
         {
-            toLower(NULL, value);
-            if (strcmp("false", value) == 0)
-            {
-                configOnfile.saveBlockedPart = FALSE;
-            }
-            else
-            {
-                configOnfile.saveBlockedPart = TRUE;
-            }
+            configOnfile.saveBlockedPart = strToBool(value);
+        }
+        else if (strcmp("showusernames", key) == 0)
+        {
+            configOnfile.showUserNames = strToBool(value);
+        }
+        else if (strcmp("showmsgbox", key) == 0)
+        {
+            configOnfile.showMsgBox = strToBool(value);
+        }
+        else if (strcmp("msgboxfontsize", key) == 0)
+        {
+            configOnfile.msgboxFontsize = atoi(value);
+        }
+        else if (strcmp("giftminprice", key) == 0)
+        {
+            configOnfile.giftMinPrice = atof(value);
+        }
+        else if (strcmp("msgboxsize", key) == 0)
+        {
+            configOnfile.msgBoxSize = jsonGetCoord(value);
+        }
+        else if (strcmp("msgboxpos", key) == 0)
+        {
+            configOnfile.msgBoxPos = jsonGetCoord(value);
         }
     }
     
@@ -261,6 +275,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
 {
     FILE *fptr = fopen(configFileName, "w");
     
+    char tempStr[MAX_TEXT_LENGTH];
     CONFIG newConfigCopy = newConfig;
     if (fptr == NULL)
     {
@@ -269,8 +284,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
     
     fprintf(fptr,
             "{\n"
-            "    \"resx\": %d,\n"
-            "    \"resy\": %d,\n"
+            "    \"resolution\": [%d, %d],\n"
             "    \"scrolltime\": %f,\n"
             "    \"fixtime\": %f,\n"
             "    \"density\": %d,\n"
@@ -279,10 +293,16 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"opacity\": %d,\n"
             "    \"outline\": %d,\n"
             "    \"shadow\": %d,\n"
-            "    \"displayarea\": %f,\n"
-            "    \"scrollarea\": %f,\n",
-            newConfigCopy.resx,
-            newConfigCopy.resy,
+            "    \"displayArea\": %f,\n"
+            "    \"scrollArea\": %f,\n"
+            "    \"bold\": %s,\n"
+            "    \"showUsernames\": %s,\n"
+            "    \"showMsgbox\": %s,\n"
+            "    \"msgboxSize\": [%d, %d],\n"
+            "    \"msgboxPos\": [%d, %d],\n"
+            "    \"msgboxFontsize\": %d,\n"
+            "    \"giftMinPrice\": %.2f,\n",
+            newConfigCopy.resolution.x, newConfigCopy.resolution.y,
             newConfigCopy.scrolltime,
             newConfigCopy.fixtime,
             newConfigCopy.density,
@@ -292,18 +312,15 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.outline,
             newConfigCopy.shadow,
             newConfigCopy.displayarea,
-            newConfigCopy.scrollarea
-           );
-    
-    /* 是否加粗 */
-    if (newConfigCopy.bold == TRUE)
-    {
-        fprintf(fptr, "    \"bold\": true, \n");
-    }
-    else
-    {
-        fprintf(fptr, "    \"bold\": false, \n");
-    }
+            newConfigCopy.scrollarea,
+            boolToStr(tempStr, newConfigCopy.bold),
+            boolToStr(tempStr, newConfigCopy.showUserNames),
+            boolToStr(tempStr, newConfigCopy.showMsgBox),
+            newConfigCopy.msgBoxSize.x, newConfigCopy.msgBoxSize.y,
+            newConfigCopy.msgBoxPos.x, newConfigCopy.msgBoxPos.y,
+            newConfigCopy.msgboxFontsize,
+            newConfigCopy.giftMinPrice
+    );
     
 
     /* 写是否保存屏蔽部分 */
@@ -325,7 +342,6 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             {
                 fprintf(fptr, ", ");
             }
-            
         }
         if (newConfigCopy.blockmode & BLK_R2L)
         {
@@ -431,4 +447,164 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
     fclose(fptr);
     
     return TRUE;
+}
+
+/* 打印配置信息 */
+void printConfig(CONFIG config)
+{
+    printf("\n"
+           "Configuration:\n"
+           "Resolution: %dx%d | ScrollTime: %.3f | FixTime: %.3f | Density: %d",
+           config.resolution.x, config.resolution.y,
+           config.scrolltime, config.fixtime, config.density
+          );
+    if (config.density == -1)
+    {
+        printf("(non-overlap)");
+    }
+    else if (config.density == 0)
+    {
+        printf("(unlimit)");
+    }
+    
+    printf(" | Fontname: \"%s\" | Fontsize: %d | Opacity: %d | Outline: %d",
+           config.fontname, config.fontsize, config.opacity, config.outline
+          );
+    if (config.outline == 0)
+    {
+        printf("(disable)");
+    }
+    
+    printf(" | Shadow: %d", config.shadow);
+    if (config.shadow == 0)
+    {
+        printf("(disable)");
+    }
+
+    printf(" | Bold: ");
+    if (config.bold == FALSE)
+    {
+        printf("false");
+    }
+    else
+    {
+        printf("true");
+    }
+    
+    printf(" | DisplayArea: %.3f", config.displayarea);
+    if (fabs(config.displayarea - 1) < EPS)
+    {
+        printf("(full)");
+    }
+    
+    printf(" | ScrollArea: %.3f", config.scrollarea);
+    if (fabs(config.scrollarea - 1) < EPS)
+    {
+        printf("(full)");
+    }
+
+    printf(" | SaveBlocked: ");
+    if (config.saveBlockedPart == FALSE)
+    {
+        printf("false");
+    }
+    else
+    {
+        printf("true");
+    }
+
+    printf(" | ShowUsernames: ");
+    if (config.showUserNames == FALSE)
+    {
+        printf("false");
+    }
+    else
+    {
+        printf("true");
+    }
+
+    printf("\nShowMessageBox: ");
+    if (config.showMsgBox == FALSE)
+    {
+        printf("false");
+    }
+    else
+    {
+        printf("true");
+    }
+
+    printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | GiftMinPrice: CNY %.2f", 
+           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.giftMinPrice);
+    
+    printf("\nBlockMode: ");
+    if (config.blockmode == 0)
+    {
+        printf("null(disable)");
+    }
+    else
+    {
+        if (config.blockmode & BLK_L2R)
+        {
+            printf("L2R(left to right) ");
+        }
+        if (config.blockmode & BLK_R2L)
+        {
+            printf("R2L(right to left) ");
+        }
+        if (config.blockmode & BLK_TOP)
+        {
+            printf("top ");
+        }
+        if (config.blockmode & BLK_BOTTOM)
+        {
+            printf("bottom ");
+        }
+        if (config.blockmode & BLK_SPECIAL)
+        {
+            printf("special ");
+        }
+        if (config.blockmode & BLK_COLOR)
+        {
+            printf("color ");
+        }
+        if (config.blockmode & BLK_REPEAT)
+        {
+            printf("repeat ");
+        }
+    }
+    
+    printf("\nStatMode:  ");
+    if (config.statmode == 0)
+    {
+        printf("null(disable)");
+    }
+    else
+    {
+        if (config.statmode & TABLE)
+        {
+            printf("table ");
+        }
+        if (config.statmode & HISTOGRAM)
+        {
+            printf("histogram ");
+        }
+    }
+    
+    printf("\n");
+    return;
+}
+
+/* 文本获取坐标 */
+static COORDIN jsonGetCoord(const char *const jsonStr)
+{
+    char *jsonStrPtr = (char *)jsonStr;
+    char number[MAX_TEXT_LENGTH];
+    COORDIN returnValue;
+    strGetLeftPart(NULL, &jsonStrPtr, '[', VALUE_LEN);
+    strGetLeftPart(number, &jsonStrPtr, ',', MAX_TEXT_LENGTH);
+    returnValue.x = atoi(number);
+    strGetLeftPart(number, &jsonStrPtr, ']', MAX_TEXT_LENGTH);
+    returnValue.y = atoi(number);
+
+    return returnValue;
 }

@@ -25,6 +25,12 @@ limitations under the License.
   */
 int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName)
 {
+    /* 非法判断 */
+    if (str == NULL)
+    {
+        return -1;
+    }
+
     return fontSizeSet + (fontSizeInFile - 25);
 }
 
@@ -38,21 +44,26 @@ int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSiz
 int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName)
 {
     
-    int cnt = 0; 
+    int cnt = 0;
+    /* 非法判断 */
+    if (str == NULL)
+    {
+        return -1;
+    }
     
     /* 判断字符串编码 */
     if (isUtf8(str) == TRUE)
     {
         /* 
          * 目前仅支持utf-8 
-         * 首字节          空间占用           起始 
+         * 首字节           空间占用           起始 
          * 0--- ----        1 byte            0x00 
          * 110- ----        2 byte            0xC0 
          * 1110 ----        3 byte            0xE0
          * 1111 0---        4 byte            0xF0
          * 1111 10--        5 byte            0xF8 
          * 1111 110-        6 byte            0xFC
-          */
+         */
         while (*str != '\0')
         {
             if (*str >= 0xC0)
@@ -64,14 +75,16 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
                 cnt += 1;
             }
             str++;
-        }       
+        }
     }
     else
     {
         cnt = strlen(str);
     }
+
+    int len = (fontSizeSet + (fontSizeInFile - 25)) / 2 * cnt;
     
-    return (fontSizeSet + (fontSizeInFile - 25)) / 2 * cnt;
+    return len;
 }
 
 /* 
@@ -651,7 +664,8 @@ BOOL isStartWith(const char *const mainStr, const char *const prefixStr)
  * 参数：字符串指针/输出字符串/输出字符串最大长度/提前结束字符（不含，'\0'表示任意空白字符结束）\是否移动指针到结束位置的下一个字符
  * 返回值：输出字符串
  * 当输出字符串长度达到 maxLen-1 时结束并补'\0'
- * 即便是指定了结束字符，遇到空白字符仍然会结束 
+ * 即便是指定了结束字符，遇到空白字符仍然会结束
+ * buf 为 NULL 时，仅移动指针
  */
 char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMovePtr)
 {
@@ -659,7 +673,7 @@ char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMove
     char *ipPtr = *ptr, *opPtr = buf;
     
     /* 参数合法性检查 */
-    if (*ptr == NULL || buf == NULL || maxLen < 2)
+    if (*ptr == NULL || maxLen < 2)
     {
         return NULL;
     }
@@ -673,10 +687,13 @@ char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMove
     /* 拷贝字符串 */
     while (*ipPtr != '\0')
     {
-        *opPtr = *ipPtr;
+        if (opPtr != NULL)
+        {
+            *opPtr = *ipPtr;
+            opPtr++;
+        }
         
         ipPtr++;
-        opPtr++;
         cnt++;
         
         /* 检查结束条件 */ 
@@ -690,8 +707,11 @@ char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMove
         }
     }
     
-    *opPtr = '\0';
-    buf[maxLen-1] = '\0';
+    if (opPtr != NULL)
+    {
+        *opPtr = '\0';
+        buf[maxLen-1] = '\0';
+    }
     
     /* 是否移动指针 */
     if (isMovePtr == TRUE)
@@ -699,4 +719,99 @@ char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMove
         *ptr = ipPtr; 
     }
     return buf;
+}
+
+/* 
+ * 从文件名获取文件格式
+ * 参数：输出格式字符串/输入文件名字符串/输出字符串最大长度
+ * 返回值：输出格式字符串
+ */
+char *filenameGetFormat(char *format, const char *const fileName, int maxLen)
+{
+    char *ptr;
+    ptr = (char *)&fileName[strlen(fileName)];
+    
+    while (*ptr != '.')
+    {
+        if (ptr < fileName)
+        {
+            strcpy(format, "");
+            return format;
+        }
+        ptr--;
+    }
+    ptr++;
+    
+    strSafeCopy(format, ptr, maxLen);
+    
+    return format;
+}
+
+/*  
+ * 获取文件路径部分（包含最后一个斜杠） 
+ * 参数：输出文件路径字符串/完整文件名字符串/输出字符串最大长度 
+ * 返回值：输出文件路径字符串
+ */
+char *filenameGetPath(char *path, const char *const fileName, int maxLen)
+{
+    int pathLen;
+    char *inPtr = (char *)fileName;
+    char *outPtr = path;
+
+    /* 移动指针到末尾 */
+    while (*inPtr != '\0')
+    {
+        inPtr++;
+    }
+
+    /* 向前寻找斜杠 */
+    while (inPtr != fileName)
+    {
+        if (*inPtr == '\\' || *inPtr == '/')
+        {
+            break;
+        }
+        inPtr--;
+    }
+    
+    if (inPtr == fileName)
+    {
+        path[0] = '\0';
+        return path;
+    }
+    
+    pathLen = inPtr - fileName + 2;/* 包含斜杠与结束符 */
+
+    strSafeCopy(outPtr, fileName, maxLen > pathLen ? pathLen : maxLen);
+
+    return path;
+}
+
+/* 字符串转布尔类型 */
+BOOL strToBool(const char *const str)
+{
+    char tempStr[MAX_TEXT_LENGTH];
+    toLower(tempStr, (char *)str);
+    trim(tempStr);
+    if (strcmp("false", tempStr) == 0)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+/* 布尔类型转字符串 */
+char *boolToStr(char *opStr, BOOL boolValue)
+{
+    if (boolValue == TRUE)
+    {
+        strcpy(opStr, "true");
+    }
+    else
+    {
+        strcpy(opStr, "false");
+    }
+
+    return opStr;
 }

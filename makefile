@@ -1,29 +1,21 @@
+CArg = ${CARG}
+OutPut = DanmakuFactory
+CC = gcc $(CArg)
+Object = String/DanmakuFactoryString.o List/DanmakuFactoryList.o Config/Config.o TemplateFile/TemplateFile.o AssFile/AssStringProcessing.o AssFile/AssFile.o XmlFile.o JsonFile.o main.o
 
-TempPath := temp
+$(OutPut): $(Object)
+	$(CC) -o $(OutPut) $(Object)
 
-DanmakuFactory: $(TempPath)/main.o $(TempPath)/string.o $(TempPath)/list.o $(TempPath)/config.o $(TempPath)/template.o $(TempPath)/ass.o $(TempPath)/json.o $(TempPath)/xml.o
-	gcc $(TempPath)/main.o $(TempPath)/string.o $(TempPath)/list.o $(TempPath)/config.o $(TempPath)/template.o $(TempPath)/ass.o $(TempPath)/json.o $(TempPath)/xml.o -o DanmakuFactory
+String/DanmakuFactoryString.o: String/DanmakuFactoryString.c
+List/DanmakuFactoryList.o: List/DanmakuFactoryList.c
+Config/Config.o: Config/Config.c
+TemplateFile/TemplateFile.o: TemplateFile/TemplateFile.c
+AssFile/AssStringProcessing.o: AssFile/AssStringProcessing.c
+AssFile/AssFile.o: AssFile/AssFile.c
+XmlFile.o: XmlFile.c
+JsonFile.o: JsonFile.c
+main.o: main.c
 
-$(TempPath)/string.o: String/DanmakuFactoryString.c
-	gcc -c String/DanmakuFactoryString.c -o $(TempPath)/string.o
-
-$(TempPath)/list.o: List/DanmakuFactoryList.c
-	gcc -c List/DanmakuFactoryList.c -o $(TempPath)/list.o
-
-$(TempPath)/config.o: Config/Config.c
-	gcc -c Config/Config.c -o $(TempPath)/config.o
-
-$(TempPath)/template.o: TemplateFile/TemplateFile.c
-	gcc -c TemplateFile/TemplateFile.c -o $(TempPath)/template.o
-
-$(TempPath)/ass.o: AssFile.c
-	gcc -c AssFile.c -o $(TempPath)/ass.o
-
-$(TempPath)/xml.o: XmlFile.c
-	gcc -c XmlFile.c -o $(TempPath)/xml.o
-
-$(TempPath)/json.o: JsonFile.c
-	gcc -c JsonFile.c -o $(TempPath)/json.o
-
-$(TempPath)/main.o: main.c
-	gcc -c main.c -o $(TempPath)/main.o
+.PHONY: clean
+clean:
+	-rm $(OutPut) $(Object)

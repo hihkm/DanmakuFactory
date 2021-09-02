@@ -109,8 +109,7 @@ Public Class ProcessingDlg
             arg = "--check-version-" + Define.cliVersion + " --ignore-warnings -i """ + fileList.GetFileName(cnt) +
                             """ -o """ + outputFileName +
                             """ -N """ + config.fontname +
-                            """ -x " + config.resx.ToString +
-                            " -y " + config.resy.ToString +
+                            """ -r " + config.resolution(0).ToString + " " + config.resolution(1).ToString +
                             " -t " + config.timeShift.ToString +
                             " -s " + config.scrolltime.ToString +
                             " -f " + config.fixtime.ToString +
@@ -121,7 +120,13 @@ Public Class ProcessingDlg
                             " -D " + config.shadow.ToString +
                             " -B " + config.bold.ToString +
                             " --displayarea " + config.displayarea.ToString +
-                            " --scrollarea " + config.scrollarea.ToString
+                            " --scrollarea " + config.scrollarea.ToString +
+                            " --showusernames " + config.showUsernames.ToString +
+                            " --showmsgbox " + config.showMsgbox.ToString +
+                            " --msgboxsize " + config.msgboxSize(0).ToString + " " + config.msgboxSize(1).ToString +
+                            " --msgboxpos " + config.msgboxPos(0).ToString + " " + config.msgboxPos(1).ToString +
+                            " --msgboxfontsize " + config.msgboxFontsize.ToString +
+                            " --giftminprice " + config.giftMinPrice.ToString
             If Not config.ToBlockString.Equals("") Then
                 arg += " -b " + config.ToBlockString
             End If

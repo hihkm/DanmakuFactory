@@ -26,8 +26,8 @@ Public Class DanmakuSettingDlg
         config.fixtime = FixTimeNUD.Value
         config.scrollarea = ScrollAreaNUD.Value / 100.0
         config.displayarea = DisplayAreaNUD.Value / 100.0
-        config.resx = ResXNUD.Value
-        config.resy = ResYNUD.Value
+        config.resolution(0) = ResXNUD.Value
+        config.resolution(1) = ResYNUD.Value
 
         '复选框部分
         config.bold = BoldCheckBox.Checked
@@ -53,6 +53,10 @@ Public Class DanmakuSettingDlg
         '调试部分
         config.statHistogram = StatHistogramCheckBox.Checked
         config.statTable = StatTableCheckBox.Checked
+
+        '其他设置部分
+        config.showUsernames = ShowUsernamesCheckBox.Checked
+        config.showMsgbox = ShowMsgboxCheckBox.Checked
 
         '保存到文件
         If SaveCheckBox.Checked Then
@@ -84,8 +88,8 @@ Public Class DanmakuSettingDlg
         FixTimeNUD.Value = config.fixtime
         ScrollAreaNUD.Value = config.scrollarea * 100.0
         DisplayAreaNUD.Value = config.displayarea * 100.0
-        ResXNUD.Value = config.resx
-        ResYNUD.Value = config.resy
+        ResXNUD.Value = config.resolution(0)
+        ResYNUD.Value = config.resolution(1)
 
         '复选框部分
         BoldCheckBox.Checked = config.bold
@@ -115,6 +119,15 @@ Public Class DanmakuSettingDlg
         '调试部分
         StatHistogramCheckBox.Checked = config.statHistogram
         StatTableCheckBox.Checked = config.statTable
+
+        '其他设置部分
+        ShowUsernamesCheckBox.Checked = config.showUsernames
+        ShowMsgboxCheckBox.Checked = config.showMsgbox
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        MessageSettingDlg.SendConfig(config)
+        MessageSettingDlg.ShowDialog()
     End Sub
 
     Private Sub SaveCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles SaveCheckBox.CheckedChanged

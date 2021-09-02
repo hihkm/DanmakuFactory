@@ -46,7 +46,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
     /* 判断读入方式 */
     if(*danmakuHead == NULL || *mode == 'n')
     {/* 新建模式 */
-        freeList(*danmakuHead);
+//      freeList(*danmakuHead);
         *danmakuHead = NULL;
     }
     else if(*mode == 'a')
@@ -72,7 +72,6 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         0, /* 默认左右 */
         0, /* 默认顶端固定 */
         0, /* 默认底部固定 */
-        0, /* 默认特殊 */
         R2L  /* 默认弹幕类型 */
     };
     SET_COLOR setColor = {
@@ -585,10 +584,10 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         DANMAKU *readDanmaku;
         BOOL isSuccess = TRUE;
 
-        if ((readDanmaku = (char *)malloc(sizeof(DANMAKU))) == NULL)
+        if ((readDanmaku = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
         {
             /* 释放内存 */
-            freeList(*danmakuHead);
+//          freeList(*danmakuHead);
             return 4;
         }
         readDanmaku -> type = HAVE_NOT_BEEN_SET;
@@ -712,7 +711,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                         free(readDanmaku->text);
                     }
                     free(readDanmaku);
-                    freeList(*danmakuHead);
+//                  freeList(*danmakuHead);
                     return 5;
                 }
                 strcpy(readDanmaku -> text, tempStr);

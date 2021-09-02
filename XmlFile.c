@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "CDanmakuFactory.h"
 
+#define LABEL_LEN 10240
+
 static char *xmlUnescape(char *const str);
 static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 
@@ -48,8 +50,8 @@ static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status)
 {
     FILE *ipF;
-    DANMAKU *now = NULL, *last = NULL;
-    int cnt;
+    DANMAKU *tailNode = NULL;
+    int cnt, ch;
     
     /* 刷新status */
     if (status != NULL)
@@ -62,10 +64,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     /* 打开文件 */
     if ((ipF = fopen(ipFile, "r")) == NULL)
     {
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 文件打开失败"); 
-        #endif
-        return 1;
+        return 1; /* 文件打开失败 */
     }
     
     /* 判断读入方式 */
@@ -76,31 +75,64 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     }
     else if (*mode == 'a')
     {/* 追加模式 */
-        now = last = *head;
-        if((*head) -> next != NULL)
+        tailNode = *head;
+        while (tailNode -> next != NULL)
         {
-            while((last -> next) -> next != NULL)
-            {
-                last = last -> next;
-            }
-            now = last -> next;
-            last -> next = now;
+            tailNode = tailNode -> next;
         }
     }
     
     /* 读取xml文件 */
-    float t_time;
-    short t_type;
-    short t_fontSize;
-    int t_color;
-    char ch, t_text[MAX_TEXT_LENGTH];
+    float time;
+    short type;
+    short fontSize;
+    int color;
+    int messageType;
+    char *text;
     char tempText[MAX_TEXT_LENGTH];
     char *textPtr;
     
+    int giftCount;
+    char giftName[GIFT_NAME_LEN];
+
+    char label[LABEL_LEN];
+    char key[MAX_TEXT_LENGTH];
+    char raw[LABEL_LEN];
+
+    DANMAKU *danmakuNode;
+    USERPART *userNode;
+    GIFTPART *giftNode;
+    SPPART *specialNode;
+    
+    char *labelPtr;
+
+    USERPART user;
+    GIFTPART gift;
+
+    BOOL isDanmaku;
+    BOOL hasUserInfo;
+    BOOL hasGiftInfo;
+    
     while (!feof(ipF))
     {
-        /* 寻找每条弹幕的开始 */
-        while (fgetc(ipF) != '<' || fgetc(ipF) != 'd')
+        int type = 0;
+        isDanmaku = FALSE;
+        hasUserInfo = FALSE;
+        hasGiftInfo = FALSE;
+
+        text = NULL;
+       
+        gift.price = -1.00;
+        gift.count = -1;
+        gift.name[0] = '\0';
+        user.level = -1;
+        user.medalLevel = -1;
+        user.uid = -1;
+        user.medalName[0] = '\0';
+        user.name[0] = '\0';
+
+        /* 读取标签内容 */
+        while (fgetc(ipF) != '<')
         {
             if (feof(ipF))
             {
@@ -108,18 +140,13 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             if (ferror(ipF))
             {
-                errorExit(ipF, *head, last);
-                #if PRINT_ERR == TRUE
-                printf("\n[X] 读文件发生错误"); 
-                #endif
-                return 2;
+                errorExit(ipF, *head, tailNode);
+                return 2; /* 读文件发生错误 */
             }
         }
-        
-        fscanf(ipF, " p=\"%f,%hd,%hd,%d,", &t_time, &t_type, &t_fontSize, &t_color);
-        
-        /* 寻找文本部分的开头 */
-        while (fgetc(ipF) != '>')
+
+        labelPtr = label;
+        while ((ch = fgetc(ipF)) != '>')
         {
             if (feof(ipF))
             {
@@ -127,166 +154,334 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             if (ferror(ipF))
             {
-                errorExit(ipF, *head, last);
-                #if PRINT_ERR == TRUE
-                printf("\n[X] 读文件发生错误"); 
-                #endif
-                return 3;
+                errorExit(ipF, *head, tailNode);
+                return 2; /* 读文件发生错误 */
+            }
+
+            if (labelPtr - label < LABEL_LEN)
+            {/* label长度限制 */
+                *labelPtr = ch;
+                labelPtr++;
             }
         }
-        
-        /* 读取文本部分 */ 
-        cnt = 0;
-        while ((ch = fgetc(ipF)) != '<' && cnt < MAX_TEXT_LENGTH - 1)
-        {
-            t_text[cnt] = ch;
-            if (feof(ipF))
-            {
-                break;
-            }
-            if (ferror(ipF))
-            {
-                errorExit(ipF, *head, last);
-                #if PRINT_ERR == TRUE
-                printf("\n[X] 读文件发生错误"); 
-                #endif
-                return 4;
-            }
-            cnt++;
+        *labelPtr = '\0';
+
+        /* 解析标签内容 */
+        labelPtr = label;
+        getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+        if (strcmp(tempText, "d") == 0)
+        {/* 普通弹幕 */
+            messageType = UNKNOW_TYPE_DANMAKU;
         }
-        t_text[cnt] = '\0';
-        
-        /* 申请一个节点的空间 */
-        if ((now = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
-        {
-            errorExit(ipF, *head, last);
-            #if PRINT_ERR == TRUE
-            printf("\n[X] 申请内存空间失败"); 
-            #endif
-            return 5;
+        else if (strcmp(tempText, "gift") == 0)
+        {/* 录播姬 - 普通礼物 */
+            messageType = MSG_GIFT;
+            hasGiftInfo = TRUE;
         }
-        
-        /* 申请文本部分空间 */
-        if ((now -> text = (char *)malloc((strlen(t_text) + 1) * sizeof(char))) == NULL)
-        {
-            errorExit(ipF, *head, now);
-            #if PRINT_ERR == TRUE
-            printf("\n[X] 申请内存空间失败"); 
-            #endif
-            return 6;
+        else if (strcmp(tempText, "sc") == 0)
+        {/* 录播姬 - SuperChat */
+            messageType = MSG_SUPER_CHAT;
+            hasGiftInfo = TRUE;
         }
-        
-        if (*head == NULL)
-        {
-            *head = last = now;
-        }
-        
-        /* +----------+-----------+-----------+ */
-        /* | 类型名称 | 原类型编号| 新类型编号| */
-        /* +----------+-----------+-----------+ */
-        /* | 右左滚动 |     1     |     1     | */
-        /* +----------+-----------+-----------+ */
-        /* | 左右滚动 |     6     |     2     | */
-        /* +----------+-----------+-----------+ */
-        /* | 上方固定 |     5     |     3     | */
-        /* +----------+-----------+-----------+ */
-        /* | 下方固定 |     4     |     4     | */
-        /* +----------+-----------+-----------+ */
-        /* | 特殊弹幕 |     7     |     5     | */
-        /* +----------+-----------+-----------+ */
-        switch (t_type)
-        {/* 将xml定义的类型编号转换为程序统一定义的类型编号（如上表） */ 
-            case 1:
-            {
-                now -> type = 1;
-                break;
-            }
-            case 6:
-            {
-                now -> type = 2;
-                break;
-            }
-            case 5:
-            {
-                now -> type = 3;
-                break;
-            }
-            case 4:
-            {
-                now -> type = 4;
-                break;
-            }
-            case 7:
-            {
-                now -> type = 5;
-                break;
-            }
-            default:
-            {
-                now -> type = t_type;
-                break;
-            }
-        }
-        
-        /* 如果时间加偏移量是负数则置0 */
-        if (t_time + timeShift < EPS)
-        {
-            now -> time = 0.00;
+        else if (strcmp(tempText, "guard") == 0)
+        {/* 录播姬 - 舰长 */
+            messageType = MSG_GUARD;
+            hasGiftInfo = TRUE;
         }
         else
-        {
-            now -> time = t_time + timeShift;
+        {/* 无效标签 */
+            continue;
         }
-        now -> fontSize = t_fontSize;
-        now -> color = t_color;
-        now -> special = NULL;
-        xmlUnescape(t_text);/* 文本内容反转义 */
-        
-        /* 特殊弹幕文本解析 */
-        if (t_type == 7)
+
+        BOOL IS_FREE_GIFT = FALSE;
+        while (*labelPtr != '\0')
         {
-            /* 申请特殊弹幕部分的空间 */ 
-            if ((now -> special = (SPPART *)malloc(sizeof(SPPART))) == NULL)
+            strGetLeftPart(key, &labelPtr, '=', MAX_TEXT_LENGTH);
+            trim(key);
+
+            if (strcmp(key, "p") == 0)
             {
-                errorExit(ipF, *head, now);
-                #if PRINT_ERR == TRUE
-                printf("\n[X] 申请内存空间失败"); 
-                #endif
-                return 7;
+                strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
+                time = atof(deQuotMarks(tempText));
+                strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
+                type = (short)atoi(deQuotMarks(tempText));
+                strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
+                fontSize = (short)atoi(deQuotMarks(tempText));
+                strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
+                color = atoi(deQuotMarks(tempText));
+
+                /* 跳过后四个无价值参数 */
+                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
+                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
+                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
+                strGetLeftPart(NULL, &labelPtr, '\"', MAX_TEXT_LENGTH);
             }
+            else if (strcmp(key, "user") == 0)
+            {
+                getNextWord(&labelPtr, user.name, USER_NAME_LEN, ' ', TRUE);
+                deQuotMarks(user.name);
+                hasUserInfo = TRUE;
+            }
+            else if (strcmp(key, "ts") == 0)
+            {
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                time = atof(deQuotMarks(tempText));
+            }
+            else if (strcmp(key, "giftname") == 0)
+            {
+                getNextWord(&labelPtr, gift.name, GIFT_NAME_LEN, ' ', TRUE);
+                deQuotMarks(gift.name);
+            }
+            else if (strcmp(key, "giftcount") == 0 || strcmp(key, "count") == 0)
+            {
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                gift.count = atof(deQuotMarks(tempText));
+            }
+            else if (strcmp(key, "price") == 0)
+            {
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                gift.price = atof(deQuotMarks(tempText));
+            }
+            else if (strcmp(key, "raw") == 0)
+            {
+                strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
+                strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
+                
+                /* 解析raw部分 */
+                char rawKey[KEY_LEN];
+                char rawValue[VALUE_LEN];
+                char *rawPtr = raw;
+
+                xmlUnescape(raw);
+                strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
+                
+                while (*rawPtr != '\0')
+                {
+                    strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
+                    strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
+                    deQuotMarks(rawKey);
+                    deQuotMarks(rawValue);
+                    if (strcmp(rawKey, "gift_name") == 0)
+                    {
+                        strSafeCopy(gift.name, rawValue, GIFT_NAME_LEN);
+                    }
+                    else if (strcmp(rawKey, "coin_type") == 0)
+                    {
+                        if (strcmp(rawValue, "silver") == 0)
+                        {
+                            IS_FREE_GIFT = TRUE;
+                        }
+                    }
+                    else if (strcmp(rawKey, "price") == 0)
+                    {
+                        if (FLOAT_IS_EQUAL(gift.price, -1.00))
+                        {
+                            gift.price = atof(rawValue);
+                            if (messageType != MSG_SUPER_CHAT)
+                            {
+                                gift.price /= 1000;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                getNextWord(&labelPtr, NULL, MAX_TEXT_LENGTH, ' ', TRUE);
+            }
+        }
+
+        /* 如果是免费礼物 价格清空（有免费代币） */
+        if (IS_FREE_GIFT == TRUE && messageType == MSG_GIFT)
+        {
+            gift.price = 0.00;
+        }
+
+        if (messageType == UNKNOW_TYPE_DANMAKU || messageType == MSG_SUPER_CHAT)
+        {
+            /* 读取普通弹幕 或 SC 的文本部分 */
+            cnt = 0;
+            while ((ch = fgetc(ipF)) != '<' && cnt < MAX_TEXT_LENGTH - 1)
+            {
+                tempText[cnt] = ch;
+                if (feof(ipF))
+                {
+                    break;
+                }
+                if (ferror(ipF))
+                {
+                    errorExit(ipF, *head, tailNode);
+                    return 4; /* 读文件发生错误 */
+                }
+                cnt++;
+            }
+            tempText[cnt] = '\0';
+            
+            /* 申请文本部分空间 */
+            if ((text = (char *)malloc((strlen(tempText)+1) * sizeof(char))) == NULL)
+            {
+                errorExit(ipF, *head, danmakuNode);
+                return 6; /* 申请内存空间失败 */
+            }
+
+            strcpy(text, tempText);
+        }
+
+        /* 申请一个节点的空间 */
+        {
+            if ((danmakuNode = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
+            {
+                errorExit(ipF, *head, tailNode);
+                return 5; /* 申请内存空间失败 */
+            }
+
+            /* 类型转换 */
+            if (messageType == UNKNOW_TYPE_DANMAKU)
+            {/* 将xml定义的类型编号转换为程序统一定义的类型编号 */ 
+                switch (type)
+                {
+                    case 1:
+                    {
+                        type = R2L;
+                        break;
+                    }
+                    case 6:
+                    {
+                        type = L2R;
+                        break;
+                    }
+                    case 5:
+                    {
+                        type = TOP;
+                        break;
+                    }
+                    case 4:
+                    {
+                        type = BOTTOM;
+                        break;
+                    }
+                    case 7:
+                    {
+                        type = SPECIAL;
+                        break;
+                    }
+                    default:
+                    {
+                        type = type;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                type = messageType;
+            }
+
+            /* 计算时轴偏移量 */
+            if (time + timeShift < EPS)
+            {/* 如果时间加偏移量是负数则置0 */
+                time = 0.00;
+            }
+            else
+            {
+                time = time + timeShift;
+            }
+
+            /* 数据部分赋值 */
+            xmlUnescape(text);/* 文本内容xml反转义 */
+            danmakuNode -> text = text;
+            danmakuNode -> type = type;
+            danmakuNode -> time = time;
+            danmakuNode -> fontSize = fontSize;
+            danmakuNode -> color = color;
+            danmakuNode -> special = NULL;
+
+            danmakuNode -> gift = NULL;
+            danmakuNode -> user = NULL;
+            danmakuNode -> special = NULL;
+            danmakuNode -> next = NULL;
+        }
+
+        /* 申请用户信息部分空间 */
+        if (hasUserInfo == TRUE)
+        {
+            if ((userNode = (USERPART *)malloc(sizeof(USERPART))) == NULL)
+            {
+                errorExit(ipF, *head, tailNode);
+                return 5; /* 申请内存空间失败 */
+            }
+
+            strSafeCopy(userNode->name, user.name, USER_NAME_LEN);
+            danmakuNode->user = userNode;
+        }
+        
+        /* 申请礼物信息部分空间 */
+        if (hasGiftInfo == TRUE)
+        {
+            if ((giftNode = (GIFTPART *)malloc(sizeof(GIFTPART))) == NULL)
+            {
+                errorExit(ipF, *head, tailNode);
+                return 5; /* 申请内存空间失败 */
+            }
+
+            strSafeCopy(giftNode->name, gift.name, GIFT_NAME_LEN);
+            giftNode->count = gift.count;
+            giftNode->price = gift.price;
+            danmakuNode->gift = giftNode;
+        }
+
+        /* 特殊弹幕解析 */
+        if (type == SPECIAL)
+        {
             char textPart[MAX_TEXT_LENGTH];
-            textPtr = t_text;
+            
+            /* 申请特殊弹幕部分的空间 */ 
+            if ((specialNode = (SPPART *)malloc(sizeof(SPPART))) == NULL)
+            {
+                errorExit(ipF, *head, danmakuNode);
+                return 7; /* 申请内存空间失败 */
+            }
+            textPtr = text;
             /* [0,0.17,"1-1",7,"文本部分内容",0,0,0,0.17,500,0,true,"微软雅黑",1] */
             strGetLeftPart(NULL, &textPtr, '[', MAX_TEXT_LENGTH);
-            now->special->startX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->startY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->fadeStart = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,'-',MAX_TEXT_LENGTH)))) * 255);
-            now->special->fadeEnd = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,',',MAX_TEXT_LENGTH)))) * 255);
-            now->special->existTime = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->startX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->startY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->fadeStart = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,'-',MAX_TEXT_LENGTH)))) * 255);
+            specialNode->fadeEnd = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,',',MAX_TEXT_LENGTH)))) * 255);
+            specialNode->existTime = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             
             /* 文本部分 */
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
             strGetLeftPart(tempText, &textPtr, '\"', MAX_TEXT_LENGTH);
-            strrpl(tempText, textPart, "/n", "\n", MAX_TEXT_LENGTH);//远古弹幕转义换行符
+            strrpl(tempText, textPart, "/n", "\n", MAX_TEXT_LENGTH);  // 远古弹幕转义换行符
             strGetLeftPart(NULL, &textPtr, ',', MAX_TEXT_LENGTH);
+            strcpy(text, textPart);
             
-            now->special->frZ = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->frY = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->endX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->endY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->moveTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
-            now->special->pauseTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->frZ = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->frY = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->endX = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->endY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->moveTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->pauseTime = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             
             /* 字体部分 */ 
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
-            strGetLeftPart(now->special->fontName, &textPtr, '\"', MAX_TEXT_LENGTH);
-            deQuotMarks(now->special->fontName);
-            strSafeCopy(t_text, textPart, MAX_TEXT_LENGTH);
+            strGetLeftPart(specialNode->fontName, &textPtr, '\"', MAX_TEXT_LENGTH);
+            deQuotMarks(specialNode->fontName);
+
+            danmakuNode -> special = specialNode;
         }
-        strcpy(now -> text, t_text);
-        
-        last -> next = now;
-        last = now;
+             
+        /* 链表连接 */
+        if (*head == NULL)
+        {
+            *head = tailNode = danmakuNode;
+        }
+        else
+        {
+            tailNode -> next = danmakuNode;
+            tailNode = danmakuNode;
+        }
         
         /* 更新状态 */
         if (status != NULL)
@@ -296,16 +491,9 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
     }/* 结束 while */
     ENDREAD:
-    if (now != NULL)
+    if (*head == NULL)
     {
-        now -> next = NULL;
-    }
-    else
-    {
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 文件不能按正确格式读入"); 
-        #endif
-        return 8;
+        return 8; /* 文件不能按正确格式读入 */
     }
     
     fclose(ipF);
@@ -315,6 +503,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     {
         status -> isDone = TRUE;
     }
+
     return 0;
 }
 
@@ -434,9 +623,6 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
         
         if(ferror(opF))
         {
-            #if PRINT_ERR == TRUE
-            printf("\n[X] 写出文件时发生错误");
-            #endif
             fclose(opF);
             return 3;
         }
@@ -474,6 +660,12 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
   */
 static char *xmlUnescape(char *const str)
 {
+    /* 非法检查 */
+    if (str == NULL)
+    {
+        return NULL;
+    }
+
     char *leftPtr, *rightPtr, *reWritePtr;
     leftPtr = str;
     while (*leftPtr != '\0')

@@ -51,7 +51,6 @@ Public Class MainWindow
 
         End Try
 
-        inputTemplate.Text = inputTemplate.Items(0)
         OutputTemplate.Text = OutputTemplate.Items(0)
 
         If My.Computer.FileSystem.FileExists(Application.StartupPath + "\DanamkuFactoryGUIConfig.txt") Then

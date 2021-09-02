@@ -14,24 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-#include "CDanmakuFactory.h"
+#include "AssFile.h"
+#include "AssStringProcessing.h"
 
-#define TEMPBUF_SIZE 128
-#define MARKSTR_SIZE 12
-
-static void arrset(int *array, const int value, const int numberOfMember);
 static int printStatDataStr(FILE *filePtr, const float startTime, const float endTime, const int posX,
-                        const int posY, const char *effect, const char *str);
+    const int posY, const char *effect, const char *str);
 static int printStatDataInt(FILE *filePtr, const float startTime, const float endTime, const int posX,
-                                const int posY, char *effect, const int data);
-static int findMin(float *array, const int numOfLine, const int stopSubScript, const int mode);
-static char *toHexOpacity(int decOpacity, char *hexOpacity);
-static char *toHexColor(int decColor, char *hexColor);
+    const int posY, char *effect, const int data);
+static int printMessage(FILE *filePtr,
+    int startPosX, int startPosY, int endPosX, int endPosY, float startTime, float endTime,
+    int width, int fontSize, char *effect, DANMAKU *message);
 static int printTime(FILE *filePtr, float time, const char *endText);
+static int getMsgBoxHeight(DANMAKU *message, int fontSize, int width);
+static char *getActionStr(char *dstBuff,int shiftX, int shiftY, int startPosX, int startPosY, int endPosX, int endPosY);
+static int findMin(float *array, const int numOfLine, const int stopSubScript, const int mode);
 static float getEndTime(DANMAKU *danmakuPtr, const int rollTime, const int holdTime);
-static int toDecColor(char *hexColor);
-static char *deStyleNamePrefix(char *str);
-static float timeToFloat(const char *ipStr);
 
 /* 
  * 读取ass文件到弹幕池
@@ -483,6 +480,14 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             inEventPtr = inEventPtr -> next;
             continue;
         }
+
+        /* 消息框部分 */
+        if (strstr(inEventPtr->style, "message_box") == inEventPtr->style)
+        {
+            /* 暂不支持 直接抛弃 */
+            inEventPtr = inEventPtr -> next;
+            continue;
+        }
         
         /* 弹幕部分 */ 
         if (!strcmp(inEventPtr -> event, "dialogue") || !strcmp(inEventPtr -> event, "comment"))
@@ -586,8 +591,8 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             /* ass转义字符转换 */
             {
                 char tempText[MAX_TEXT_LENGTH];
-                strrpl(textPart, tempText, "\\h", " ", MAX_TEXT_LENGTH);
-                strrpl(tempText, textPart, "\\N", "\n", MAX_TEXT_LENGTH);
+                strSafeCopy(tempText, textPart, MAX_TEXT_LENGTH);
+                assEscape(textPart, tempText, MAX_TEXT_LENGTH, ASS_UNESCAPE);
             }
             
             /* 解析代码部分 */
@@ -1075,7 +1080,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                   "PlayResX: %d\n"
                   "PlayResY: %d\n"
                   "Timer: 100.0000\n\n",
-            config.resx, config.resy
+            config.resolution.x, config.resolution.y
            );
     
     /* 写styles部分 */ 
@@ -1133,11 +1138,17 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                      0, 0, 0, 1
                );
         
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+                     "message_box", config.fontname, config.msgboxFontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
+                     0, 0, 0, 1
+               );
+        
         if (config.statmode != 0)
         {
             fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "danmakuFactory_stat", config.fontname, config.fontsize, "&H35FFFFFF", "&H35FFFFFF", "&H35000000", "&H356A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 0, 1, 0, 5,
+                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 0, 0, 0, 5,
                      0, 0, 0, 1
                     );
         }
@@ -1153,16 +1164,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                  "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text");
     
     returnValue *= 10;
-    returnValue += writeAssDanmakuPart(fptr, danmakuHead,
-                                       config.resx, config.resy,
-                                       config.fontsize, config.fontname,
-                                       config.scrolltime, config.fixtime,
-                                       config.displayarea, config.scrollarea,
-                                       config.density,
-                                       config.blockmode,
-                                       config.saveBlockedPart,
-                                       status
-                                      );
+    returnValue += writeAssDanmakuPart(fptr, danmakuHead, config, status);
     
     /* 刷新status */
     if (status != NULL)
@@ -1209,9 +1211,7 @@ void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles)
 /* 
  * 将弹幕池写到ass文件 
  * 参数：
- * 输入文件/输出文件/分辨率宽/分辨率高/字号/字体/
- * 阴影/描边/滚动速度（滚动弹幕）/停留时间（现隐弹幕）/密度/不透明度/下部留空/
- * 同屏重复弹幕是否屏蔽/屏蔽弹幕是否保存到文件/
+ * 输入文件/输出文件/配置项/写状态
  * 返回值：
  * 0 正常退出
  * 1 弹幕池为空
@@ -1219,11 +1219,24 @@ void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles)
  * 3 4 5 6 7 8 申请内存空间失败
  * 9 写文件时发生错误 
   */
-int writeAssDanmakuPart(FILE *opF,
-                        DANMAKU *head, const int resX, const int resY, const int fontSize, const char *fontName,
-                        const float rollTime, const float holdTime, const float displayArea, const float rollArea,
-                        const int density, const int blockMode, const BOOL saveBlockedPart, STATUS *const status)
+int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const status)
 {
+    COORDIN resolution = config.resolution;
+    const int fontSize = config.fontsize;
+    const char *fontName = config.fontname;
+    const float rollTime = config.scrolltime;
+    const float holdTime = config.fixtime;
+    const float displayArea = config.displayarea;
+    const float rollArea = config.scrollarea;
+    const int density = config.density;
+    const int blockMode = config.blockmode;
+    const BOOL saveBlockedPart = config.saveBlockedPart;
+    BOOL showMsgBox = config.showMsgBox;
+    const BOOL showUserName = config.showUserNames;
+    COORDIN msgBoxSize = config.msgBoxSize;
+    COORDIN msgBoxPos = config.msgBoxPos;
+    int msgFontSize = config.msgboxFontsize;
+
     /* 刷新status */
     if (status != NULL)
     {
@@ -1234,9 +1247,6 @@ int writeAssDanmakuPart(FILE *opF,
     
     if(head == NULL || opF == NULL)
     {
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 弹幕池为空");
-        #endif
         return 1;
     }
     
@@ -1245,57 +1255,57 @@ int writeAssDanmakuPart(FILE *opF,
         return 2;
     }
     
-    DANMAKU *now = NULL;
+    /* 临时变量 */
     int cnt;
-    char escapedText[MAX_TEXT_LENGTH];
     char tempText[MAX_TEXT_LENGTH];
-    
+
+    DANMAKU *now = NULL;
     DANMAKU *signPtr = head, *scanPtr = head;
+
+    MSGLIST *msgListHead = NULL;
+    MSGLIST *msgListTail = NULL;
+    MSGLIST *msgListPtr;
     
-    int screenNum;
-    int rollResY, holdResY;
-    int listCnt, PositionY;
-    int textLen, textHei;
-    
+    /* 信息框参数 */
+    float msgAnimationTime = 0.5;  /* 新消息弹出动画时间 */
+    int msgMarginV = msgFontSize / 6;  /* 消息之前竖直方向间隔 */
+    int msgBoxRadius = msgFontSize / 2;  /* 消息框圆角半径 */
+    float msgStartTime;  /* 消息开始时间 */
+
+    /* 弹幕占用时间 */
+    float msgEndTime = -msgAnimationTime;     /* 上一条消息动画结束时间 */
     float *R2LToRightTime, *R2LToLeftTime;    /* 右左滚动行经过特定点时间 */
     float *L2RToRightTime, *L2RToLeftTime;    /* 左右滚动行经过特定点时间 */
     float *fixEndTime;    /* 顶部与底部弹幕消失时间 */
     
-    if (displayArea > 1)
-    {
-        rollResY = holdResY = resY;
-    }
-    else if(fabs(displayArea - 1) > EPS)
-    {
-        rollResY = holdResY = resY * displayArea;
+    /* 显示区域限制 */
+    int rollResY, holdResY;
+    if(displayArea > EPS && displayArea < 1-EPS)
+    {/* 大于 0 但小于 1 的情况 */
+        /* TODO: 此处可能有逻辑错误 */
+        rollResY = holdResY = resolution.y * displayArea;
     }
     else
-    {/* 不进行运算直接取整防止误差 */ 
-        rollResY = holdResY = resY;
+    {/* 显示区域为 1 (100%) 或 非法输入 */ 
+        rollResY = holdResY = resolution.y;
     }
     
     if(fabs(rollArea - 1) > EPS)
     {
-        if (resY * rollArea < rollResY)
+        if (resolution.y * rollArea < rollResY)
         {
-            rollResY = resY * rollArea;
+            rollResY = resolution.y * rollArea;
         }
     }
     
     if((R2LToRightTime = (float *)malloc(rollResY * sizeof(float))) == NULL)
     {
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 申请内存空间失败");
-        #endif
         fclose(opF);
         return 3;
     }
     if((R2LToLeftTime = (float *)malloc(rollResY * sizeof(float))) == NULL)
     {
         free(R2LToRightTime);
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 申请内存空间失败");
-        #endif
         fclose(opF);
         return 4;
     }
@@ -1303,9 +1313,6 @@ int writeAssDanmakuPart(FILE *opF,
     {
         free(R2LToRightTime);
         free(R2LToLeftTime);
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 申请内存空间失败");
-        #endif
         fclose(opF);
         return 5;
     }
@@ -1314,9 +1321,6 @@ int writeAssDanmakuPart(FILE *opF,
         free(R2LToRightTime);
         free(R2LToLeftTime);
         free(L2RToRightTime);
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 申请内存空间失败");
-        #endif
         fclose(opF);
         return 6;
     }
@@ -1326,35 +1330,46 @@ int writeAssDanmakuPart(FILE *opF,
         free(R2LToLeftTime);
         free(L2RToRightTime);
         free(L2RToLeftTime);
-        #if PRINT_ERR == TRUE
-        printf("\n[X] 申请内存空间失败");
-        #endif
         fclose(opF);
         return 7;
     }
-    
+
+    /* 信息框边框与蒙版 */
+    char msgBoxClip[MAX_TEXT_LENGTH];
+    // sprintf(msgBoxClip, "\\clip(%d,%d,%d,%d)", msgBoxPos.x, msgBoxPos.y, msgBoxPos.x+msgBoxSize.x, msgBoxPos.y+msgBoxSize.y);
+    sprintf(msgBoxClip, "\\clip(m %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d l %d %d l %d %d)",
+        0+msgBoxPos.x, msgBoxRadius+msgBoxPos.y, /* 起点 */
+        0+msgBoxPos.x, msgBoxRadius/2+msgBoxPos.y, msgBoxRadius/2+msgBoxPos.x, 
+        0+msgBoxPos.y, msgBoxRadius+msgBoxPos.x, 0+msgBoxPos.y, /* 左上圆角 */
+        msgBoxSize.x - msgBoxRadius+msgBoxPos.x, 0+msgBoxPos.y, /* 左上直线 */
+        msgBoxSize.x - msgBoxRadius/2+msgBoxPos.x, 0+msgBoxPos.y, msgBoxSize.x+msgBoxPos.x, 
+        msgBoxRadius/2+msgBoxPos.y, msgBoxSize.x+msgBoxPos.x, msgBoxRadius+msgBoxPos.y, /* 右上圆角 */
+        msgBoxSize.x+msgBoxPos.x, msgBoxSize.y+msgBoxPos.y, /* 右边直线 */
+        0+msgBoxPos.x, msgBoxSize.y+msgBoxPos.y /* 底线 */
+    );
+
     now = head;
-    listCnt = 0;
-    while(now != NULL)
+    int listCnt = 0;  /* 序号计数器 */
+    while (now != NULL)
     {/* 读链表写ass */
         listCnt++;
-        
-        /* 密度上限屏蔽 及 相同内容弹幕屏蔽 */
-        
+
         /* 
-        对待特殊弹幕的屏蔽策略：
-        除非按类型屏蔽，否则不屏蔽特殊弹幕（按密度或重复内容屏蔽无效） 
-        但特殊弹幕占用弹幕密度，当超过指定密度时，会将普通弹幕挤下来 
+         * 密度上限屏蔽 及 相同内容弹幕屏蔽
+         * 对待特殊弹幕的屏蔽策略：
+         * 除非按类型屏蔽，否则不屏蔽特殊弹幕（按密度或重复内容屏蔽无效） 
+         * 但特殊弹幕占用弹幕密度，当超过指定密度时，会将普通弹幕挤下来 
          */
-        if ((density > 0 || (blockMode & BLK_REPEAT)) && !IS_SPECIAL(now))
+        if ((density > 0 || (blockMode & BLK_REPEAT)) && IS_NORMAL(now))
         {
+            int danmakuNum = 0;
+
             while (getEndTime(signPtr, rollTime, holdTime) < now -> time + EPS)
             {/* 移动指针到同屏第一条弹幕 */
                 signPtr = signPtr -> next;
             }
             
             scanPtr = signPtr;
-            screenNum = 0;
             while (scanPtr != now)
             {
                 if (scanPtr -> type > 0 && getEndTime(scanPtr, rollTime, holdTime) > now -> time)
@@ -1373,13 +1388,13 @@ int writeAssDanmakuPart(FILE *opF,
                     }
                     else if (IS_NORMAL(scanPtr) || IS_SPECIAL(scanPtr))
                     {/* 如果是一个合法的弹幕 */
-                        screenNum++;
+                        danmakuNum++;
                     }
                 }
                 scanPtr = scanPtr -> next;
             }
             
-            if (now -> type > 0 && density > 0 && density <= screenNum)
+            if (now -> type > 0 && density > 0 && density <= danmakuNum)
             {/* 判断是否达到弹幕密度要求上限并屏蔽 */
                 if (now -> type > 0)
                 {
@@ -1392,31 +1407,34 @@ int writeAssDanmakuPart(FILE *opF,
             }
         }
         
-        textLen = getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
+        /* 文本长度计算 */
+        int textLen = 0, textHei = 0;
+
+        /* 计算用户ID长度 */
+        if (showUserName == TRUE && now->user != NULL)
+        {
+            textLen = getStrLen((unsigned char *)(now->user->name), fontSize, now -> fontSize, fontName);
+        }
+
+        /* 计算弹幕内容长度 */
+        textLen += getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
         textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
 
         /* 特殊字符替换 */
-        if (*(now->text) == ' ')
-        {
-            strcpy(escapedText, "\\h");
-            strSafeCat(escapedText, MAX_TEXT_LENGTH, now->text);
-        }
-        else
-        {
-            strSafeCopy(escapedText, now->text, MAX_TEXT_LENGTH);
-        }
-
-        strrpl(escapedText, tempText, "\n ", "\\N\\h", MAX_TEXT_LENGTH);
-        strrpl(tempText, escapedText, "\n", "\\N", MAX_TEXT_LENGTH);
+        char escapedText[MAX_TEXT_LENGTH];
+        assEscape(escapedText, now->text, MAX_TEXT_LENGTH, ASS_ESCAPE);
+        // strSafeCopy(escapedText, now->text, MAX_TEXT_LENGTH);
         
+        /* 弹幕按类型解析 */
         if(now -> type == 1 || now -> type == -1)/* 右左弹幕 */ 
         {
+            int PositionY;
             for(PositionY = 1; PositionY < rollResY - textHei; PositionY++)
             {
                 for(cnt = 0; cnt < fontSize; cnt++)
                 {
                     if(now->time < R2LToRightTime[PositionY + cnt] || 
-                       now->time + rollTime*(float)resX/(resX+textLen) < R2LToLeftTime[PositionY + cnt])
+                       now->time + rollTime*(float)resolution.x/(resolution.x+textLen) < R2LToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕右边 或 
                         当本条弹幕到达左端时该行最后一条弹幕没有完全退出屏幕 */
                         PositionY = PositionY + cnt + 1;
@@ -1445,7 +1463,7 @@ int writeAssDanmakuPart(FILE *opF,
             {
                 for(cnt = 0; cnt < textHei; cnt++)
                 {/* 登记位置占用信息 */
-                    R2LToRightTime[PositionY + cnt] = now -> time + rollTime * (float)textLen / (resX + textLen); 
+                    R2LToRightTime[PositionY + cnt] = now -> time + rollTime * (float)textLen / (resolution.x + textLen); 
                     R2LToLeftTime[PositionY + cnt] = now -> time + rollTime;
                 }
                 fprintf(opF, "\nDialogue: 0,");
@@ -1458,29 +1476,36 @@ int writeAssDanmakuPart(FILE *opF,
             printTime(opF, now->time, ",");
             printTime(opF, now->time + rollTime, ",");
             fprintf(opF, "R2L,,0000,0000,0000,,{\\move(%d,%d,%d,%d)\\q2",
-                    resX + textLen/2, PositionY, -1 * textLen / 2, PositionY);
+                    resolution.x + textLen/2, PositionY, -1 * textLen / 2, PositionY);
             
             if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
             
-            if(now -> color != 0xFFFFFF)
+            fprintf(opF, "}");
+            if (showUserName == TRUE && now->user != NULL)
+            {
+                fprintf(opF, "{\\c&HBCACF7}%s:\\h", now->user->name);
+            }
+
+            if(now -> color != 0xFFFFFF || showUserName == TRUE)
             {
                 char hexColor[7];
-                fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
+                fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
             }
-            
-            fprintf(opF, "}%s", escapedText);
+
+            fprintf(opF, "%s", escapedText);
         }
         else if(now -> type == 2 || now -> type == -2)/* 左右弹幕 */ 
         {
+            int PositionY;
             for(PositionY = 1; PositionY < rollResY - textHei; PositionY++)
             {
                 for(cnt = 0; cnt < textHei; cnt++)
                 {
                     if(now->time < L2RToRightTime[PositionY + cnt] || 
-                       now->time + rollTime*(float)resX/(resX+textLen) < L2RToLeftTime[PositionY + cnt])
+                       now->time + rollTime*(float)resolution.x/(resolution.x+textLen) < L2RToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕左边 或 
                         当本条弹幕到达右端时该行最后一条弹幕没有完全退出屏幕 */
                         PositionY = PositionY + cnt + 1;
@@ -1509,7 +1534,7 @@ int writeAssDanmakuPart(FILE *opF,
             {
                 for(cnt = 0; cnt < textHei; cnt++)
                 {/* 登记位置占用信息 */
-                    L2RToRightTime[PositionY + cnt] = now -> time + rollTime * (float)textLen / (resX + textLen); 
+                    L2RToRightTime[PositionY + cnt] = now -> time + rollTime * (float)textLen / (resolution.x + textLen); 
                     L2RToLeftTime[PositionY + cnt] = now -> time + rollTime;
                 }
                 
@@ -1523,23 +1548,30 @@ int writeAssDanmakuPart(FILE *opF,
             printTime(opF, now->time, ",");
             printTime(opF, now->time + rollTime, ",");
             fprintf(opF, "L2R,,0000,0000,0000,,{\\move(%d,%d,%d,%d)\\q2",
-                    -1 * textLen / 2, PositionY, resX + textLen/2, PositionY);
+                    -1 * textLen / 2, PositionY, resolution.x + textLen/2, PositionY);
             
             if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
             
-            if(now -> color != 0xFFFFFF)
+            fprintf(opF, "}");
+            if (showUserName == TRUE && now->user != NULL)
+            {
+                fprintf(opF, "{\\c&HBCACF7}%s:", now->user->name);
+            }
+
+            if(now -> color != 0xFFFFFF || showUserName == TRUE)
             {
                 char hexColor[7];
-                fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
+                fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
             }
-            
-            fprintf(opF, "}%s", escapedText);
+
+            fprintf(opF, "%s", escapedText);
         }
         else if(now -> type == 3 || now -> type == -3)/* 顶端弹幕 */ 
         {
+            int PositionY;
             for(PositionY = 1; PositionY < holdResY - textHei; PositionY++)
             {
                 for(cnt = 0; cnt < textHei; cnt++)
@@ -1583,23 +1615,30 @@ int writeAssDanmakuPart(FILE *opF,
             
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
-            fprintf(opF, "TOP,,0000,0000,0000,,{\\pos(%d,%d)\\q2", resX / 2, PositionY);
+            fprintf(opF, "TOP,,0000,0000,0000,,{\\pos(%d,%d)\\q2", resolution.x / 2, PositionY);
             
             if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
             
-            if(now -> color != 0xFFFFFF)
+            fprintf(opF, "}");
+            if (showUserName == TRUE && now->user != NULL)
+            {
+                fprintf(opF, "{\\c&HBCACF7}%s:", now->user->name);
+            }
+
+            if(now -> color != 0xFFFFFF || showUserName == TRUE)
             {
                 char hexColor[7];
-                fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
+                fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
             }
-            
-            fprintf(opF, "}%s", escapedText);
+
+            fprintf(opF, "%s", escapedText);
         }
         else if(now -> type == 4 || now -> type == -4)/* 底端弹幕 */ 
         {
+            int PositionY;
             for(PositionY = holdResY - 1; PositionY > textHei - 1; PositionY--)
             {
                 for(cnt = 0; cnt < textHei; cnt++)
@@ -1648,20 +1687,26 @@ int writeAssDanmakuPart(FILE *opF,
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
             fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)\\q2",
-                    resX / 2, PositionY - textHei + 2);
+                    resolution.x / 2, PositionY - textHei + 2);
             
             if(textHei != 25)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
             
-            if(now -> color != 0xFFFFFF)
+            fprintf(opF, "}");
+            if (showUserName == TRUE && now->user != NULL)
+            {
+                fprintf(opF, "{\\c&HBCACF7}%s:", now->user->name);
+            }
+
+            if(now -> color != 0xFFFFFF || showUserName == TRUE)
             {
                 char hexColor[7];
-                fprintf(opF, "\\c&H%s", toHexColor(now->color, hexColor));
+                fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
             }
-            
-            fprintf(opF, "}%s", escapedText);
+
+            fprintf(opF, "%s", escapedText);
         }
         else if(now -> type == 5 || now -> type == -5)/* 特殊弹幕 */
         {
@@ -1700,12 +1745,12 @@ int writeAssDanmakuPart(FILE *opF,
             printTime(opF, now->time, ",");
             printTime(opF, now->time + n7ExistTime, ",");
             fprintf(opF, "SP,,0000,0000,0000,,{");
-            if( n7StartX < 1+EPS && n7EndX < 1+EPS && n7StartY < 1+EPS && n7EndY < 1+EPS )
+            if( (n7StartX < 1+EPS) && (n7EndX < 1+EPS) && (n7StartY < 1+EPS) && (n7EndY < 1+EPS) )
             {
-                n7StartX *= resX;
-                n7EndX *= resX;
-                n7StartY *= resY;
-                n7EndY *= resY;
+                n7StartX *= resolution.x;
+                n7EndX *= resolution.x;
+                n7StartY *= resolution.y;
+                n7EndY *= resolution.y;
             }
             if(n7StartX == n7EndX && n7StartY == n7EndY)
             {/* 固定位置 */ 
@@ -1769,26 +1814,134 @@ int writeAssDanmakuPart(FILE *opF,
 
             fprintf(opF, "}%s", escapedText);
         }
-        else if(now -> type == 8)/* 代码弹幕 */ 
+        else if (now -> type == 8)/* 代码弹幕 */ 
         {
-            #if PRINT_ERR == TRUE
-            printf("\n[!] 第%d条 无法解析代码弹幕", listCnt);
-            #endif
-            fprintf(opF, "\nComment: NO.%d(Code danmaku):unable to read this type", listCnt);
+            fprintf(opF, "\nComment: NO.%d(Code danmaku):Unable to read this type.", listCnt);
         }
-        else if(now -> type > 0)/* 错误弹幕 */ 
+        else if (IS_MSG(now) && showMsgBox)/* 消息 */
         {
-            #if PRINT_ERR == TRUE
-            printf("\n[!] 第%d条 弹幕类型错误", listCnt);
-            #endif
+            /* 按最低价格屏蔽 */
+            if (now->gift->price < config.giftMinPrice && now->gift->price > -EPS)
+            {
+                goto NEXTNODE;
+            }
+
+            int totalHeight = 0;
+            MSGLIST *newMsgNode;
+
+            if((newMsgNode = (MSGLIST *)malloc(sizeof(MSGLIST))) == NULL)
+            {
+                /* TODO: 异常处理 */
+                fclose(opF);
+                return 3;
+            }
+
+            if (msgListTail != NULL)
+            {
+                msgStartTime = msgListHead->message -> time;
+            }
+            else
+            {
+                msgStartTime = 0.0;
+            }
+
+            /* 填入数据 */
+            newMsgNode -> isShown = FALSE;
+            newMsgNode -> message = now;
+            newMsgNode -> height = getMsgBoxHeight(newMsgNode->message, msgFontSize, msgBoxSize.x) + msgMarginV;
+
+            /* 链表连接 */
+            if (msgListTail == NULL)
+            {/* 成为首个元素 */
+                msgListTail = msgListHead = newMsgNode;
+                newMsgNode->nextNode = NULL;
+                newMsgNode->lastNode = NULL;
+            }
+            else
+            {/* 并入队头 */                
+                newMsgNode->lastNode = NULL;
+                msgListHead->lastNode = newMsgNode;
+                newMsgNode->nextNode = msgListHead;
+                msgListHead = newMsgNode;
+            }
+
+            if (now->time - msgAnimationTime < msgStartTime)
+            {
+                goto NEXTNODE;
+            }
+            
+            /* 刷新显示 */
+            msgListPtr = msgListHead -> nextNode;
+            while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
+            {/* 计算需显示消息总高度 */
+                totalHeight += msgListPtr->height;
+                msgListPtr = msgListPtr -> nextNode;
+            }
+
+            msgListPtr = msgListTail;
+            while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
+            {/* 上次在场的消息常驻显示 */
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgStartTime, 
+                             msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                msgListPtr = msgListPtr -> lastNode;
+            }
+            
+            msgListPtr = msgListTail;
+            while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
+            {/* 旧消息向上滚动 */
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY-totalHeight,
+                             msgStartTime, msgStartTime + msgAnimationTime/2.0, 
+                             msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                msgListPtr->posY -= totalHeight;
+                
+                if (msgListPtr->posY < msgBoxPos.y - msgListPtr->height)
+                {
+                    MSGLIST *msgListNextPtr;
+                    msgListTail = msgListNextPtr = msgListPtr -> lastNode;
+                    if (msgListPtr -> lastNode != NULL)
+                    {
+                        msgListPtr->lastNode -> nextNode = msgListPtr -> nextNode;
+                    }
+                    if (msgListPtr -> nextNode != NULL)
+                    {
+                        msgListPtr->nextNode -> lastNode = msgListPtr -> lastNode;
+                    }
+                    free(msgListPtr);
+
+                    msgListPtr = msgListNextPtr;
+                }
+                else
+                {
+                    printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                                 msgStartTime + msgAnimationTime/2.0, msgStartTime + msgAnimationTime, 
+                                 msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                    msgListPtr = msgListPtr -> lastNode;
+                }
+            }
+            
+            msgListPtr = msgListHead -> nextNode;
+            totalHeight = msgBoxPos.y + msgBoxSize.y;
+            while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
+            {/* 新消息进场 */
+                msgListPtr->isShown = TRUE;
+                totalHeight -= msgListPtr -> height;
+                msgListPtr -> posY = totalHeight;
+                
+                printMessage(opF, msgBoxPos.x-100, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                                 msgStartTime + msgAnimationTime/2.0, msgStartTime + msgAnimationTime, 
+                                 msgBoxSize.x, msgFontSize, "", msgListPtr->message);  
+                msgListPtr = msgListPtr -> nextNode;
+            }
+
+            msgEndTime = msgStartTime + msgAnimationTime;
+        }
+        else if (now -> type > 0)/* 类型错误 */ 
+        {
             fprintf(opF, "\nComment: NO.%d:unknow type", listCnt);
         }
         
-        if(ferror(opF))
+        if (ferror(opF))
         {
-            #if PRINT_ERR == TRUE
-            printf("\n[X] 写出文件时发生错误");
-            #endif
             fclose(opF);
             return 9;
         }
@@ -1802,19 +1955,91 @@ int writeAssDanmakuPart(FILE *opF,
             (status -> completedNum)++;
         }
     }
+
+    /* 剩余消息保持显示 */
+    if (msgListTail != NULL && showMsgBox)
+    {
+        int totalHeight = 0;
+        msgStartTime = msgListHead->message->time;
+
+        msgListPtr = msgListHead;
+        while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
+        {/* 计算需显示消息总高度 */
+            totalHeight += msgListPtr->height;
+            msgListPtr = msgListPtr -> nextNode;
+        }
+
+        msgListPtr = msgListTail;
+        while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
+        {/* 上次在场的消息常驻显示 */
+            printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgStartTime, 
+                         msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+            msgListPtr = msgListPtr -> lastNode;
+        }
+        
+        msgListPtr = msgListTail;
+        while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
+        {/* 旧消息向上滚动 */
+            printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY-totalHeight,
+                            msgStartTime, msgStartTime + msgAnimationTime/2.0, 
+                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+            msgListPtr->posY -= totalHeight;
+            
+            if (msgListPtr->posY >= msgBoxPos.y - msgListPtr->height)
+            {
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                                msgStartTime + msgAnimationTime/2.0, msgStartTime + msgAnimationTime, 
+                                msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+            }
+
+            msgListPtr = msgListPtr -> lastNode;
+        }
+        
+        msgListPtr = msgListHead;
+        totalHeight = msgBoxPos.y + msgBoxSize.y;
+        while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
+        { /* 新消息进场 */
+            msgListPtr->isShown = TRUE;
+            totalHeight -= msgListPtr -> height;
+            msgListPtr -> posY = totalHeight;
+            printMessage(opF, msgBoxPos.x-100, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                                msgStartTime + msgAnimationTime/2.0, msgStartTime + msgAnimationTime, 
+                                msgBoxSize.x, msgFontSize, "", msgListPtr->message);   
+            msgListPtr = msgListPtr -> nextNode;
+        }
+
+        msgListPtr = msgListTail;
+        while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
+        { /* 最后一屏常驻显示 */
+            printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                        msgStartTime + msgAnimationTime, msgStartTime + msgAnimationTime + 30, 
+                        msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+            msgListPtr = msgListPtr -> lastNode;
+        }
+    }
+    
     /* 归还空间 */
     free(R2LToRightTime);
     free(R2LToLeftTime);
     free(L2RToRightTime);
     free(L2RToLeftTime);
     free(fixEndTime);
+
+    msgListPtr = msgListHead;
+    while (msgListPtr != NULL)
+    {
+        MSGLIST *thisNode = msgListPtr;
+        msgListPtr = msgListPtr->nextNode;
+        free(thisNode);
+    }
     
+    /* 清空缓冲区 */
     fflush(opF);
     
     /* 刷新status */
     if (status != NULL)
     {
-//        status -> isDone = TRUE;
+        status -> isDone = TRUE;
     }
     return 0;
 }
@@ -2062,21 +2287,33 @@ int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, con
             fprintf(opF, " l 20 385{\\p0}");
         }
     }
+
     
     /* 显示弹幕统计表 */
     if(mode & TABLE)
     {
+        /* 非法数据拦截 部分类型未做统计模式 */
+        now = head;
+        while(now != NULL)
+        {
+            if (!IS_NORMAL(now) && !IS_SPECIAL(now))
+            {
+                return 0;
+            }
+            now = now->next;
+        }
+
         now = head;
         if(!total[0])
         {/* 统计出每种弹幕的总数 如果之前没有计算过则计算一遍 */
             while(now != NULL)
             {
-                if(abs(now -> type) <= NUM_OF_TYPE)
+                if (abs(now -> type) <= NUM_OF_TYPE)
                 {
                     total[abs(now -> type)]++;
                 }
                 
-                if(now -> next == NULL)
+                if (now -> next == NULL)
                 {
                     lastDanmakuStartTime = now -> time;
                 }
@@ -2482,155 +2719,13 @@ void freeAssFile(ASSFILE *assFile)
 }
 
 /* 
-以ass标准读取时间
-输出单位：秒 
- */
-static float timeToFloat(const char *ipStr)
-{
-    /* 0:00:01.60 */
-    int num = 0;
-    float time = 0.00;
-    char *ptr = (char *)ipStr;
-    
-    /* 小时部分 */
-    while (*ptr != ':' && *ptr != '.' && *ptr != '\0')
-    {
-        if (*ptr == ' ')
-        {
-            ptr++;
-            continue;
-        }
-        num *= 10;
-        num += *ptr - '0';
-        ptr++;
-    }
-    time = num * 3600;
-    num = 0;
-    ptr++;
-    
-    /* 分钟部分 */
-    while (*ptr != ':' && *ptr != '.' && *ptr != '\0')
-    {
-        if (*ptr == ' ')
-        {
-            ptr++;
-            continue;
-        }
-        num *= 10;
-        num += *ptr - '0';
-        ptr++;
-    }
-    time += num * 60;
-    num = 0;
-    ptr++;
-    
-    /* 秒部分 */
-    while (*ptr != '.' && *ptr != ':' && *ptr != '\0')
-    {
-        if (*ptr == ' ')
-        {
-            ptr++;
-            continue;
-        }
-        num *= 10;
-        num += *ptr - '0';
-        ptr++;
-    }
-    time += num;
-    num = 0;
-    ptr++;
-    
-    /* 秒部分 */
-    while (*ptr != '.' && *ptr != ':' && *ptr != '\0')
-    {
-        if (*ptr == ' ')
-        {
-            ptr++;
-            continue;
-        }
-        num *= 10;
-        num += *ptr - '0';
-        ptr++;
-    }
-    time += num / 100.0;
-    
-    return time;
-}
-
-/*  去样式名前缀
- *
- *   0         1         2
- *   012345678901234567890123456789
- *   danmakuFactory_ext_sub00_name     ->     name
-  */
-static char *deStyleNamePrefix(char *str)
-{
-    /* 合法性检查 避免偏移导致的非法访问 */
-    if (strlen(str) < 22)
-    {
-        return NULL;
-    }
-    
-    char *leftPtr, *rightPtr;
-    leftPtr = str;
-    rightPtr = str + 21;/* 从22个字节开始寻找字符 '_' 下划线 */
-    
-    while (*rightPtr != '\0' && *(rightPtr-1) != '_')
-    {/* 寻找下划线 */
-        rightPtr++;
-    }
-    
-    while (*(rightPtr-1) != '\0')
-    {/* 内容拷贝 */
-        *leftPtr = *rightPtr;
-        leftPtr++;
-        rightPtr++;
-    }
-    
-    return str;
-}
-
-/* 
- * 转换十六进制rgb颜色为十进制颜色
-  */ 
-static int toDecColor(char *hexColor)
-{
-    int i, j;
-    int color = 0;
-    
-    for (i = 2; i >= 0; i--)
-    {
-        for (j = 0; j < 2; j++)
-        {
-            if (hexColor[2*i + j] >= '0' && hexColor[2*i + j] <= '9')
-            {
-                color *= 16;
-                color += hexColor[2*i + j] - '0';
-            }
-            else if (hexColor[2*i + j] >= 'a' && hexColor[2*i + j] <= 'f')
-            {
-                color *= 16;
-                color += hexColor[2*i + j] - 'a' + 10;
-            }
-            else if (hexColor[2*i + j] >= 'A' && hexColor[2*i + j] <= 'F')
-            {
-                color *= 16;
-                color += hexColor[2*i + j] - 'A' + 10;
-            }
-        }
-    }
-    
-    return color;
-}
-
-/* 
  * 获取弹幕结束时间（秒）
  * 参数： 
  * 弹幕指针/滚动弹幕速度/固定弹幕保持时间 
  * 返回值：
  * 生存时间
  * 错误返回0.00 
-  */
+ */
 static float getEndTime(DANMAKU *danmakuPtr, const int rollTime, const int holdTime)
 {/* [0,0.17,"1-1",7,"文本部分内容",0,0,0,0.17,500,0,true,"微软雅黑",1] */
     if (danmakuPtr == NULL)
@@ -2654,7 +2749,6 @@ static float getEndTime(DANMAKU *danmakuPtr, const int rollTime, const int holdT
     {
         return 0.00;
     }
-    
 }
 
 /* 
@@ -2663,9 +2757,14 @@ static float getEndTime(DANMAKU *danmakuPtr, const int rollTime, const int holdT
  * 文件指针/秒数/紧接着打印在后面的字符串
  * 返回值：
  * ferror函数的返回值 
-  */
+ */
 static int printTime(FILE *filePtr, float time, const char *endText)
 {
+    if (time < EPS)
+    {
+        time = 0.0;
+    }
+
     int hour = (int)time / 3600;
     time -= hour * 3600;
     int min = (int)time / 60;
@@ -2676,56 +2775,295 @@ static int printTime(FILE *filePtr, float time, const char *endText)
     return ferror(filePtr);
 }
 
-/* 
- * 转换十进制rgb颜色为十六进制颜色
- * 参数：
- * 十进制颜色/记录十六进制的数组（7个字节以上） 
- * 返回值：
- * 十六进制数组的地址
-  */ 
-static char *toHexColor(int decColor, char *hexColor)
-{/* 先转换为16进制再两个为一对倒序排列 */
-    int i, j;
-    /* 使用两个for实现位置交叉 */ 
-    for(i = 0; i < 3; i++)
+/*
+ * 获取移动指令字符串
+ */
+char *getActionStr(char *dstBuff,int shiftX, int shiftY, int startPosX, int startPosY, int endPosX, int endPosY)
+{
+    if (startPosX == endPosX && startPosY == endPosY)
     {
-        for(j = 1; j >= 0; j--)
-        {
-            if (decColor % 16 < 10)
-            {
-                hexColor[2 * i + j] = decColor % 16 + '0';
-            }
-            else
-            {
-                hexColor[2 * i + j] = decColor % 16 - 10 + 'A';
-            }
-            decColor /= 16;
-        }
+        sprintf(dstBuff, "\\pos(%d,%d)", startPosX+shiftX, startPosY+shiftY);
     }
-    hexColor[6] = '\0'; 
-    return hexColor;
+    else
+    {
+        sprintf(dstBuff, "\\move(%d,%d,%d,%d)", startPosX+shiftX, startPosY+shiftY, endPosX+shiftX, endPosY+shiftY);
+    }
+
+    return dstBuff;
 }
 
-/* 
- * 十进制透明度转十六进制透明度（0-255） 
-  */
-static char *toHexOpacity(int decOpacity, char *hexOpacity)
+/*
+ * 获取消息高度 
+ */
+int getMsgBoxHeight(DANMAKU *message, int fontSize, int width)
 {
-    int cnt;
-    for(cnt = 1; cnt >=0; cnt--)
+    int boxHeight = -1;
+    int radius = fontSize / 2;
+    if (message->type == MSG_GIFT)
     {
-        if (decOpacity % 16 < 10)
+        boxHeight = fontSize;
+    }
+    else if (message->type == MSG_SUPER_CHAT)
+    {
+        int lineNum;
+        int charCount = 0;
+        unsigned char *textPtr = message->text;
+
+        while (*textPtr != '\0')
         {
-            hexOpacity[cnt] = decOpacity % 16 + '0';
+            if (*textPtr >= 0xC0 || *textPtr < 0x80)
+            {/* 一个字符的开头 */
+                charCount++;
+            }
+            textPtr++;
+        }
+
+        lineNum = (charCount * fontSize * SCBOX_TXT_LEN_COMPENSATION) / width + 1;
+
+        int topBoxHeight = fontSize + fontSize*(4.0/5.0) + radius/2;
+        int btmBoxHeight = lineNum * fontSize + radius/2;
+        boxHeight = topBoxHeight + btmBoxHeight;
+    }
+    else if (message->type == MSG_GUARD)
+    {
+        boxHeight = fontSize + fontSize*(4.0/5.0) + radius;
+    }
+
+    return boxHeight;
+}
+
+/*
+ * 打印一条消息到指定位置
+ */
+int printMessage(FILE *filePtr,
+    int startPosX, int startPosY, int endPosX, int endPosY, float startTime, float endTime,
+    int width, int fontSize, char *effect, DANMAKU *message)
+{
+    int radius = fontSize / 2;
+    char actionStr[MAX_TEXT_LENGTH];
+    
+    if (message->type == MSG_GIFT)
+    {
+        fprintf(filePtr, "\nDialogue: 0,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\q2}{\\c&HBCACF7\\b1}%s: {\\c&HFFFFFF\\b0}%s x%d",
+            getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            message->user->name, message->gift->name, message->gift->count /* 礼物信息 */
+        );
+    }
+    else if (message->type == MSG_SUPER_CHAT)
+    {
+        unsigned char scMsgStr[MAX_TEXT_LENGTH];
+        unsigned char *srcStrPtr, *resStrPtr;
+        srcStrPtr = message->text;
+        resStrPtr = scMsgStr;
+
+        /* 文本消息加入换行符 */
+        int lineNum = 1;
+        int charCount = 0;
+        while (*srcStrPtr != '\0' && resStrPtr-scMsgStr < MAX_TEXT_LENGTH)
+        {
+            if (*srcStrPtr >= 0xC0 || *srcStrPtr < 0x80)
+            {/* 一个字符的开头 */
+                charCount++;
+            }
+
+            if (charCount * fontSize * SCBOX_TXT_LEN_COMPENSATION >= width)
+            {/* 填入换行符 */
+                *resStrPtr = '\\';
+                resStrPtr++;
+                *resStrPtr = 'N';
+                resStrPtr++;
+
+                lineNum++;
+                charCount = 0;
+            }
+
+            *resStrPtr = *srcStrPtr;
+
+            srcStrPtr++;
+            resStrPtr++;
+        }
+        
+        *resStrPtr = '\0';
+
+        int topBoxHeight = fontSize + fontSize*(4.0/5.0) + radius/2;
+        int btmBoxHeight = lineNum * fontSize + radius/2;
+
+        /* 配色 */
+        char topBoxColor[ASS_COLOR_LEN];
+        char btmBoxColor[ASS_COLOR_LEN];
+        char userIDColor[ASS_COLOR_LEN];
+        char textColor[ASS_COLOR_LEN];
+
+        strcpy(textColor, "\\c&H313131");
+
+        if (message->gift->price + EPS > 1000)
+        { /* 1k及以上 */
+            strcpy(topBoxColor, "\\c&HE5E5FF");
+            strcpy(btmBoxColor, "\\c&H8C8CF7");
+            strcpy(userIDColor, "\\c&H0F0F75");
+        }
+        else if (message->gift->price + EPS > 500)
+        { /* 500及以上 */
+            strcpy(topBoxColor, "\\c&HD4F6FF");
+            strcpy(btmBoxColor, "\\c&H8CCEF7");
+            strcpy(userIDColor, "\\c&H236C64");
+        }
+        else if (message->gift->price + EPS > 100)
+        { /* 100及以上 */
+            strcpy(topBoxColor, "\\c&HCAF9F8");
+            strcpy(btmBoxColor, "\\c&H76E8E9");
+            strcpy(userIDColor, "\\c&H1A8B87");
         }
         else
-        {
-            hexOpacity[cnt] = decOpacity % 16 - 10 + 'A';
+        { /* 其他 */
+            strcpy(topBoxColor, "\\c&HFCE8D8");
+            strcpy(btmBoxColor, "\\c&HE4A47A");
+            strcpy(userIDColor, "\\c&H8A3619");
         }
-        decOpacity /= 16;
+
+        /* 绘制上底框 */
+        fprintf(filePtr, "\nDialogue: 0,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1}m %d %d b %d %d %d %d %d %d "
+            "l %d %d b %d %d %d %d %d %d l %d %d l %d %d",
+            getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            topBoxColor, /* 颜色 */
+            0, radius, /* 起点 */
+            0, radius / 2, radius / 2, 0, radius, 0, /* 左上圆角 */
+            width - radius, 0, /* 上部直线 */
+            width - radius/2, 0, width, radius/2, width, radius, /* 右上圆角 */
+            width, topBoxHeight, /* 右边直线 */
+            0, topBoxHeight /* 底线 */
+        );
+
+        /* 绘制下底框 */
+        fprintf(filePtr, "\nDialogue: 0,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\shad0\\p1%s}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
+            "b %d %d %d %d %d %d",
+            getActionStr(actionStr, 0, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            btmBoxColor, /* 颜色 */
+            0, 0, /* 起点 */
+            width, 0, /* 上部直线 */
+            width, btmBoxHeight-radius, /* 右边直线 */
+            width, btmBoxHeight-radius/2, width-radius/2, btmBoxHeight, width-radius, btmBoxHeight, /* 右下圆角 */
+            radius, btmBoxHeight, /* 底部直线 */
+            radius/2, btmBoxHeight, 0, btmBoxHeight-radius/2, 0, btmBoxHeight-radius /* 左边直线 */
+        );
+
+        /* 用户ID */
+        fprintf(filePtr, "\nDialogue: 1,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\q2}%s",
+            getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            userIDColor, /* 颜色 */
+            fontSize, /* ID文字大小 */
+            message->user->name /* 用户id */
+        );
+
+        /* SC金额 */
+        fprintf(filePtr, "\nDialogue: 1,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2}SuperChat CNY %d",
+            getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            textColor, /* 颜色 */
+            (int)(fontSize*(4.0/5.0)), /* 金额文字大小 */
+            (int)message->gift->price /* SC金额 */
+        );
+
+        /* SC内容 */
+        fprintf(filePtr, "\nDialogue: 1,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\q2}%s",
+            getActionStr(actionStr, radius/2, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            scMsgStr /* SC内容 */
+        );
     }
-    hexOpacity[2] = '\0';
-    return hexOpacity;
+    else if (message->type == MSG_GUARD)
+    {
+        int boxHeight = fontSize + fontSize*(4.0/5.0) + radius;
+        
+        /* 配色 */
+        char boxColor[ASS_COLOR_LEN];
+        char userIDColor[ASS_COLOR_LEN];
+        char textColor[ASS_COLOR_LEN];
+
+        strcpy(textColor, "\\c&H313131");
+        if (message->gift->price + EPS > 19800)
+        { /* 总督 */
+            strcpy(boxColor, "\\c&HE5E5FF");
+            strcpy(userIDColor, "\\c&H0F0F75");
+        }
+        else if (message->gift->price + EPS > 1980)
+        { /* 提督 */
+            strcpy(boxColor, "\\c&HCAF9F8");
+            strcpy(userIDColor, "\\c&H1A8B87");
+        }
+        else
+        { /* 舰长、未知 */
+            strcpy(boxColor, "\\c&HFCE8D8");
+            strcpy(userIDColor, "\\c&H8A3619");
+        }
+
+        /* 绘制底框 */
+        fprintf(filePtr, "\nDialogue: 0,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1}m %d %d b %d %d %d %d %d %d "
+            "l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d",
+            getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            boxColor, /* 颜色 */
+            0, radius, /* 起点 */
+            0, radius / 2, radius / 2, 0, radius, 0, /* 左上圆角 */
+            width - radius, 0, /* 上部直线 */
+            width - radius/2, 0, width, radius/2, width, radius, /* 右上圆角 */
+            width, boxHeight-radius, /* 右边直线 */
+            width, boxHeight-radius/2, width-radius/2, boxHeight, width-radius, boxHeight, /* 右下圆角 */
+            radius, boxHeight, /* 底线 */
+            radius/2, boxHeight, 0, boxHeight-radius/2, 0, boxHeight-radius /* 左下圆角 */
+        );
+
+        /* 用户ID */
+        fprintf(filePtr, "\nDialogue: 1,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2}%s",
+            getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            userIDColor, /* 颜色 */
+            fontSize, /* ID文字大小 */
+            message->user->name /* 用户id */
+        );
+
+        /* 舰长信息 */
+        fprintf(filePtr, "\nDialogue: 1,");
+        printTime(filePtr, startTime, ",");
+        printTime(filePtr, endTime, ",");
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2}Welcome new %s!",
+            getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+            effect, /* 补充特效 */
+            textColor, /* 颜色 */
+            (int)(fontSize*(4.0/5.0)), /* 舰长信息文字大小 */
+            message->gift->name /* 礼物名称 */
+        );
+    }
+    
+    return ferror(filePtr);
 }
 
 /* 
@@ -2739,7 +3077,7 @@ static int findMin(float *array, const int numOfLine, const int stopSubScript, c
 {
     int cnt, minSub;
     if(!mode)
-    {/* 正序排序 */
+    {/* 正序查找 */
         minSub = 0;
         for(cnt = 0; cnt < stopSubScript; cnt++)
         {
@@ -2750,7 +3088,7 @@ static int findMin(float *array, const int numOfLine, const int stopSubScript, c
         }
     }
     else
-    {/* 逆序排序 */ 
+    {/* 逆序查找 */ 
         minSub = numOfLine - 1;
         for(cnt = numOfLine - 1; cnt >= stopSubScript; cnt--)
         {
@@ -2805,21 +3143,4 @@ static int printStatDataStr(FILE *filePtr, const float startTime, const float en
     }
     fprintf(filePtr, "\\fs25\\1c&HFFFFFF}%s", str);
     return ferror(filePtr);
-}
-
-/* 
- * 数组清空 
- * 参数： 
- * 数组首地址/要初始化成的值/成员数量/ 
- * 返回值：
- * ferror函数的返回值 
-  */
-static void arrset(int *array, const int value, const int numberOfMember)
-{
-    int cnt;
-    for(cnt = 0; cnt < numberOfMember; cnt++)
-    {
-        *(array + cnt) = value;
-    }
-    return;
 }

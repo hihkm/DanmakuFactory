@@ -23,12 +23,14 @@ extern "C" {
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "../Define/DanmakuDef.h"
 
 #define CHAR_IS_BLANK(ch) (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')
 #define STR_IS_EMPTY(str) (str[0] == '\0')
 #define STR_IS_BLANK(str) (isDesignatedStr(str, " \n\t\r"))
 #define TO_STR_END(ptr)   (ptr += strlen(ptr))
+#define FLOAT_IS_EQUAL(floatNum1, floatNum2) (fabs(floatNum1 - floatNum2) < EPS)
 
 /*移动字符指针向后跳到距离为字符串prefix的长度的位置*/
 #define STR_PTR_JUMP(strPtr, prefix)         \
@@ -48,11 +50,15 @@ extern BOOL isDesignatedChar(char ch, const char *designatedChar);
 extern BOOL isDesignatedStr(char *str, char *designatedChar);
 extern BOOL isUtf8(char const *const str);
 extern char *strSafeCopy(char *destination, const char *const source, size_t count);
-int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf);
+extern int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf);
 extern int match(char *mainStr, char *patternStr);
 extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
 extern BOOL isStartWith(const char *const mainStr, const char *const prefixStr);
 extern char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMovePtr);
+extern char *filenameGetFormat(char *format, const char *const fileName, int maxLen);
+extern char *filenameGetPath(char *path, const char *const fileName, int maxLen);
+extern BOOL strToBool(const char *const str);
+extern char *boolToStr(char *opStr, BOOL boolValue);
 
 #ifdef __cplusplus
 }

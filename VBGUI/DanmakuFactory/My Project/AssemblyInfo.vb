@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("一款开源的轻量级弹幕格式转换工具")>
 <Assembly: AssemblyCompany("tikm.org")>
 <Assembly: AssemblyProduct("DanmakuFactory")>
-<Assembly: AssemblyCopyright("Copyright ©  2020 HKM")>
+<Assembly: AssemblyCopyright("Copyright © 2021 HKM")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 '通过使用 "*"，如下所示:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.52.0.0")>
-<Assembly: AssemblyFileVersion("1.52.0.0")>
+<Assembly: AssemblyVersion("1.62")>
+<Assembly: AssemblyFileVersion("1.62")>

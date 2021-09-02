@@ -26,9 +26,7 @@ Partial Class MainWindow
         Me.StartButton = New System.Windows.Forms.Button()
         Me.InputGroupBox = New System.Windows.Forms.GroupBox()
         Me.FileListButton = New System.Windows.Forms.Button()
-        Me.inputTemplate = New System.Windows.Forms.ComboBox()
         Me.FileOpenButton = New System.Windows.Forms.Button()
-        Me.Label2 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.OutputDir = New System.Windows.Forms.TextBox()
@@ -51,9 +49,7 @@ Partial Class MainWindow
         'InputGroupBox
         '
         Me.InputGroupBox.Controls.Add(Me.FileListButton)
-        Me.InputGroupBox.Controls.Add(Me.inputTemplate)
         Me.InputGroupBox.Controls.Add(Me.FileOpenButton)
-        Me.InputGroupBox.Controls.Add(Me.Label2)
         Me.InputGroupBox.Controls.Add(Me.Label1)
         resources.ApplyResources(Me.InputGroupBox, "InputGroupBox")
         Me.InputGroupBox.Name = "InputGroupBox"
@@ -65,24 +61,11 @@ Partial Class MainWindow
         Me.FileListButton.Name = "FileListButton"
         Me.FileListButton.UseVisualStyleBackColor = True
         '
-        'inputTemplate
-        '
-        Me.inputTemplate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        resources.ApplyResources(Me.inputTemplate, "inputTemplate")
-        Me.inputTemplate.FormattingEnabled = True
-        Me.inputTemplate.Items.AddRange(New Object() {resources.GetString("inputTemplate.Items")})
-        Me.inputTemplate.Name = "inputTemplate"
-        '
         'FileOpenButton
         '
         resources.ApplyResources(Me.FileOpenButton, "FileOpenButton")
         Me.FileOpenButton.Name = "FileOpenButton"
         Me.FileOpenButton.UseVisualStyleBackColor = True
-        '
-        'Label2
-        '
-        resources.ApplyResources(Me.Label2, "Label2")
-        Me.Label2.Name = "Label2"
         '
         'Label1
         '
@@ -96,6 +79,7 @@ Partial Class MainWindow
         '
         'OutputDir
         '
+        Me.OutputDir.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         resources.ApplyResources(Me.OutputDir, "OutputDir")
         Me.OutputDir.Name = "OutputDir"
         '
@@ -163,9 +147,7 @@ Partial Class MainWindow
 
     Friend WithEvents StartButton As Button
     Friend WithEvents InputGroupBox As GroupBox
-    Friend WithEvents inputTemplate As ComboBox
     Friend WithEvents FileOpenButton As Button
-    Friend WithEvents Label2 As Label
     Friend WithEvents Label1 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents OutputDir As TextBox

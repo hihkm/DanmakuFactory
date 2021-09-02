@@ -1,10 +1,11 @@
 ﻿Public Class Config
+    'TODO: 改用与cli版本一致的json配置文件或ini
+
     '不保存的配置
     Public timeShift As Double = 0.00
 
     '保存的配置
-    Public resx As Integer = 1920
-    Public resy As Integer = 1080
+    Public resolution() As Integer = {1920, 1080}
     Public displayarea As Double = 1.0
     Public scrollarea As Double = 1.0
 
@@ -17,6 +18,7 @@
     Public outline As Integer = 0
     Public shadow As Integer = 1
     Public bold As Boolean = False
+    Public showUsernames As Boolean = False
 
     Public blockR2L As Boolean = False
     Public blockL2R As Boolean = False
@@ -25,6 +27,12 @@
     Public blockSpecial As Boolean = False
     Public blockColor As Boolean = False
     Public blockRepeat As Boolean = False
+
+    Public showMsgbox As Boolean = True
+    Public msgboxPos() As Integer = {10, 0}
+    Public msgboxSize() As Integer = {500, 1080}
+    Public msgboxFontsize As Integer = 35
+    Public giftMinPrice As Double = 0.00
 
     Public statTable As Boolean = False
     Public statHistogram As Boolean = False
@@ -51,12 +59,12 @@
         For Each setStr As String In Settings
             Dim str As String() = setStr.Split(":")
             If str.Length > 1 Then
-                Dim key As String = str(0).ToLower()
-                Dim value As String = str(1)
+                Dim key As String = str(0).Trim().ToLower()
+                Dim value As String = str(1).Trim()
                 If key = "resx" Then
-                    resx = Convert.ToInt32(value)
+                    resolution(0) = Convert.ToInt32(value)
                 ElseIf key = "resy" Then
-                    resy = Convert.ToInt32(value)
+                    resolution(1) = Convert.ToInt32(value)
                 ElseIf key = "displayarea" Then
                     displayarea = Convert.ToDouble(value)
                 ElseIf key = "scrollarea" Then
@@ -95,6 +103,22 @@
                     statTable = Convert.ToBoolean(value)
                 ElseIf key = "stathistogram" Then
                     statHistogram = Convert.ToBoolean(value)
+                ElseIf key = "showusernames" Then
+                    showUsernames = Convert.ToBoolean(value)
+                ElseIf key = "showmsgbox" Then
+                    showMsgbox = Convert.ToBoolean(value)
+                ElseIf key = "msgboxposx" Then
+                    msgboxPos(0) = Convert.ToInt32(value)
+                ElseIf key = "msgboxposy" Then
+                    msgboxPos(1) = Convert.ToInt32(value)
+                ElseIf key = "msgboxsizewidth" Then
+                    msgboxSize(0) = Convert.ToInt32(value)
+                ElseIf key = "msgboxsizeheight" Then
+                    msgboxSize(1) = Convert.ToInt32(value)
+                ElseIf key = "msgboxfontsize" Then
+                    msgboxFontsize = Convert.ToInt32(value)
+                ElseIf key = "giftminprice" Then
+                    giftMinPrice = Convert.ToDouble(value)
                 End If
             End If
         Next
@@ -102,28 +126,35 @@
 
     Public Overrides Function ToString() As String
         Dim retStr As String
-        retStr = "resX:" + resx.ToString() + ";" +
-                 "resY:" + resy.ToString() + ";" +
-                 "displayarea:" + displayarea.ToString() + ";" +
-                 "scrollarea:" + scrollarea.ToString() + ";" +
-                 "scrolltime:" + scrolltime.ToString() + ";" +
-                 "fixtime:" + fixtime.ToString() + ";" +
-                 "density:" + density.ToString() + ";" +
-                 "fontname:" + fontname + ";" +
-                 "fontsize:" + fontsize.ToString() + ";" +
-                 "opacity:" + opacity.ToString() + ";" +
-                 "outline:" + outline.ToString() + ";" +
-                 "shadow:" + shadow.ToString() + ";" +
-                 "bold:" + bold.ToString() + ";" +
+        retStr = "DanmakuFactoryConfigVer:1.0;" + vbCrLf +
+                 "resX:" + resolution(0).ToString() + ";" + "resY:" + resolution(1).ToString() + ";" + vbCrLf +
+                 "displayarea:" + displayarea.ToString() + ";" + vbCrLf +
+                 "scrollarea:" + scrollarea.ToString() + ";" + vbCrLf +
+                 "scrolltime:" + scrolltime.ToString() + ";" + vbCrLf +
+                 "fixtime:" + fixtime.ToString() + ";" + vbCrLf +
+                 "density:" + density.ToString() + ";" + vbCrLf +
+                 "fontname:" + fontname + ";" + vbCrLf +
+                 "fontsize:" + fontsize.ToString() + ";" + vbCrLf +
+                 "opacity:" + opacity.ToString() + ";" + vbCrLf +
+                 "outline:" + outline.ToString() + ";" + vbCrLf +
+                 "shadow:" + shadow.ToString() + ";" + vbCrLf +
+                 "bold:" + bold.ToString() + ";" + vbCrLf +
                  "blockR2L:" + blockR2L.ToString() + ";" +
                  "blockL2R:" + blockL2R.ToString() + ";" +
                  "blockTop:" + blockTop.ToString() + ";" +
                  "blockBtm:" + blockBtm.ToString() + ";" +
                  "blockSpecial:" + blockSpecial.ToString() + ";" +
                  "blockColor:" + blockColor.ToString() + ";" +
-                 "blockRepeat:" + blockRepeat.ToString() + ";" +
+                 "blockRepeat:" + blockRepeat.ToString() + ";" + vbCrLf +
                  "statTable:" + statTable.ToString() + ";" +
-                 "statHistogram:" + statHistogram.ToString() + ";"
+                 "statHistogram:" + statHistogram.ToString() + ";" + vbCrLf +
+                 "showUsernames:" + showUsernames.ToString() + ";" + vbCrLf +
+                 "showMsgbox:" + showMsgbox.ToString() + ";" + vbCrLf +
+                 "msgboxPosX:" + msgboxPos(0).ToString() + ";" + "msgboxPosY:" + msgboxPos(1).ToString() + ";" + vbCrLf +
+                 "msgboxSizeWidth:" + msgboxSize(0).ToString() + ";" +
+                 "msgboxSizeHeight:" + msgboxSize(1).ToString() + ";" + vbCrLf +
+                 "msgboxFontsize:" + msgboxFontsize.ToString() + ";" + vbCrLf +
+                 "giftMinPrice:" + giftMinPrice.ToString() + ";" + vbCrLf
         Return retStr
     End Function
 
@@ -193,36 +224,40 @@
 
     '非法设置修正
     Public Sub Check()
-        If resx <= 0 Or resy <= 0 Then
-            resx = 1920
-            resy = 1080
+        Dim defaultConfig As Config = New Config
+
+        If resolution(0) <= 0 Or resolution(1) <= 0 Then
+            resolution = defaultConfig.resolution
         End If
         If displayarea <= 0 Or displayarea > 1 Then
-            displayarea = 1.0
+            displayarea = defaultConfig.displayarea
         End If
         If scrollarea <= 0 Or scrollarea > displayarea Then
             scrollarea = displayarea
         End If
         If scrolltime <= 0 Then
-            scrolltime = 12.0
+            scrolltime = defaultConfig.scrolltime
         End If
         If fixtime <= 0 Then
-            fixtime = 5.0
+            fixtime = defaultConfig.fixtime
         End If
         If density < -1 Then
-            density = 0
+            density = defaultConfig.density
         End If
         If fontsize <= 0 Then
-            fontsize = 38
+            fontsize = defaultConfig.fontsize
         End If
         If opacity <= 0 Or opacity > 255 Then
-            opacity = 255
+            opacity = defaultConfig.opacity
         End If
         If outline < 0 Or outline > 4 Then
-            outline = 0
+            outline = defaultConfig.outline
         End If
         If shadow < 0 Or shadow > 4 Then
-            shadow = 0
+            shadow = defaultConfig.shadow
+        End If
+        If giftMinPrice < 0 Then
+            giftMinPrice = defaultConfig.giftMinPrice
         End If
     End Sub
 End Class

@@ -23,6 +23,9 @@ Partial Class DanmakuSettingDlg
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Label18 = New System.Windows.Forms.Label()
+        Me.TimeshiftUpDown = New System.Windows.Forms.NumericUpDown()
+        Me.Label19 = New System.Windows.Forms.Label()
         Me.BLK_Rep_CheckBox = New System.Windows.Forms.CheckBox()
         Me.BLK_Special_CheckBox = New System.Windows.Forms.CheckBox()
         Me.BLK_Color_CheckBox = New System.Windows.Forms.CheckBox()
@@ -43,6 +46,7 @@ Partial Class DanmakuSettingDlg
         Me.DensityRadioButton1 = New System.Windows.Forms.RadioButton()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.BoldCheckBox = New System.Windows.Forms.CheckBox()
         Me.Label17 = New System.Windows.Forms.Label()
         Me.OpacityNUD = New System.Windows.Forms.NumericUpDown()
         Me.OutlineNUD = New System.Windows.Forms.NumericUpDown()
@@ -69,11 +73,12 @@ Partial Class DanmakuSettingDlg
         Me.ScrollAreaNUD = New System.Windows.Forms.NumericUpDown()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.SaveCheckBox = New System.Windows.Forms.CheckBox()
-        Me.Label18 = New System.Windows.Forms.Label()
-        Me.TimeshiftUpDown = New System.Windows.Forms.NumericUpDown()
-        Me.Label19 = New System.Windows.Forms.Label()
-        Me.BoldCheckBox = New System.Windows.Forms.CheckBox()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.ShowUsernamesCheckBox = New System.Windows.Forms.CheckBox()
+        Me.ShowMsgboxCheckBox = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
+        CType(Me.TimeshiftUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FixTimeNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ScrollTimeNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DensityNUD, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -87,7 +92,7 @@ Partial Class DanmakuSettingDlg
         CType(Me.ResXNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DisplayAreaNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ScrollAreaNUD, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TimeshiftUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox4.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
@@ -115,23 +120,57 @@ Partial Class DanmakuSettingDlg
         Me.GroupBox1.Controls.Add(Me.DensityRadioButton1)
         Me.GroupBox1.Controls.Add(Me.Label2)
         Me.GroupBox1.Font = New System.Drawing.Font("微软雅黑", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.GroupBox1.Location = New System.Drawing.Point(13, 132)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox1.Location = New System.Drawing.Point(13, 131)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.GroupBox1.Size = New System.Drawing.Size(527, 269)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4)
+        Me.GroupBox1.Size = New System.Drawing.Size(598, 236)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "弹幕设置"
         '
+        'Label18
+        '
+        Me.Label18.AutoSize = True
+        Me.Label18.Location = New System.Drawing.Point(248, 98)
+        Me.Label18.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label18.Name = "Label18"
+        Me.Label18.Size = New System.Drawing.Size(28, 24)
+        Me.Label18.TabIndex = 22
+        Me.Label18.Text = "秒"
+        '
+        'TimeshiftUpDown
+        '
+        Me.TimeshiftUpDown.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TimeshiftUpDown.DecimalPlaces = 2
+        Me.TimeshiftUpDown.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.TimeshiftUpDown.Location = New System.Drawing.Point(170, 98)
+        Me.TimeshiftUpDown.Margin = New System.Windows.Forms.Padding(4)
+        Me.TimeshiftUpDown.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
+        Me.TimeshiftUpDown.Minimum = New Decimal(New Integer() {2139062143, 0, 0, -2147483648})
+        Me.TimeshiftUpDown.Name = "TimeshiftUpDown"
+        Me.TimeshiftUpDown.Size = New System.Drawing.Size(76, 27)
+        Me.TimeshiftUpDown.TabIndex = 21
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Location = New System.Drawing.Point(10, 98)
+        Me.Label19.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(118, 24)
+        Me.Label19.TabIndex = 20
+        Me.Label19.Text = "时间轴偏移量"
+        '
         'BLK_Rep_CheckBox
         '
         Me.BLK_Rep_CheckBox.AutoSize = True
-        Me.BLK_Rep_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_Rep_CheckBox.Location = New System.Drawing.Point(263, 233)
-        Me.BLK_Rep_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_Rep_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_Rep_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_Rep_CheckBox.Location = New System.Drawing.Point(272, 199)
+        Me.BLK_Rep_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_Rep_CheckBox.Name = "BLK_Rep_CheckBox"
-        Me.BLK_Rep_CheckBox.Size = New System.Drawing.Size(91, 24)
+        Me.BLK_Rep_CheckBox.Size = New System.Drawing.Size(106, 29)
         Me.BLK_Rep_CheckBox.TabIndex = 19
         Me.BLK_Rep_CheckBox.Text = "内容重复"
         Me.BLK_Rep_CheckBox.UseVisualStyleBackColor = True
@@ -139,11 +178,12 @@ Partial Class DanmakuSettingDlg
         'BLK_Special_CheckBox
         '
         Me.BLK_Special_CheckBox.AutoSize = True
-        Me.BLK_Special_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_Special_CheckBox.Location = New System.Drawing.Point(13, 233)
-        Me.BLK_Special_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_Special_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_Special_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_Special_CheckBox.Location = New System.Drawing.Point(22, 199)
+        Me.BLK_Special_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_Special_CheckBox.Name = "BLK_Special_CheckBox"
-        Me.BLK_Special_CheckBox.Size = New System.Drawing.Size(61, 24)
+        Me.BLK_Special_CheckBox.Size = New System.Drawing.Size(68, 29)
         Me.BLK_Special_CheckBox.TabIndex = 18
         Me.BLK_Special_CheckBox.Text = "特殊"
         Me.BLK_Special_CheckBox.UseVisualStyleBackColor = True
@@ -151,11 +191,12 @@ Partial Class DanmakuSettingDlg
         'BLK_Color_CheckBox
         '
         Me.BLK_Color_CheckBox.AutoSize = True
-        Me.BLK_Color_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_Color_CheckBox.Location = New System.Drawing.Point(134, 233)
-        Me.BLK_Color_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_Color_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_Color_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_Color_CheckBox.Location = New System.Drawing.Point(143, 199)
+        Me.BLK_Color_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_Color_CheckBox.Name = "BLK_Color_CheckBox"
-        Me.BLK_Color_CheckBox.Size = New System.Drawing.Size(76, 24)
+        Me.BLK_Color_CheckBox.Size = New System.Drawing.Size(87, 29)
         Me.BLK_Color_CheckBox.TabIndex = 17
         Me.BLK_Color_CheckBox.Text = "非白色"
         Me.BLK_Color_CheckBox.UseVisualStyleBackColor = True
@@ -163,11 +204,12 @@ Partial Class DanmakuSettingDlg
         'BLK_Btm_CheckBox
         '
         Me.BLK_Btm_CheckBox.AutoSize = True
-        Me.BLK_Btm_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_Btm_CheckBox.Location = New System.Drawing.Point(393, 199)
-        Me.BLK_Btm_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_Btm_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_Btm_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_Btm_CheckBox.Location = New System.Drawing.Point(402, 165)
+        Me.BLK_Btm_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_Btm_CheckBox.Name = "BLK_Btm_CheckBox"
-        Me.BLK_Btm_CheckBox.Size = New System.Drawing.Size(91, 24)
+        Me.BLK_Btm_CheckBox.Size = New System.Drawing.Size(106, 29)
         Me.BLK_Btm_CheckBox.TabIndex = 16
         Me.BLK_Btm_CheckBox.Text = "底部固定"
         Me.BLK_Btm_CheckBox.UseVisualStyleBackColor = True
@@ -175,11 +217,12 @@ Partial Class DanmakuSettingDlg
         'BLK_Top_CheckBox
         '
         Me.BLK_Top_CheckBox.AutoSize = True
-        Me.BLK_Top_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_Top_CheckBox.Location = New System.Drawing.Point(263, 199)
-        Me.BLK_Top_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_Top_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_Top_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_Top_CheckBox.Location = New System.Drawing.Point(272, 165)
+        Me.BLK_Top_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_Top_CheckBox.Name = "BLK_Top_CheckBox"
-        Me.BLK_Top_CheckBox.Size = New System.Drawing.Size(91, 24)
+        Me.BLK_Top_CheckBox.Size = New System.Drawing.Size(106, 29)
         Me.BLK_Top_CheckBox.TabIndex = 15
         Me.BLK_Top_CheckBox.Text = "顶部固定"
         Me.BLK_Top_CheckBox.UseVisualStyleBackColor = True
@@ -187,11 +230,12 @@ Partial Class DanmakuSettingDlg
         'BLK_L2R_CheckBox
         '
         Me.BLK_L2R_CheckBox.AutoSize = True
-        Me.BLK_L2R_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_L2R_CheckBox.Location = New System.Drawing.Point(134, 199)
-        Me.BLK_L2R_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_L2R_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_L2R_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_L2R_CheckBox.Location = New System.Drawing.Point(143, 165)
+        Me.BLK_L2R_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_L2R_CheckBox.Name = "BLK_L2R_CheckBox"
-        Me.BLK_L2R_CheckBox.Size = New System.Drawing.Size(91, 24)
+        Me.BLK_L2R_CheckBox.Size = New System.Drawing.Size(106, 29)
         Me.BLK_L2R_CheckBox.TabIndex = 14
         Me.BLK_L2R_CheckBox.Text = "左右滚动"
         Me.BLK_L2R_CheckBox.UseVisualStyleBackColor = True
@@ -199,11 +243,12 @@ Partial Class DanmakuSettingDlg
         'BLK_R2L_CheckBox
         '
         Me.BLK_R2L_CheckBox.AutoSize = True
-        Me.BLK_R2L_CheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BLK_R2L_CheckBox.Location = New System.Drawing.Point(13, 199)
-        Me.BLK_R2L_CheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.BLK_R2L_CheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BLK_R2L_CheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BLK_R2L_CheckBox.Location = New System.Drawing.Point(22, 165)
+        Me.BLK_R2L_CheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.BLK_R2L_CheckBox.Name = "BLK_R2L_CheckBox"
-        Me.BLK_R2L_CheckBox.Size = New System.Drawing.Size(91, 24)
+        Me.BLK_R2L_CheckBox.Size = New System.Drawing.Size(106, 29)
         Me.BLK_R2L_CheckBox.TabIndex = 13
         Me.BLK_R2L_CheckBox.Text = "右左滚动"
         Me.BLK_R2L_CheckBox.UseVisualStyleBackColor = True
@@ -211,7 +256,7 @@ Partial Class DanmakuSettingDlg
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(8, 171)
+        Me.Label9.Location = New System.Drawing.Point(8, 137)
         Me.Label9.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(100, 24)
@@ -221,7 +266,7 @@ Partial Class DanmakuSettingDlg
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(254, 138)
+        Me.Label7.Location = New System.Drawing.Point(545, 63)
         Me.Label7.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(28, 24)
@@ -230,9 +275,10 @@ Partial Class DanmakuSettingDlg
         '
         'FixTimeNUD
         '
+        Me.FixTimeNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.FixTimeNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.FixTimeNUD.Location = New System.Drawing.Point(170, 135)
-        Me.FixTimeNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FixTimeNUD.Location = New System.Drawing.Point(468, 63)
+        Me.FixTimeNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.FixTimeNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
         Me.FixTimeNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.FixTimeNUD.Name = "FixTimeNUD"
@@ -243,7 +289,7 @@ Partial Class DanmakuSettingDlg
         'Label8
         '
         Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(8, 135)
+        Me.Label8.Location = New System.Drawing.Point(311, 63)
         Me.Label8.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(154, 24)
@@ -253,7 +299,7 @@ Partial Class DanmakuSettingDlg
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(254, 103)
+        Me.Label6.Location = New System.Drawing.Point(248, 63)
         Me.Label6.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(28, 24)
@@ -262,9 +308,10 @@ Partial Class DanmakuSettingDlg
         '
         'ScrollTimeNUD
         '
+        Me.ScrollTimeNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ScrollTimeNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.ScrollTimeNUD.Location = New System.Drawing.Point(170, 100)
-        Me.ScrollTimeNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ScrollTimeNUD.Location = New System.Drawing.Point(170, 63)
+        Me.ScrollTimeNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.ScrollTimeNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
         Me.ScrollTimeNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.ScrollTimeNUD.Name = "ScrollTimeNUD"
@@ -275,7 +322,7 @@ Partial Class DanmakuSettingDlg
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(8, 103)
+        Me.Label5.Location = New System.Drawing.Point(8, 63)
         Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(154, 24)
@@ -284,9 +331,10 @@ Partial Class DanmakuSettingDlg
         '
         'DensityNUD
         '
+        Me.DensityNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.DensityNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.DensityNUD.Location = New System.Drawing.Point(373, 29)
-        Me.DensityNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.DensityNUD.Location = New System.Drawing.Point(416, 28)
+        Me.DensityNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.DensityNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
         Me.DensityNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.DensityNUD.Name = "DensityNUD"
@@ -297,11 +345,12 @@ Partial Class DanmakuSettingDlg
         'DensityRadioButton3
         '
         Me.DensityRadioButton3.AutoSize = True
+        Me.DensityRadioButton3.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.DensityRadioButton3.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.DensityRadioButton3.Location = New System.Drawing.Point(283, 29)
-        Me.DensityRadioButton3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.DensityRadioButton3.Location = New System.Drawing.Point(334, 29)
+        Me.DensityRadioButton3.Margin = New System.Windows.Forms.Padding(4)
         Me.DensityRadioButton3.Name = "DensityRadioButton3"
-        Me.DensityRadioButton3.Size = New System.Drawing.Size(75, 24)
+        Me.DensityRadioButton3.Size = New System.Drawing.Size(74, 24)
         Me.DensityRadioButton3.TabIndex = 4
         Me.DensityRadioButton3.TabStop = True
         Me.DensityRadioButton3.Text = "按条数"
@@ -310,11 +359,12 @@ Partial Class DanmakuSettingDlg
         'DensityRadioButton2
         '
         Me.DensityRadioButton2.AutoSize = True
+        Me.DensityRadioButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.DensityRadioButton2.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.DensityRadioButton2.Location = New System.Drawing.Point(192, 29)
-        Me.DensityRadioButton2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.DensityRadioButton2.Location = New System.Drawing.Point(215, 29)
+        Me.DensityRadioButton2.Margin = New System.Windows.Forms.Padding(4)
         Me.DensityRadioButton2.Name = "DensityRadioButton2"
-        Me.DensityRadioButton2.Size = New System.Drawing.Size(75, 24)
+        Me.DensityRadioButton2.Size = New System.Drawing.Size(74, 24)
         Me.DensityRadioButton2.TabIndex = 3
         Me.DensityRadioButton2.TabStop = True
         Me.DensityRadioButton2.Text = "不重叠"
@@ -323,11 +373,12 @@ Partial Class DanmakuSettingDlg
         'DensityRadioButton1
         '
         Me.DensityRadioButton1.AutoSize = True
+        Me.DensityRadioButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.DensityRadioButton1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.DensityRadioButton1.Location = New System.Drawing.Point(104, 29)
-        Me.DensityRadioButton1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.DensityRadioButton1.Margin = New System.Windows.Forms.Padding(4)
         Me.DensityRadioButton1.Name = "DensityRadioButton1"
-        Me.DensityRadioButton1.Size = New System.Drawing.Size(60, 24)
+        Me.DensityRadioButton1.Size = New System.Drawing.Size(59, 24)
         Me.DensityRadioButton1.TabIndex = 2
         Me.DensityRadioButton1.TabStop = True
         Me.DensityRadioButton1.Text = "无限"
@@ -357,18 +408,31 @@ Partial Class DanmakuSettingDlg
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Font = New System.Drawing.Font("微软雅黑", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.GroupBox2.Location = New System.Drawing.Point(13, 12)
-        Me.GroupBox2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox2.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.GroupBox2.Size = New System.Drawing.Size(527, 111)
+        Me.GroupBox2.Padding = New System.Windows.Forms.Padding(4)
+        Me.GroupBox2.Size = New System.Drawing.Size(598, 111)
         Me.GroupBox2.TabIndex = 2
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "文字设置"
         '
+        'BoldCheckBox
+        '
+        Me.BoldCheckBox.AutoSize = True
+        Me.BoldCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.BoldCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BoldCheckBox.Location = New System.Drawing.Point(251, 68)
+        Me.BoldCheckBox.Margin = New System.Windows.Forms.Padding(4)
+        Me.BoldCheckBox.Name = "BoldCheckBox"
+        Me.BoldCheckBox.Size = New System.Drawing.Size(68, 29)
+        Me.BoldCheckBox.TabIndex = 17
+        Me.BoldCheckBox.Text = "粗体"
+        Me.BoldCheckBox.UseVisualStyleBackColor = True
+        '
         'Label17
         '
         Me.Label17.AutoSize = True
-        Me.Label17.Location = New System.Drawing.Point(187, 70)
+        Me.Label17.Location = New System.Drawing.Point(170, 70)
         Me.Label17.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label17.Name = "Label17"
         Me.Label17.Size = New System.Drawing.Size(26, 24)
@@ -377,10 +441,11 @@ Partial Class DanmakuSettingDlg
         '
         'OpacityNUD
         '
+        Me.OpacityNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.OpacityNUD.DecimalPlaces = 1
         Me.OpacityNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.OpacityNUD.Location = New System.Drawing.Point(103, 70)
-        Me.OpacityNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.OpacityNUD.Location = New System.Drawing.Point(93, 70)
+        Me.OpacityNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.OpacityNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.OpacityNUD.Name = "OpacityNUD"
         Me.OpacityNUD.Size = New System.Drawing.Size(76, 27)
@@ -389,9 +454,10 @@ Partial Class DanmakuSettingDlg
         '
         'OutlineNUD
         '
+        Me.OutlineNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.OutlineNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.OutlineNUD.Location = New System.Drawing.Point(419, 29)
-        Me.OutlineNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.OutlineNUD.Location = New System.Drawing.Point(423, 29)
+        Me.OutlineNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.OutlineNUD.Maximum = New Decimal(New Integer() {4, 0, 0, 0})
         Me.OutlineNUD.Name = "OutlineNUD"
         Me.OutlineNUD.Size = New System.Drawing.Size(76, 27)
@@ -401,7 +467,7 @@ Partial Class DanmakuSettingDlg
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(361, 29)
+        Me.Label4.Location = New System.Drawing.Point(374, 30)
         Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(46, 24)
@@ -410,9 +476,10 @@ Partial Class DanmakuSettingDlg
         '
         'ShadowNUD
         '
+        Me.ShadowNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ShadowNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.ShadowNUD.Location = New System.Drawing.Point(260, 30)
-        Me.ShadowNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ShadowNUD.Location = New System.Drawing.Point(251, 29)
+        Me.ShadowNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.ShadowNUD.Maximum = New Decimal(New Integer() {4, 0, 0, 0})
         Me.ShadowNUD.Name = "ShadowNUD"
         Me.ShadowNUD.Size = New System.Drawing.Size(76, 27)
@@ -441,9 +508,10 @@ Partial Class DanmakuSettingDlg
         '
         'FontSizeNUD
         '
+        Me.FontSizeNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.FontSizeNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.FontSizeNUD.Location = New System.Drawing.Point(103, 29)
-        Me.FontSizeNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FontSizeNUD.Location = New System.Drawing.Point(93, 29)
+        Me.FontSizeNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.FontSizeNUD.Maximum = New Decimal(New Integer() {65535, 0, 0, 0})
         Me.FontSizeNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.FontSizeNUD.Name = "FontSizeNUD"
@@ -463,8 +531,9 @@ Partial Class DanmakuSettingDlg
         '
         'OkButton
         '
-        Me.OkButton.Location = New System.Drawing.Point(442, 595)
-        Me.OkButton.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.OkButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.OkButton.Location = New System.Drawing.Point(511, 641)
+        Me.OkButton.Margin = New System.Windows.Forms.Padding(4)
         Me.OkButton.Name = "OkButton"
         Me.OkButton.Size = New System.Drawing.Size(100, 29)
         Me.OkButton.TabIndex = 3
@@ -473,8 +542,9 @@ Partial Class DanmakuSettingDlg
         '
         'CancelButton
         '
-        Me.CancelButton.Location = New System.Drawing.Point(322, 595)
-        Me.CancelButton.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.CancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.CancelButton.Location = New System.Drawing.Point(403, 641)
+        Me.CancelButton.Margin = New System.Windows.Forms.Padding(4)
         Me.CancelButton.Name = "CancelButton"
         Me.CancelButton.Size = New System.Drawing.Size(100, 29)
         Me.CancelButton.TabIndex = 4
@@ -497,11 +567,11 @@ Partial Class DanmakuSettingDlg
         Me.GroupBox3.Controls.Add(Me.ScrollAreaNUD)
         Me.GroupBox3.Controls.Add(Me.Label10)
         Me.GroupBox3.Font = New System.Drawing.Font("微软雅黑", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.GroupBox3.Location = New System.Drawing.Point(13, 409)
-        Me.GroupBox3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.GroupBox3.Location = New System.Drawing.Point(13, 375)
+        Me.GroupBox3.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.GroupBox3.Size = New System.Drawing.Size(527, 175)
+        Me.GroupBox3.Padding = New System.Windows.Forms.Padding(4)
+        Me.GroupBox3.Size = New System.Drawing.Size(598, 132)
         Me.GroupBox3.TabIndex = 2
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "画面设置"
@@ -509,11 +579,12 @@ Partial Class DanmakuSettingDlg
         'StatHistogramCheckBox
         '
         Me.StatHistogramCheckBox.AutoSize = True
-        Me.StatHistogramCheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.StatHistogramCheckBox.Location = New System.Drawing.Point(201, 139)
-        Me.StatHistogramCheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.StatHistogramCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.StatHistogramCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.StatHistogramCheckBox.Location = New System.Drawing.Point(198, 98)
+        Me.StatHistogramCheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.StatHistogramCheckBox.Name = "StatHistogramCheckBox"
-        Me.StatHistogramCheckBox.Size = New System.Drawing.Size(76, 24)
+        Me.StatHistogramCheckBox.Size = New System.Drawing.Size(87, 29)
         Me.StatHistogramCheckBox.TabIndex = 19
         Me.StatHistogramCheckBox.Text = "直方图"
         Me.StatHistogramCheckBox.UseVisualStyleBackColor = True
@@ -521,11 +592,12 @@ Partial Class DanmakuSettingDlg
         'StatTableCheckBox
         '
         Me.StatTableCheckBox.AutoSize = True
-        Me.StatTableCheckBox.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.StatTableCheckBox.Location = New System.Drawing.Point(87, 139)
-        Me.StatTableCheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.StatTableCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.StatTableCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.StatTableCheckBox.Location = New System.Drawing.Point(84, 98)
+        Me.StatTableCheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.StatTableCheckBox.Name = "StatTableCheckBox"
-        Me.StatTableCheckBox.Size = New System.Drawing.Size(76, 24)
+        Me.StatTableCheckBox.Size = New System.Drawing.Size(87, 29)
         Me.StatTableCheckBox.TabIndex = 18
         Me.StatTableCheckBox.Text = "统计表"
         Me.StatTableCheckBox.UseVisualStyleBackColor = True
@@ -533,7 +605,7 @@ Partial Class DanmakuSettingDlg
         'Label16
         '
         Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(11, 137)
+        Me.Label16.Location = New System.Drawing.Point(10, 98)
         Me.Label16.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(46, 24)
@@ -543,7 +615,7 @@ Partial Class DanmakuSettingDlg
         'Label15
         '
         Me.Label15.AutoSize = True
-        Me.Label15.Location = New System.Drawing.Point(169, 105)
+        Me.Label15.Location = New System.Drawing.Point(168, 66)
         Me.Label15.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label15.Name = "Label15"
         Me.Label15.Size = New System.Drawing.Size(22, 24)
@@ -552,9 +624,10 @@ Partial Class DanmakuSettingDlg
         '
         'ResYNUD
         '
+        Me.ResYNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ResYNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.ResYNUD.Location = New System.Drawing.Point(199, 102)
-        Me.ResYNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ResYNUD.Location = New System.Drawing.Point(198, 63)
+        Me.ResYNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.ResYNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
         Me.ResYNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.ResYNUD.Name = "ResYNUD"
@@ -564,9 +637,10 @@ Partial Class DanmakuSettingDlg
         '
         'ResXNUD
         '
+        Me.ResXNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ResXNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.ResXNUD.Location = New System.Drawing.Point(85, 102)
-        Me.ResXNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ResXNUD.Location = New System.Drawing.Point(84, 63)
+        Me.ResXNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.ResXNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
         Me.ResXNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.ResXNUD.Name = "ResXNUD"
@@ -577,7 +651,7 @@ Partial Class DanmakuSettingDlg
         'Label14
         '
         Me.Label14.AutoSize = True
-        Me.Label14.Location = New System.Drawing.Point(9, 102)
+        Me.Label14.Location = New System.Drawing.Point(8, 63)
         Me.Label14.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label14.Name = "Label14"
         Me.Label14.Size = New System.Drawing.Size(64, 24)
@@ -587,8 +661,8 @@ Partial Class DanmakuSettingDlg
         'Label13
         '
         Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(279, 65)
-        Me.Label13.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label13.Location = New System.Drawing.Point(545, 28)
+        Me.Label13.Margin = New System.Windows.Forms.Padding(0)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(26, 24)
         Me.Label13.TabIndex = 12
@@ -597,7 +671,7 @@ Partial Class DanmakuSettingDlg
         'Label12
         '
         Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(279, 28)
+        Me.Label12.Location = New System.Drawing.Point(248, 29)
         Me.Label12.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(26, 24)
@@ -606,20 +680,21 @@ Partial Class DanmakuSettingDlg
         '
         'DisplayAreaNUD
         '
+        Me.DisplayAreaNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.DisplayAreaNUD.DecimalPlaces = 1
         Me.DisplayAreaNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.DisplayAreaNUD.Location = New System.Drawing.Point(177, 66)
-        Me.DisplayAreaNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.DisplayAreaNUD.Location = New System.Drawing.Point(466, 28)
+        Me.DisplayAreaNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.DisplayAreaNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 65536})
         Me.DisplayAreaNUD.Name = "DisplayAreaNUD"
-        Me.DisplayAreaNUD.Size = New System.Drawing.Size(97, 27)
+        Me.DisplayAreaNUD.Size = New System.Drawing.Size(78, 27)
         Me.DisplayAreaNUD.TabIndex = 10
         Me.DisplayAreaNUD.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(9, 66)
+        Me.Label11.Location = New System.Drawing.Point(311, 28)
         Me.Label11.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(154, 24)
@@ -628,13 +703,14 @@ Partial Class DanmakuSettingDlg
         '
         'ScrollAreaNUD
         '
+        Me.ScrollAreaNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ScrollAreaNUD.DecimalPlaces = 1
         Me.ScrollAreaNUD.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.ScrollAreaNUD.Location = New System.Drawing.Point(177, 28)
-        Me.ScrollAreaNUD.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.ScrollAreaNUD.Location = New System.Drawing.Point(169, 28)
+        Me.ScrollAreaNUD.Margin = New System.Windows.Forms.Padding(4)
         Me.ScrollAreaNUD.Minimum = New Decimal(New Integer() {1, 0, 0, 65536})
         Me.ScrollAreaNUD.Name = "ScrollAreaNUD"
-        Me.ScrollAreaNUD.Size = New System.Drawing.Size(97, 27)
+        Me.ScrollAreaNUD.Size = New System.Drawing.Size(77, 27)
         Me.ScrollAreaNUD.TabIndex = 8
         Me.ScrollAreaNUD.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
@@ -653,64 +729,75 @@ Partial Class DanmakuSettingDlg
         Me.SaveCheckBox.AutoSize = True
         Me.SaveCheckBox.Checked = True
         Me.SaveCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.SaveCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.SaveCheckBox.Font = New System.Drawing.Font("宋体", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.SaveCheckBox.Location = New System.Drawing.Point(202, 602)
-        Me.SaveCheckBox.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.SaveCheckBox.Location = New System.Drawing.Point(293, 645)
+        Me.SaveCheckBox.Margin = New System.Windows.Forms.Padding(4)
         Me.SaveCheckBox.Name = "SaveCheckBox"
-        Me.SaveCheckBox.Size = New System.Drawing.Size(102, 22)
+        Me.SaveCheckBox.Size = New System.Drawing.Size(98, 22)
         Me.SaveCheckBox.TabIndex = 5
         Me.SaveCheckBox.Text = "保存设置"
         Me.SaveCheckBox.UseVisualStyleBackColor = True
         '
-        'Label18
+        'GroupBox4
         '
-        Me.Label18.AutoSize = True
-        Me.Label18.Location = New System.Drawing.Point(254, 69)
-        Me.Label18.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(28, 24)
-        Me.Label18.TabIndex = 22
-        Me.Label18.Text = "秒"
+        Me.GroupBox4.Controls.Add(Me.Button1)
+        Me.GroupBox4.Controls.Add(Me.ShowUsernamesCheckBox)
+        Me.GroupBox4.Controls.Add(Me.ShowMsgboxCheckBox)
+        Me.GroupBox4.Font = New System.Drawing.Font("微软雅黑", 10.5!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.GroupBox4.Location = New System.Drawing.Point(13, 515)
+        Me.GroupBox4.Margin = New System.Windows.Forms.Padding(4)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Padding = New System.Windows.Forms.Padding(4)
+        Me.GroupBox4.Size = New System.Drawing.Size(598, 111)
+        Me.GroupBox4.TabIndex = 20
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "其他设置"
         '
-        'TimeshiftUpDown
+        'Button1
         '
-        Me.TimeshiftUpDown.DecimalPlaces = 2
-        Me.TimeshiftUpDown.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.TimeshiftUpDown.Location = New System.Drawing.Point(170, 65)
-        Me.TimeshiftUpDown.Margin = New System.Windows.Forms.Padding(4)
-        Me.TimeshiftUpDown.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
-        Me.TimeshiftUpDown.Minimum = New Decimal(New Integer() {2139062143, 0, 0, -2147483648})
-        Me.TimeshiftUpDown.Name = "TimeshiftUpDown"
-        Me.TimeshiftUpDown.Size = New System.Drawing.Size(76, 27)
-        Me.TimeshiftUpDown.TabIndex = 21
+        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.Button1.Location = New System.Drawing.Point(244, 62)
+        Me.Button1.Margin = New System.Windows.Forms.Padding(4)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(143, 32)
+        Me.Button1.TabIndex = 20
+        Me.Button1.Text = "修改信息框设置" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
+        Me.Button1.UseVisualStyleBackColor = True
         '
-        'Label19
+        'ShowUsernamesCheckBox
         '
-        Me.Label19.AutoSize = True
-        Me.Label19.Location = New System.Drawing.Point(9, 69)
-        Me.Label19.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label19.Name = "Label19"
-        Me.Label19.Size = New System.Drawing.Size(118, 24)
-        Me.Label19.TabIndex = 20
-        Me.Label19.Text = "时间轴偏移量"
+        Me.ShowUsernamesCheckBox.AutoSize = True
+        Me.ShowUsernamesCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ShowUsernamesCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.ShowUsernamesCheckBox.Location = New System.Drawing.Point(12, 29)
+        Me.ShowUsernamesCheckBox.Margin = New System.Windows.Forms.Padding(4)
+        Me.ShowUsernamesCheckBox.Name = "ShowUsernamesCheckBox"
+        Me.ShowUsernamesCheckBox.Size = New System.Drawing.Size(125, 29)
+        Me.ShowUsernamesCheckBox.TabIndex = 19
+        Me.ShowUsernamesCheckBox.Text = "显示用户名"
+        Me.ShowUsernamesCheckBox.UseVisualStyleBackColor = True
         '
-        'BoldCheckBox
+        'ShowMsgboxCheckBox
         '
-        Me.BoldCheckBox.AutoSize = True
-        Me.BoldCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.BoldCheckBox.Location = New System.Drawing.Point(260, 68)
-        Me.BoldCheckBox.Margin = New System.Windows.Forms.Padding(4)
-        Me.BoldCheckBox.Name = "BoldCheckBox"
-        Me.BoldCheckBox.Size = New System.Drawing.Size(72, 29)
-        Me.BoldCheckBox.TabIndex = 17
-        Me.BoldCheckBox.Text = "粗体"
-        Me.BoldCheckBox.UseVisualStyleBackColor = True
+        Me.ShowMsgboxCheckBox.AutoSize = True
+        Me.ShowMsgboxCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ShowMsgboxCheckBox.Font = New System.Drawing.Font("微软雅黑", 10.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.ShowMsgboxCheckBox.Location = New System.Drawing.Point(12, 64)
+        Me.ShowMsgboxCheckBox.Margin = New System.Windows.Forms.Padding(4)
+        Me.ShowMsgboxCheckBox.Name = "ShowMsgboxCheckBox"
+        Me.ShowMsgboxCheckBox.Size = New System.Drawing.Size(220, 29)
+        Me.ShowMsgboxCheckBox.TabIndex = 18
+        Me.ShowMsgboxCheckBox.Text = "启用信息框（礼物框）"
+        Me.ShowMsgboxCheckBox.UseVisualStyleBackColor = True
         '
         'DanmakuSettingDlg
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(551, 638)
+        Me.ClientSize = New System.Drawing.Size(624, 683)
+        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.SaveCheckBox)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.CancelButton)
@@ -727,6 +814,7 @@ Partial Class DanmakuSettingDlg
         Me.Text = "弹幕设置"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        CType(Me.TimeshiftUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FixTimeNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ScrollTimeNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DensityNUD, System.ComponentModel.ISupportInitialize).EndInit()
@@ -742,7 +830,8 @@ Partial Class DanmakuSettingDlg
         CType(Me.ResXNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DisplayAreaNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ScrollAreaNUD, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TimeshiftUpDown, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -798,4 +887,8 @@ Partial Class DanmakuSettingDlg
     Friend WithEvents TimeshiftUpDown As NumericUpDown
     Friend WithEvents Label19 As Label
     Friend WithEvents BoldCheckBox As CheckBox
+    Friend WithEvents GroupBox4 As GroupBox
+    Private WithEvents Button1 As Button
+    Friend WithEvents ShowUsernamesCheckBox As CheckBox
+    Friend WithEvents ShowMsgboxCheckBox As CheckBox
 End Class

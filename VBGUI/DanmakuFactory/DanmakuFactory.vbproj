@@ -28,7 +28,7 @@
     <PublisherName>hkm</PublisherName>
     <AutorunEnabled>true</AutorunEnabled>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.5.1.0</ApplicationVersion>
+    <ApplicationVersion>1.6.1.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -139,6 +139,12 @@
       <DependentUpon>MainWindow.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="MessageSettingDlg.Designer.vb">
+      <DependentUpon>MessageSettingDlg.vb</DependentUpon>
+    </Compile>
+    <Compile Include="MessageSettingDlg.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -188,6 +194,9 @@
     <EmbeddedResource Include="MainWindow.zh-CN.resx">
       <DependentUpon>MainWindow.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="MessageSettingDlg.resx">
+      <DependentUpon>MessageSettingDlg.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
@@ -205,6 +214,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="DanmakuFactory_TemporaryKey.pfx" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
@@ -226,6 +236,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bitbug_favicon.ico" />
+    <None Include="Resources\messageSetting.png" />
     <None Include="Resources\logo1.bmp" />
     <None Include="Resources\logo.bmp" />
   </ItemGroup>
