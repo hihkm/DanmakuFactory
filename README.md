@@ -74,7 +74,7 @@ make
 
 5. 支持录播姬导出弹幕中的礼物、SC、用户名显示等直播内容
 
-   <img src="images/06.png" alt="pic06" style="zoom:80%;" />
+   <img src="images/06.png" alt="pic06" style="zoom:60%;" />
 
 6. 强大的统计模式
    <img src="images/03.png" alt="pic03" style="zoom:38%;" />
