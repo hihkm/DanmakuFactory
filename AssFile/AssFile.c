@@ -1147,7 +1147,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
         
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
                      "message_box", config.fontname, config.msgboxFontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, 0, 0, 7,
                      0, 0, 0, 1
                );
         
