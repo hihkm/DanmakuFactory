@@ -1050,6 +1050,46 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
     return 0;
 }
 
+static void mergeGiftDanmaku(DANMAKU *head, float giftMergeTolerance) {
+    DANMAKU *current = head;
+    while (current != NULL) {
+        if (IS_MSG_GIFT(current) && current->gift != NULL) {
+            DANMAKU *next = current->next;
+            DANMAKU *prev = current;
+            float time = current->time;
+            while (next != NULL) {
+                if (IS_MSG_GIFT(next) && next->gift != NULL &&
+                    current->user->uid == next->user->uid &&
+                    strcmp(current->gift->name, next->gift->name) == 0 &&
+                    next->time - time <= giftMergeTolerance) {
+                    // 合并礼物
+                    time = next->time;
+                    current->gift->price += next->gift->price;
+                    current->gift->count += next->gift->count;
+
+                    // 移除 next 节点
+                    prev->next = next->next;
+                    free(next->gift);
+                    free(next->user);
+                    free(next->text);
+                    free(next);
+                    next = prev->next;
+                }
+                else if (next->time - time > giftMergeTolerance) {
+                    // 时间相差大于 giftMergeTolerance 秒，跳出内部循环
+                    break;
+                }
+                else {
+                    prev = next;
+                    next = next->next;
+                }
+            }
+        }
+        current = current->next;
+    }
+}
+
+
 /*  
  * 写ass文件
  * 参数：输出文件名/弹幕池/配置信息/字幕部分/状态
@@ -1063,6 +1103,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
              STATUS *const status
             )
 {
+
     FILE *fptr = fopen(fileName, "w");
     
     int returnValue = 0;
@@ -1169,6 +1210,8 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
     /* 写events部分 */  
     fprintf(fptr, "\n\n[Events]\n"
                  "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text");
+
+    mergeGiftDanmaku(danmakuHead, config.giftMergeTolerance);
     
     returnValue *= 10;
     returnValue += writeAssDanmakuPart(fptr, danmakuHead, config, status);

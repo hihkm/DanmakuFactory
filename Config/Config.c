@@ -259,6 +259,10 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         {
             configOnfile.giftMinPrice = atof(value);
         }
+        else if (strcmp("giftmergetolerance", key) == 0)
+        {
+            configOnfile.giftMergeTolerance = atof(value);
+        }
         else if (strcmp("msgboxsize", key) == 0)
         {
             configOnfile.msgBoxSize = jsonGetCoord(value);
@@ -326,7 +330,8 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.msgBoxSize.x, newConfigCopy.msgBoxSize.y,
             newConfigCopy.msgBoxPos.x, newConfigCopy.msgBoxPos.y,
             newConfigCopy.msgboxFontsize,
-            newConfigCopy.giftMinPrice
+            newConfigCopy.giftMinPrice,
+            newConfigCopy.giftMergeTolerance
     );
     
 
@@ -542,6 +547,8 @@ void printConfig(CONFIG config)
 
     printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | GiftMinPrice: CNY %.2f", 
            config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.giftMinPrice);
+
+    printf(" | GiftMergeTolerance: %.2f", config.giftMergeTolerance);
     
     printf("\nBlockMode: ");
     if (config.blockmode == 0)
