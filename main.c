@@ -71,6 +71,7 @@ static CONFIG defaultConfig =
     {20, 0},        /* 消息框位置 */
     38,             /* 消息框内文字大小 */
     0.00,           /* 消息框礼物最低价格限制 */
+    5.0,            /* 消息框礼物合并时间窗 */
 
     0,              /* 屏蔽模式 */
     0,              /* 统计模式 */
@@ -618,6 +619,13 @@ int main(int argc, char **argv)
             { /* 按最低礼物价格屏蔽 */
                 double returnValue = getArgValDouble(argc, argv, argCnt, "GiftMinPrice", 0);
                 config.giftMinPrice = (float)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!(strcmp("--giftmergetolerance", argv[argCnt])))
+            { /* 按最低礼物价格屏蔽 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "GiftMergeTolerance", 0);
+                config.giftMergeTolerance = (float)returnValue;
                 
                 argCnt += 2; 
             }
@@ -1339,6 +1347,7 @@ void printHelpInfo()
            "\n                    Use any character to connect posX and posY, like \"50x50\"."
            "\n--msgboxfontsize    Specify the fontsize of message box."
            "\n--giftminprice      Specify the the minimum price of the gifts."
+           "\n--giftmergetoleranceSpecify the the time window of merging same user, same type gifts."
            "\n"
            "\nOther options:"
            "\n-h, --help          Display this help and version information than exit."
