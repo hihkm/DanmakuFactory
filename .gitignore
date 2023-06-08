@@ -5,3 +5,7 @@
 *.exe
 *.ini
 *.o
+
+# Cmake
+build/
+bin/
