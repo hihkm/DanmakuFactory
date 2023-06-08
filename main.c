@@ -1323,7 +1323,7 @@ void printHelpInfo()
            "\n-O, --opacity       Specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)."
            "\n-L, --outline       Specify the width of outline for each danmaku(range: 0-4)."
            "\n-D, --shadow        Specify the depth of shadow for each danmaku(range: 0-4)."
-           "\n-B, --Bold          Specify whether the font should be boldface."
+           "\n-B, --bold          Specify whether the font should be boldface."
            "\n                    Available value: TRUE, FALSE"
            "\n"
            "\n--displayarea       Specify the percent of display area on the screen(range: 0.0-1.0)."
