@@ -2981,7 +2981,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1}m %d %d b %d %d %d %d %d %d "
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1\\bord0\\shadow0}m %d %d b %d %d %d %d %d %d "
             "l %d %d b %d %d %d %d %d %d l %d %d l %d %d",
             getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
@@ -2998,7 +2998,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\shad0\\p1%s}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\shad0\\p1%s\\bord0\\shadow0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
             "b %d %d %d %d %d %d",
             getActionStr(actionStr, 0, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
@@ -3075,7 +3075,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1}m %d %d b %d %d %d %d %d %d "
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1\\bord0\\shadow0}m %d %d b %d %d %d %d %d %d "
             "l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d",
             getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
