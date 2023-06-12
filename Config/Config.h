@@ -58,8 +58,8 @@ struct Configurations
     int fontsize;      /* 字号 */
     char fontname[FONTNAME_LEN]; /* 字体 */
     int opacity;       /* 不透明度 */
-    int outline;       /* 描边 */
-    int shadow;        /* 阴影 */
+    float outline;       /* 描边 */
+    float shadow;        /* 阴影 */
     BOOL bold;         /* 是否加粗 */
 
     BOOL saveBlockedPart;  /* 是否保存屏蔽部分 */

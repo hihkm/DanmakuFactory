@@ -221,11 +221,11 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         }
         else if (strcmp("outline", key) == 0)
         {
-            configOnfile.outline = atoi(value);
+            configOnfile.outline = atof(value);
         }
         else if (strcmp("shadow", key) == 0)
         {
-            configOnfile.shadow = atoi(value);
+            configOnfile.shadow = atof(value);
         }
         else if (strcmp("bold", key) == 0)
         {
@@ -302,8 +302,8 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"fontname\": \"%s\",\n"
             "    \"fontsize\": %d,\n"
             "    \"opacity\": %d,\n"
-            "    \"outline\": %d,\n"
-            "    \"shadow\": %d,\n"
+            "    \"outline\": %.1f,\n"
+            "    \"shadow\": %.1f,\n"
             "    \"displayArea\": %f,\n"
             "    \"scrollArea\": %f,\n"
             "    \"bold\": %s,\n"
@@ -479,16 +479,16 @@ void printConfig(CONFIG config)
         printf("(unlimit)");
     }
     
-    printf(" | Fontname: \"%s\" | Fontsize: %d | Opacity: %d | Outline: %d",
+    printf(" | Fontname: \"%s\" | Fontsize: %d | Opacity: %d | Outline: %.1f",
            config.fontname, config.fontsize, config.opacity, config.outline
           );
-    if (config.outline == 0)
+    if (fabs(config.outline) < EPS)
     {
         printf("(disable)");
     }
     
-    printf(" | Shadow: %d", config.shadow);
-    if (config.shadow == 0)
+    printf(" | Shadow: %.1f", config.shadow);
+    if (fabs(config.shadow) < EPS)
     {
         printf("(disable)");
     }

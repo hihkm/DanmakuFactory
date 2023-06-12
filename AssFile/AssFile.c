@@ -1127,7 +1127,8 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                   "Collisions: Normal\n"
                   "PlayResX: %d\n"
                   "PlayResY: %d\n"
-                  "Timer: 100.0000\n\n",
+                  "Timer: 100.0000\n"
+                  "ScaledBorderAndShadow: yes\n\n",
             config.resolution.x, config.resolution.y
            );
     
@@ -1156,47 +1157,48 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
         
         
         /* 样式设定 */
-        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "R2L", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
                      bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
-        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "L2R", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
                      bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
-        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "TOP", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
                      bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
-        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "BTM", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
                      bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
                      0, 0, 0, 1
                );
         
-        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "SP", config.fontname, config.fontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
                      bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
                      0, 0, 0, 1
                );
-        
-        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+        float msgboxOutline = config.outline * config.msgboxFontsize / config.fontsize;
+        float msgboxShadow = config.shadow * config.msgboxFontsize / config.fontsize;
+        fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "message_box", config.fontname, config.msgboxFontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, 0, 0, 7,
+                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, msgboxOutline, msgboxShadow, 7,
                      0, 0, 0, 1
                );
         
         if (config.statmode != 0)
         {
-            fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+            fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
                      "danmakuFactory_stat", config.fontname, config.fontsize, "&H35FFFFFF", "&H35FFFFFF", "&H35000000", "&H356A5149",
-                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 0, 0, 0, 5,
+                     0, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 0, 0.0, 0.0, 5,
                      0, 0, 0, 1
                     );
         }
@@ -3013,7 +3015,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\q2}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\q2\\bord0\\shadow0}%s",
             getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             userIDColor, /* 颜色 */
@@ -3025,7 +3027,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2}SuperChat CNY %d",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shadow0}SuperChat CNY %d",
             getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             textColor, /* 颜色 */
@@ -3037,7 +3039,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\q2}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\q2\\bord0\\shadow0}%s",
             getActionStr(actionStr, radius/2, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             scMsgStr /* SC内容 */
@@ -3092,7 +3094,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shadow0}%s",
             getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             userIDColor, /* 颜色 */
@@ -3104,7 +3106,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2}Welcome new %s!",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shadow0}Welcome new %s!",
             getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             textColor, /* 颜色 */
