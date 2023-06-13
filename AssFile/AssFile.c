@@ -2981,7 +2981,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1\\bord0\\shadow0}m %d %d b %d %d %d %d %d %d "
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\p1\\bord0\\shad0}m %d %d b %d %d %d %d %d %d "
             "l %d %d b %d %d %d %d %d %d l %d %d l %d %d",
             getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
@@ -2998,7 +2998,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\shad0\\p1%s\\bord0\\shadow0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\p1%s\\bord0\\shad0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
             "b %d %d %d %d %d %d",
             getActionStr(actionStr, 0, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
@@ -3015,7 +3015,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\q2\\bord0\\shadow0}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\q2\\bord0\\shad0}%s",
             getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             userIDColor, /* 颜色 */
@@ -3027,7 +3027,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shadow0}SuperChat CNY %d",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shad0}SuperChat CNY %d",
             getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             textColor, /* 颜色 */
@@ -3039,7 +3039,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\q2\\bord0\\shadow0}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\q2\\bord0\\shad0}%s",
             getActionStr(actionStr, radius/2, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             scMsgStr /* SC内容 */
@@ -3075,7 +3075,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\shad0\\p1\\bord0\\shadow0}m %d %d b %d %d %d %d %d %d "
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\p1\\bord0\\shad0}m %d %d b %d %d %d %d %d %d "
             "l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d",
             getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
@@ -3094,7 +3094,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shadow0}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shad0}%s",
             getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             userIDColor, /* 颜色 */
@@ -3106,7 +3106,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shadow0}Welcome new %s!",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shad0}Welcome new %s!",
             getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             textColor, /* 颜色 */
