@@ -373,7 +373,7 @@ int main(int argc, char **argv)
                 {
                     return 0;
                 }
-                config.outline = (int)returnValue;
+                config.outline = returnValue;
                 
                 argCnt += 2; 
             }
@@ -384,7 +384,7 @@ int main(int argc, char **argv)
                 {
                     return 0;
                 }
-                config.shadow = (int)returnValue;
+                config.shadow = returnValue;
                 
                 argCnt += 2; 
             }
@@ -764,17 +764,17 @@ int main(int argc, char **argv)
             return 0;
         }
         /* 描边 */
-        if (config.outline < 0 || config.outline > 4)
+        if (config.outline < 0.0 || config.outline > 4.0)
         {
             fprintf(stderr, "\nERROR"
-                            "\n\"Outline\" must be an integer greater than or equal to 0 and less than or equal to 4.\n");
+                            "\n\"Outline\" must be an float greater than or equal to 0 and less than or equal to 4.\n");
             return 0;
         }
         /* 阴影 */
-        if (config.shadow < 0 || config.shadow > 4)
+        if (config.shadow < 0.0|| config.shadow > 4.0)
         {
             fprintf(stderr, "\nERROR"
-                            "\n\"Shadow\" must be an integer greater than or equal to 0 and less than or equal to 4.\n");
+                            "\n\"Shadow\" must be an float greater than or equal to 0 and less than or equal to 4.\n");
             return 0;
         }
         /* 显示区域 */

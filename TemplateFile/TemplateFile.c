@@ -784,7 +784,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
             /* 没有定义的填充默认值 */
             if (readDanmaku->type == HAVE_NOT_BEEN_SET)
             {
-                readDanmaku->type == setType.defaultType;
+                readDanmaku->type = setType.defaultType;
             }
             if (readDanmaku->fontSize == HAVE_NOT_BEEN_SET)
             {
