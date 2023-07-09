@@ -2864,7 +2864,7 @@ static int printTime(FILE *filePtr, float time, const char *endText)
     int min = (int)time / 60;
     time -= min * 60;
     int sec = (int)time;
-    int ms = (time - sec) * 100;
+    int ms = (time - sec) * 100 + 0.5;
     fprintf(filePtr, "%01d:%02d:%02d.%02d%s", hour, min, sec, ms, endText);
     return ferror(filePtr);
 }
