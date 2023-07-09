@@ -6,6 +6,6 @@
 *.ini
 *.o
 
-# Cmake
+# CMake
 build/
 bin/

@@ -69,6 +69,7 @@ struct Configurations
     struct Coordinate msgBoxSize; /* 消息框大小 */
     struct Coordinate msgBoxPos;  /* 消息框位置 */
     int msgboxFontsize;           /* 消息框内文字大小 */
+    float msgboxDuration;         /* 消息框持续时长 */
     float giftMinPrice;           /* 消息框礼物最低价格限制 */
     float giftMergeTolerance;      /* 相同用户相同礼物合并时间窗 */
 
