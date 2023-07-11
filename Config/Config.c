@@ -255,6 +255,10 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         {
             configOnfile.msgboxFontsize = atoi(value);
         }
+        else if (strcmp("msgboxduration", key) == 0)
+        {
+            configOnfile.msgboxDuration = atof(value);
+        }
         else if (strcmp("giftminprice", key) == 0)
         {
             configOnfile.giftMinPrice = atof(value);
@@ -312,7 +316,9 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"msgboxSize\": [%d, %d],\n"
             "    \"msgboxPos\": [%d, %d],\n"
             "    \"msgboxFontsize\": %d,\n"
-            "    \"giftMinPrice\": %.2f,\n",
+            "    \"msgboxDuration\": %.2f,\n"
+            "    \"giftMinPrice\": %.2f,\n"
+            "    \"giftMergeTolerance\": %.2f,\n",
             newConfigCopy.resolution.x, newConfigCopy.resolution.y,
             newConfigCopy.scrolltime,
             newConfigCopy.fixtime,
@@ -330,6 +336,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.msgBoxSize.x, newConfigCopy.msgBoxSize.y,
             newConfigCopy.msgBoxPos.x, newConfigCopy.msgBoxPos.y,
             newConfigCopy.msgboxFontsize,
+            newConfigCopy.msgboxDuration,
             newConfigCopy.giftMinPrice,
             newConfigCopy.giftMergeTolerance
     );
@@ -545,10 +552,10 @@ void printConfig(CONFIG config)
         printf("true");
     }
 
-    printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | GiftMinPrice: CNY %.2f", 
-           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.giftMinPrice);
+    printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f", 
+           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration);
 
-    printf(" | GiftMergeTolerance: %.2f", config.giftMergeTolerance);
+    printf(" | GiftMinPrice: CNY %.2f | GiftMergeTolerance: %.2f", config.giftMinPrice, config.giftMergeTolerance);
     
     printf("\nBlockMode: ");
     if (config.blockmode == 0)

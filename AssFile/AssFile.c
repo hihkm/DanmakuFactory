@@ -1288,6 +1288,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     COORDIN msgBoxSize = config.msgBoxSize;
     COORDIN msgBoxPos = config.msgBoxPos;
     int msgFontSize = config.msgboxFontsize;
+    const float msgDuration = config.msgboxDuration;
 
     /* 刷新status */
     if (status != NULL)
@@ -1932,10 +1933,26 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             msgListPtr = msgListTail;
             while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
-            {/* 上次在场的消息常驻显示 */
-                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgStartTime, 
-                             msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
-                msgListPtr = msgListPtr -> lastNode;
+            {/* 上次在场的消息按需常驻显示 */
+                if (msgDuration > msgAnimationTime && msgStartTime - msgListPtr -> message -> time >= msgDuration)
+                {
+                    printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgListPtr -> message -> time + msgAnimationTime + msgDuration, 
+                                msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+
+                    msgListTail = msgListPtr -> lastNode;
+                    if (msgListTail != NULL)
+                    {
+                        msgListTail -> nextNode = NULL;
+                    }
+                    free(msgListPtr);
+                    msgListPtr = msgListTail;
+                }
+                else
+                {
+                    printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgStartTime, 
+                                msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                    msgListPtr = msgListPtr -> lastNode;
+                }
             }
             
             msgListPtr = msgListTail;
@@ -2023,10 +2040,26 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
         msgListPtr = msgListTail;
         while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
-        {/* 上次在场的消息常驻显示 */
-            printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgStartTime, 
-                         msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
-            msgListPtr = msgListPtr -> lastNode;
+        {/* 上次在场的消息按需常驻显示 */
+            if (msgDuration > msgAnimationTime && msgStartTime - msgListPtr -> message -> time >= msgDuration)
+            {
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgListPtr -> message -> time + msgAnimationTime + msgDuration, 
+                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+
+                msgListTail = msgListPtr -> lastNode;
+                if (msgListTail != NULL)
+                {
+                    msgListTail -> nextNode = NULL;
+                }
+                free(msgListPtr);
+                msgListPtr = msgListTail;
+            }
+            else
+            {
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY, msgEndTime, msgStartTime, 
+                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                msgListPtr = msgListPtr -> lastNode;
+            }
         }
         
         msgListPtr = msgListTail;
@@ -2062,10 +2095,19 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
         msgListPtr = msgListTail;
         while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
-        { /* 最后一屏常驻显示 */
-            printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
-                        msgStartTime + msgAnimationTime, msgStartTime + msgAnimationTime + 30, 
-                        msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+        { /* 最后一屏按需常驻显示 */
+            if (msgDuration > msgAnimationTime)
+            {
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                            msgStartTime + msgAnimationTime, msgListPtr -> message -> time + msgAnimationTime + msgDuration, 
+                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+            }
+            else
+            {
+                printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                            msgStartTime + msgAnimationTime, msgStartTime + msgAnimationTime + 30, 
+                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+            }
             msgListPtr = msgListPtr -> lastNode;
         }
     }
@@ -2822,7 +2864,7 @@ static int printTime(FILE *filePtr, float time, const char *endText)
     int min = (int)time / 60;
     time -= min * 60;
     int sec = (int)time;
-    int ms = (time - sec) * 100;
+    int ms = (time - sec) * 100 + 0.5;
     fprintf(filePtr, "%01d:%02d:%02d.%02d%s", hour, min, sec, ms, endText);
     return ferror(filePtr);
 }

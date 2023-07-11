@@ -70,6 +70,7 @@ static CONFIG defaultConfig =
     {500, 1080},    /* 消息框大小 */
     {20, 0},        /* 消息框位置 */
     38,             /* 消息框内文字大小 */
+    0.00,           /* 消息框持续时长 */
     0.00,           /* 消息框礼物最低价格限制 */
     5.0,            /* 消息框礼物合并时间窗 */
 
@@ -615,6 +616,13 @@ int main(int argc, char **argv)
                 
                 argCnt += 2; 
             }
+            else if (!(strcmp("--msgboxduration", argv[argCnt])))
+            { /* 消息框持续时长 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "MsgboxDuration", 0);
+                config.msgboxDuration = (float)returnValue;
+                
+                argCnt += 2; 
+            }
             else if (!(strcmp("--giftminprice", argv[argCnt])))
             { /* 按最低礼物价格屏蔽 */
                 double returnValue = getArgValDouble(argc, argv, argCnt, "GiftMinPrice", 0);
@@ -623,7 +631,7 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!(strcmp("--giftmergetolerance", argv[argCnt])))
-            { /* 按最低礼物价格屏蔽 */
+            { /* 相同用户相同礼物合并时间窗 */
                 double returnValue = getArgValDouble(argc, argv, argCnt, "GiftMergeTolerance", 0);
                 config.giftMergeTolerance = (float)returnValue;
                 
@@ -818,6 +826,13 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "\nERROR"
                             "\n\"MsgBoxSize\" must be an integer greater than the \"msgboxFontsize\".\n");
+            return 0;
+        }
+        /* 消息框持续时长 */
+        if (config.msgboxDuration < 0)
+        {
+            fprintf(stderr, "\nERROR"
+                            "\n\"MsgBoxDuration\" must be a real number greater or equal to 0.00.\n");
             return 0;
         }
     }
@@ -1346,6 +1361,7 @@ void printHelpInfo()
            "\n--msgboxpos         Specify the position of message box."
            "\n                    Use any character to connect posX and posY, like \"50x50\"."
            "\n--msgboxfontsize    Specify the fontsize of message box."
+           "\n--msgboxduration    Specify the duration of message box."
            "\n--giftminprice      Specify the the minimum price of the gifts."
            "\n--giftmergetoleranceSpecify the the time window of merging same user, same type gifts."
            "\n"
