@@ -1366,6 +1366,7 @@ void printHelpInfo()
            "\n--giftmergetoleranceSpecify the the time window of merging same user, same type gifts."
            "\n"
            "\nOther options:"
+           "\n--ignore-warnings   Ignore all warnings, like `-y, --yes`."
            "\n-h, --help          Display this help and version information than exit."
            "\n-c, --config        Display configuration information and exit."
            "\n--save              Save configuration as current command settings."

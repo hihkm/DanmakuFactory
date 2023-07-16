@@ -133,10 +133,20 @@ struct MessageList
     struct MessageList *nextNode;
 };
 
+struct MessageListPtrList
+{
+    struct MessageList *msgListPtr;
+
+    float thisMsgEndTime;
+
+    struct MessageListPtrList *nextNode;
+};
+
 typedef struct AssSubtitleFile ASSFILE;
 typedef struct AssSubtitleFileStyles STYLE;
 typedef struct AssSubtitleFileEvents EVENT;
 typedef struct MessageList MSGLIST;
+typedef struct MessageListPtrList MSGPTRLIST;
 
 /* ass */
 extern int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode, ASSFILE *assSub, const float timeShift,
