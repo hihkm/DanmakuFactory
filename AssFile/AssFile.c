@@ -1061,12 +1061,12 @@ static void mergeGiftDanmaku(DANMAKU *head, float giftMergeTolerance) {
                 if (IS_MSG_GIFT(next) && next->gift != NULL &&
                     current->user->uid == next->user->uid &&
                     strcmp(current->gift->name, next->gift->name) == 0 &&
-                    next->time - time <= giftMergeTolerance) {
+                    GET_MS(next->time) - GET_MS(time) <= GET_MS(giftMergeTolerance)) {
                     // 合并礼物
                     time = next->time;
                     current->gift->price += next->gift->price;
                     current->gift->count += next->gift->count;
-                    current->gift->time = next->time - current->time + next->gift->time;
+                    current->gift->duration = next->time - current->time + next->gift->duration;
 
                     // 移除 next 节点
                     prev->next = next->next;
@@ -1076,7 +1076,7 @@ static void mergeGiftDanmaku(DANMAKU *head, float giftMergeTolerance) {
                     free(next);
                     next = prev->next;
                 }
-                else if (next->time - time > giftMergeTolerance) {
+                else if (GET_MS(next->time) - GET_MS(time) > GET_MS(giftMergeTolerance)) {
                     // 时间相差大于 giftMergeTolerance 秒，跳出内部循环
                     break;
                 }
@@ -1214,7 +1214,9 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
     fprintf(fptr, "\n\n[Events]\n"
                  "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text");
 
-    mergeGiftDanmaku(danmakuHead, config.giftMergeTolerance);
+    if (config.giftMergeTolerance > EPS) {
+        mergeGiftDanmaku(danmakuHead, config.giftMergeTolerance);
+    }
     
     returnValue *= 10;
     returnValue += writeAssDanmakuPart(fptr, danmakuHead, config, status);
@@ -1263,171 +1265,129 @@ void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles)
 
 void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const int msgFontSize,
                        const float msgDuration, MSGLIST **msgListHead, MSGLIST **msgListTail,
-                       const float msgAnimationTime, const float msgStartTime, float msgEndTime, char *msgBoxClip
-                      )
-{
+                       const float msgAnimationTime, const float msgStartTime, float msgEndTime, char *msgBoxClip) {
     MSGLIST *msgListPtr;
-    if (msgDuration > msgAnimationTime)
-    {
+    float thisMsgEndTime;
+    if (msgDuration > EPS) {
         msgListPtr = *msgListTail;
-        while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
-        {
-            if (msgStartTime - msgListPtr->message->time > msgDuration)
-            {
-                if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height)
-                {
+        while (msgListPtr != NULL && msgListPtr->isShown == TRUE) {
+            thisMsgEndTime = msgListPtr->message->time + msgDuration;
+            if (GET_MS(thisMsgEndTime) <= GET_MS(msgStartTime + msgAnimationTime) || msgStartTime < EPS) {
+                if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y) {
                     printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                                msgEndTime, msgListPtr->message->time + msgDuration + msgAnimationTime, 
-                                msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
+                                 msgEndTime, thisMsgEndTime + msgAnimationTime, 
+                                 msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                 }
                 *msgListTail = msgListPtr->lastNode;
-                if (*msgListTail != NULL)
-                {
+                if (*msgListTail != NULL) {
                     (*msgListTail)->nextNode = NULL;
+                } else {
+                    *msgListHead = NULL;
                 }
                 free(msgListPtr);
                 msgListPtr = *msgListTail;
-            }
-            else
-            {
-                if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height)
-                {
+            } else {
+                if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y) {
                     printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                                msgEndTime, msgStartTime, 
-                                msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
+                                 msgEndTime, msgStartTime, 
+                                 msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                 }
                 msgListPtr = msgListPtr->lastNode;
             }
         }
-    }
-    else
-    {
-        // 按消息结束时间排序
-        MSGPTRLIST msgPtrListHead;
-        MSGPTRLIST *msgPtrListPtr;
+    } else {
+        // 按消息结束时间由短到长排序
+        MSGPTRLIST msgPtrListHead, *msgPtrListPtr;
         msgPtrListHead.thisMsgEndTime = 0;
         msgPtrListHead.nextNode = NULL;
-        for (msgListPtr = *msgListTail; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->lastNode)
-        {
+        for (msgListPtr = *msgListTail; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->lastNode) {
             MSGPTRLIST *newMsgPtrListPtr = (MSGPTRLIST *)malloc(sizeof(MSGPTRLIST));
             newMsgPtrListPtr->msgListPtr = msgListPtr;
-            newMsgPtrListPtr->thisMsgEndTime = msgListPtr->message->time + msgListPtr->message->gift->time;
-            for (msgPtrListPtr = &msgPtrListHead; msgPtrListPtr->nextNode != NULL; msgPtrListPtr = msgPtrListPtr->nextNode)
-            {
-                if (newMsgPtrListPtr->thisMsgEndTime <= msgPtrListPtr->nextNode->thisMsgEndTime)
-                {
+            newMsgPtrListPtr->thisMsgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
+            for (msgPtrListPtr = &msgPtrListHead; msgPtrListPtr->nextNode != NULL; msgPtrListPtr = msgPtrListPtr->nextNode) {
+                if (GET_MS(newMsgPtrListPtr->thisMsgEndTime) <= GET_MS(msgPtrListPtr->nextNode->thisMsgEndTime)) {
                     newMsgPtrListPtr->nextNode = msgPtrListPtr->nextNode;
                     msgPtrListPtr->nextNode = newMsgPtrListPtr;
                     break;
                 }
             }
-            if (msgPtrListPtr->nextNode == NULL)
-            {
+            if (msgPtrListPtr->nextNode == NULL) {
                 newMsgPtrListPtr->nextNode = NULL;
                 msgPtrListPtr->nextNode = newMsgPtrListPtr;
             }
         }
         // 按需常驻显示
-        MSGLIST *msgListLastPtr, *msgListNextPtr;
         MSGPTRLIST *msgPtrListNextPtr;
-        float thisMsgEndTime;
+        MSGLIST *msgListLastPtr, *msgListNextPtr;
         int total_height;
-        float msgDownMoveStartTime;
-        for (msgPtrListPtr = msgPtrListHead.nextNode; msgPtrListPtr != NULL; msgPtrListPtr = msgPtrListPtr->nextNode)
-        {
-            msgListPtr = msgPtrListPtr->msgListPtr;
+        for (msgPtrListPtr = msgPtrListHead.nextNode; msgPtrListPtr != NULL; msgPtrListPtr = msgPtrListPtr->nextNode) {
             thisMsgEndTime = msgPtrListPtr->thisMsgEndTime;
-            total_height = 0;
-            if (thisMsgEndTime < msgStartTime)
-            {
-                for (msgPtrListNextPtr = msgPtrListPtr; msgPtrListNextPtr != NULL && GET_MS(msgPtrListNextPtr->thisMsgEndTime) - GET_MS(thisMsgEndTime) <= 0; msgPtrListNextPtr = msgPtrListNextPtr->nextNode)
-                {
+            if (GET_MS(thisMsgEndTime + msgAnimationTime / 2) <= GET_MS(msgStartTime + msgAnimationTime) || msgStartTime < EPS) {
+                total_height = 0;
+                // 淘汰所有超时及临近超时的消息
+                for (msgPtrListNextPtr = msgPtrListPtr; msgPtrListNextPtr != NULL && GET_MS(msgPtrListNextPtr->thisMsgEndTime) <= GET_MS(thisMsgEndTime + msgAnimationTime / 2); msgPtrListNextPtr = msgPtrListNextPtr->nextNode) {
                     msgPtrListPtr = msgPtrListNextPtr;
                     msgListPtr = msgPtrListPtr->msgListPtr;
+                    // 计算需要向下滚动的高度
                     total_height += msgListPtr->height;
-                    if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height
-                        && GET_MS((thisMsgEndTime + msgAnimationTime / 2)) - GET_MS(msgEndTime) >= 1)
-                    {
+                    if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y) {
                         printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                                    msgEndTime, thisMsgEndTime + msgAnimationTime / 2, 
-                                    msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
+                                     msgEndTime, msgPtrListPtr->thisMsgEndTime + msgAnimationTime / 2, 
+                                     msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                     }
                     msgListLastPtr = msgListPtr->lastNode;
                     msgListNextPtr = msgListPtr->nextNode;
-                    if (msgListLastPtr != NULL)
-                    {
+                    if (msgListLastPtr != NULL) {
                         msgListLastPtr->nextNode = msgListNextPtr;
-                    }
-                    else
-                    {
+                    } else {
                         *msgListHead = msgListNextPtr;
                     }
-                    if (msgListNextPtr != NULL)
-                    {
+                    if (msgListNextPtr != NULL) {
                         msgListNextPtr->lastNode = msgListLastPtr;
-                    }
-                    else
-                    {
+                    } else {
                         *msgListTail = msgListLastPtr;
                     }
                     free(msgListPtr);
                 }
                 // 根据不同消息的停留时长向下滚动
-                for (msgListPtr = msgListNextPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->nextNode)
-                {
-                    msgDownMoveStartTime = thisMsgEndTime + msgAnimationTime / 2;
-                    if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height)
-                    {
-                        if (GET_MS(msgDownMoveStartTime) - GET_MS(msgEndTime) >= 1)
-                        {
-                            printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                                        msgEndTime, msgDownMoveStartTime, 
-                                        msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
-                        }
-                        else
-                        {
-                            msgDownMoveStartTime = msgEndTime;
-                        }
+                for (msgListPtr = msgListNextPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->nextNode) {
+                    if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y) {
+                        printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
+                                     msgEndTime, thisMsgEndTime + msgAnimationTime / 2, 
+                                     msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                     }
                     msgListPtr->posY += total_height;
-                    if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height)
-                    {
+                    if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y) {
                         printMessage(opF, msgBoxPos->x, msgListPtr->posY - total_height, msgBoxPos->x, msgListPtr->posY,
-                                    msgDownMoveStartTime, thisMsgEndTime + msgAnimationTime, 
-                                    msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
+                                     thisMsgEndTime + msgAnimationTime / 2, thisMsgEndTime + msgAnimationTime, 
+                                     msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                     }
                 }
                 // 其余消息常驻显示
-                for (msgListPtr = msgListLastPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->lastNode)
-                {
-                    if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height
-                        && GET_MS((thisMsgEndTime + msgAnimationTime)) - GET_MS(msgEndTime) >= 1)
-                    {
+                for (msgListPtr = msgListLastPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->lastNode) {
+                    if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y) {
                         printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                                    msgEndTime, thisMsgEndTime + msgAnimationTime, 
-                                    msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
+                                     msgEndTime, thisMsgEndTime + msgAnimationTime, 
+                                     msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                     }
                 }
-                
                 msgEndTime = thisMsgEndTime + msgAnimationTime;
-            }
-            else
-            {
-                if (msgListPtr->posY >= msgBoxPos->y - msgListPtr->height)
-                {
+            } else {
+                // 较长的消息承接上方的 msgEndTime 常驻显示即可
+                msgListPtr = msgPtrListPtr->msgListPtr;
+                if (msgListPtr->posY + msgListPtr->height >= msgBoxPos->y
+                    && GET_MS(msgStartTime) - GET_MS(msgEndTime) >= 1) {
                     printMessage(opF, msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                                msgEndTime, msgStartTime, 
-                                msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
+                                 msgEndTime, msgStartTime, 
+                                 msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr->message);
                 }
             }
         }
-        for (msgPtrListPtr = msgPtrListHead.nextNode; msgPtrListPtr != NULL; msgPtrListPtr = msgPtrListNextPtr)
-        {
+        for (msgPtrListPtr = msgPtrListHead.nextNode; msgPtrListPtr != NULL; msgPtrListPtr = msgPtrListNextPtr) {
             msgPtrListNextPtr = msgPtrListPtr->nextNode;
             free(msgPtrListPtr);
         }
     }
-
 }
 
 /* 
@@ -2061,7 +2021,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             if (msgListTail != NULL)
             {
-                msgStartTime = msgListHead->message -> time;
+                msgStartTime = msgListHead->message->time;
             }
             else
             {
@@ -2069,9 +2029,9 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
 
             /* 填入数据 */
-            newMsgNode -> isShown = FALSE;
-            newMsgNode -> message = now;
-            newMsgNode -> height = getMsgBoxHeight(newMsgNode->message, msgFontSize, msgBoxSize.x) + msgMarginV;
+            newMsgNode->isShown = FALSE;
+            newMsgNode->message = now;
+            newMsgNode->height = getMsgBoxHeight(newMsgNode->message, msgFontSize, msgBoxSize.x) + msgMarginV;
 
             /* 链表连接 */
             if (msgListTail == NULL)
@@ -2094,11 +2054,11 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
             
             /* 刷新显示 */
-            msgListPtr = msgListHead -> nextNode;
+            msgListPtr = msgListHead->nextNode;
             while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
             {/* 计算需显示消息总高度 */
                 totalHeight += msgListPtr->height;
-                msgListPtr = msgListPtr -> nextNode;
+                msgListPtr = msgListPtr->nextNode;
             }
 
             /* 上次在场的消息按需常驻显示 */
@@ -2108,34 +2068,34 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             msgListPtr = msgListTail;
             while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
             {/* 旧消息向上滚动 */
-                if (msgListPtr -> posY >= msgBoxPos.y - msgListPtr -> height)
+                if (msgListPtr->posY >= msgBoxPos.y - msgListPtr->height)
                 {
-                    printMessage(opF, msgBoxPos.x, msgListPtr -> posY, msgBoxPos.x, msgListPtr -> posY - totalHeight,
-                                msgStartTime, msgStartTime + msgAnimationTime / 2.0, 
-                                msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr -> message);
+                    printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY - totalHeight,
+                                 msgStartTime, msgStartTime + msgAnimationTime / 2.0, 
+                                 msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
                 }
-                msgListPtr -> posY -= totalHeight;
-                if (msgListPtr -> posY >= msgBoxPos.y - msgListPtr -> height)
+                msgListPtr->posY -= totalHeight;
+                if (msgListPtr->posY >= msgBoxPos.y - msgListPtr->height)
                 {
-                    printMessage(opF, msgBoxPos.x, msgListPtr -> posY, msgBoxPos.x, msgListPtr -> posY,
-                                msgStartTime + msgAnimationTime / 2.0, msgStartTime + msgAnimationTime, 
-                                msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr -> message);
+                    printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                                 msgStartTime + msgAnimationTime / 2.0, msgStartTime + msgAnimationTime, 
+                                 msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
                 }
-                msgListPtr = msgListPtr -> lastNode;
+                msgListPtr = msgListPtr->lastNode;
             }
             
-            msgListPtr = msgListHead -> nextNode;
+            msgListPtr = msgListHead->nextNode;
             totalHeight = msgBoxPos.y + msgBoxSize.y;
             while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
             {/* 新消息进场 */
                 msgListPtr->isShown = TRUE;
-                totalHeight -= msgListPtr -> height;
-                msgListPtr -> posY = totalHeight;
+                totalHeight -= msgListPtr->height;
+                msgListPtr->posY = totalHeight;
                 
-                printMessage(opF, msgBoxPos.x-100, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
-                                 msgStartTime + msgAnimationTime/2.0, msgStartTime + msgAnimationTime, 
-                                 msgBoxSize.x, msgFontSize, "", msgListPtr->message);  
-                msgListPtr = msgListPtr -> nextNode;
+                printMessage(opF, msgBoxPos.x - 100, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                             msgStartTime + msgAnimationTime / 2.0, msgStartTime + msgAnimationTime, 
+                             msgBoxSize.x, msgFontSize, "", msgListPtr->message);  
+                msgListPtr = msgListPtr->nextNode;
             }
 
             msgEndTime = msgStartTime + msgAnimationTime;
@@ -2171,7 +2131,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
         {/* 计算需显示消息总高度 */
             totalHeight += msgListPtr->height;
-            msgListPtr = msgListPtr -> nextNode;
+            msgListPtr = msgListPtr->nextNode;
         }
 
         /* 上次在场的消息按需常驻显示 */
@@ -2181,20 +2141,20 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         msgListPtr = msgListTail;
         while (msgListPtr != NULL && msgListPtr->isShown == TRUE)
         {/* 旧消息向上滚动 */
-            if (msgListPtr -> posY >= msgBoxPos.y - msgListPtr -> height)
+            if (msgListPtr->posY >= msgBoxPos.y - msgListPtr->height)
             {
                 printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY-totalHeight,
-                            msgStartTime, msgStartTime + msgAnimationTime / 2.0, 
-                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                             msgStartTime, msgStartTime + msgAnimationTime / 2.0, 
+                             msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
             }
-            msgListPtr -> posY -= totalHeight;
-            if (msgListPtr -> posY >= msgBoxPos.y - msgListPtr -> height)
+            msgListPtr->posY -= totalHeight;
+            if (msgListPtr->posY >= msgBoxPos.y - msgListPtr->height)
             {
                 printMessage(opF, msgBoxPos.x, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
-                            msgStartTime + msgAnimationTime / 2.0, msgStartTime + msgAnimationTime, 
-                            msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
+                             msgStartTime + msgAnimationTime / 2.0, msgStartTime + msgAnimationTime, 
+                             msgBoxSize.x, msgFontSize, msgBoxClip, msgListPtr->message);
             }
-            msgListPtr = msgListPtr -> lastNode;
+            msgListPtr = msgListPtr->lastNode;
         }
         
         msgListPtr = msgListHead;
@@ -2202,20 +2162,19 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         while (msgListPtr != NULL && msgListPtr->isShown == FALSE)
         { /* 新消息进场 */
             msgListPtr->isShown = TRUE;
-            totalHeight -= msgListPtr -> height;
-            msgListPtr -> posY = totalHeight;
-            printMessage(opF, msgBoxPos.x-100, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
-                                msgStartTime + msgAnimationTime/2.0, msgStartTime + msgAnimationTime, 
-                                msgBoxSize.x, msgFontSize, "", msgListPtr->message);   
-            msgListPtr = msgListPtr -> nextNode;
+            totalHeight -= msgListPtr->height;
+            msgListPtr->posY = totalHeight;
+            printMessage(opF, msgBoxPos.x - 100, msgListPtr->posY, msgBoxPos.x, msgListPtr->posY,
+                         msgStartTime + msgAnimationTime / 2.0, msgStartTime + msgAnimationTime, 
+                         msgBoxSize.x, msgFontSize, "", msgListPtr->message);   
+            msgListPtr = msgListPtr->nextNode;
         }
 
         msgEndTime = msgStartTime + msgAnimationTime;
-        msgStartTime = 3.402823466e+38F;    // FLT_MAX
+        msgStartTime = 0;
         /* 最后一屏按需常驻显示 */
         writeAliveMessage(opF, &msgBoxSize, &msgBoxPos, msgFontSize, msgDuration, &msgListHead, &msgListTail,
                           msgAnimationTime, msgStartTime, msgEndTime, msgBoxClip);
-
     }
     
     /* 归还空间 */
@@ -2970,7 +2929,7 @@ static int printTime(FILE *filePtr, float time, const char *endText)
     int min = (int)time / 60;
     time -= min * 60;
     int sec = (int)time;
-    int ms = GET_MS((time - sec));
+    int ms = GET_MS(time - sec);
     fprintf(filePtr, "%01d:%02d:%02d.%02d%s", hour, min, sec, ms, endText);
     return ferror(filePtr);
 }

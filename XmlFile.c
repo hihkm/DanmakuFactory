@@ -132,7 +132,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         gift.price = -1.00;
         gift.count = -1;
         gift.name[0] = '\0';
-        gift.time = 0.00;
+        gift.duration = 0.00;
         user.level = -1;
         user.medalLevel = -1;
         user.uid = -1;
@@ -253,7 +253,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "time") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.time = atof(deQuotMarks(tempText));
+                gift.duration = atof(deQuotMarks(tempText));
             }
             else if (strcmp(key, "raw") == 0)
             {
@@ -298,9 +298,9 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                     }
                     else if (strcmp(rawKey, "combo_stay_time") == 0)
                     {
-                        if (FLOAT_IS_EQUAL(gift.time, 0.00))
+                        if (FLOAT_IS_EQUAL(gift.duration, 0.00))
                         {
-                            gift.time = atof(rawValue);
+                            gift.duration = atof(rawValue);
                         }
                     }
                 }
@@ -447,7 +447,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             strSafeCopy(giftNode->name, gift.name, GIFT_NAME_LEN);
             giftNode->count = gift.count;
             giftNode->price = gift.price;
-            giftNode->time = gift.time;
+            giftNode->duration = gift.duration;
             danmakuNode->gift = giftNode;
         }
 
