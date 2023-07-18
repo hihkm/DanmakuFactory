@@ -255,6 +255,29 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
                 gift.duration = atof(deQuotMarks(tempText));
             }
+            else if (strcmp(key, "level") == 0)
+            {
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                switch (atoi(deQuotMarks(tempText)))
+                {
+                    case 1:
+                    // 总督
+                        gift.duration = 19998;
+                        break;
+                    case 2:
+                    // 提督
+                        gift.duration = 1998;
+                        break;
+                    case 3:
+                    // 舰长
+                        gift.duration = 198;
+                        break;
+                    default:
+                    // 未知
+                        gift.duration = 18;
+                        break;
+                }
+            }
             else if (strcmp(key, "raw") == 0)
             {
                 strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
