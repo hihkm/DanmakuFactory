@@ -79,6 +79,8 @@ extern "C" {
 #define IS_NORMAL(ptr) (IS_R2L(ptr) || IS_L2R(ptr) || IS_TOP(ptr) || IS_BTM(ptr))
 #define IS_MSG(ptr) (IS_MSG_SUPER_CHAT(ptr) || IS_MSG_GUARD(ptr) || IS_MSG_GIFT(ptr))
 
+#define GET_MS(sec) ((int)((sec) * 100 + 0.55))
+
 struct SingleDanmaku
 {/* 弹幕节点定义 */
     float time;            /* 开始时间 */ 
@@ -108,6 +110,7 @@ struct GiftPart
     char name[GIFT_NAME_LEN];
     float price;
     int count;
+    float duration;
 };
 
 
