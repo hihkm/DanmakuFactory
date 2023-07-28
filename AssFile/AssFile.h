@@ -125,6 +125,7 @@ struct MessageList
     DANMAKU *message;
 
     BOOL isShown;
+    BOOL isLifted;  // 该消息在特殊情况下是否已向上滚动
     int height;
     int width;
     int posY;
@@ -138,6 +139,8 @@ struct MessageListPtrList
     struct MessageList *msgListPtr;
 
     float thisMsgEndTime;
+    int height;
+    int posY;
 
     struct MessageListPtrList *nextNode;
 };
