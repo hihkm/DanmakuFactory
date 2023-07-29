@@ -30,6 +30,9 @@ const struct AssEscapeListNode assEscapeList[] =
     {"\\h", "\\{}h"},
     {" ", "\\h"},
     {"\n", "\\N"},
+    {"&lt;", "<"},
+    {"&gt;", ">"},
+    {"&amp;", "&"},
     {NULL, NULL}
 };
 
@@ -290,17 +293,18 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
             }
             
             char *srcCmpPtr = srcPtr;
-            while (*originalTextPtr != '\0' && *srcCmpPtr != '\0')
+            char *originalTextCmpPtr = originalTextPtr;
+            while (*originalTextCmpPtr != '\0' && *srcCmpPtr != '\0')
             {
-                if (*originalTextPtr != *srcCmpPtr)
+                if (*originalTextCmpPtr != *srcCmpPtr)
                 {
                     break;
                 }
-                originalTextPtr++;
+                originalTextCmpPtr++;
                 srcCmpPtr++;
             }
 
-            if (*originalTextPtr == '\0')
+            if (*originalTextCmpPtr == '\0')
             {
                 /* 拷贝转义后字串 */
                 while (*assEscapedTextPtr != '\0')
@@ -316,7 +320,7 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
                     lenCnt++;
                 }
                 
-                srcPtr += strlen(assEscapeList[listCnt].originalText)-1;
+                srcPtr += strlen(originalTextPtr) - 1;
                 break;
             }
 
