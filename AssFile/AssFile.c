@@ -1263,7 +1263,7 @@ void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles)
     }
 }
 
-inline void showMessage(FILE *opF, const int startPosX, const int startPosY, const int endPosX, const int endPosY,
+extern inline void showMessage(FILE *opF, const int startPosX, const int startPosY, const int endPosX, const int endPosY,
                         const float startTime, const float endTime,
                         const int width, const int fontSize, const char *effect, MSGLIST *msgListPtr, const int boxPosY) {
     if (startPosY + msgListPtr->height >= boxPosY || endPosY + msgListPtr->height >= boxPosY) {
@@ -1271,7 +1271,7 @@ inline void showMessage(FILE *opF, const int startPosX, const int startPosY, con
     }
 }
 
-inline void printEndMessage(FILE *opF, const float msgStartTime, const float msgAnimationTime,
+extern inline void printEndMessage(FILE *opF, const float msgStartTime, const float msgAnimationTime,
                             float startTime, float endTime, const int totalUpHeight,
                             COORDIN *msgBoxSize, const int msgFontSize, const char *msgBoxClip, MSGLIST *msgListPtr, COORDIN *msgBoxPos) {
     if (GET_MS(endTime) <= GET_MS(msgStartTime - msgAnimationTime / 2.0f) || msgStartTime < EPS) {
