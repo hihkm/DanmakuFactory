@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#define INT_MAX 2147483647
 #define NUM_OF_TYPE 5
 #define EPS 1e-4
 #define MAX_TEXT_LENGTH 1024
