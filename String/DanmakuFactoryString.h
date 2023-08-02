@@ -47,6 +47,7 @@ extern "C" {
 
 extern int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName);
 extern int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName);
+extern char *intTimeToStr(char *const outputStr, const int input, const int accuracy);
 extern char *floatToStr(char *const outputStr, const double input, const int accuracy);
 extern char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, const int maxLen);
 extern char *trim(char *const str);

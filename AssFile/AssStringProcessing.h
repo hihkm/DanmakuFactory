@@ -46,7 +46,7 @@ extern char *toHexOpacity(int decOpacity, char *hexOpacity);
 extern char *toHexColor(int decColor, char *hexColor);
 extern int toDecColor(char *hexColor);
 extern char *deStyleNamePrefix(char *str);
-extern float timeToFloat(const char *ipStr);
+extern int timeToInt(const char *ipStr);
 extern void arrset(int *array, const int value, const int numberOfMember);
 char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode);
 

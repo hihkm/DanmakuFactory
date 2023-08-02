@@ -79,11 +79,13 @@ extern "C" {
 #define IS_NORMAL(ptr) (IS_R2L(ptr) || IS_L2R(ptr) || IS_TOP(ptr) || IS_BTM(ptr))
 #define IS_MSG(ptr) (IS_MSG_SUPER_CHAT(ptr) || IS_MSG_GUARD(ptr) || IS_MSG_GIFT(ptr))
 
-#define GET_MS(sec) ((int)((sec) * 100 + 0.55))
+#define GET_MS_FLT(sec) ((int)((sec) * 1000.0f + 0.5f))
+#define GET_ASS_MS_FLT(sec) ((int)((sec) * 100.0f + 0.55f) * 10)
+#define GET_ASS_MS_INT(ms) ((ms + 5) / 10 * 10)
 
 struct SingleDanmaku
 {/* 弹幕节点定义 */
-    float time;            /* 开始时间 */ 
+    int time;              /* 开始时间(毫秒) */
     short type;            /* 弹幕类型 */ 
     short fontSize;        /* 字体大小 25是基准 */ 
     int color;             /* 文字颜色 */ 
@@ -97,7 +99,7 @@ struct SingleDanmaku
 /* 用户信息部分 */
 struct UserPart
 {
-    long uid;
+    unsigned long long uid;
     int level;
     char name[USER_NAME_LEN];
     char medalName[MEDAL_NAME_LEN];
@@ -110,14 +112,14 @@ struct GiftPart
     char name[GIFT_NAME_LEN];
     float price;
     int count;
-    float duration;
+    int duration;   // 持续时间(毫秒)
 };
 
 
 /* 特殊弹幕部分 */
 struct SpecialDanmakuPart
 {
-    float existTime;         /* 生存时间  s */
+    int existTime;           /* 生存时间  ms */
     int moveTime;            /* 移动时间  ms */
     int pauseTime;           /* 暂停时间  ms */
     float startX;            /* 开始X坐标 小数0-1表比例 */

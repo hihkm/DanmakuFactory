@@ -105,8 +105,8 @@ struct AssSubtitleFileEvents
 {
     char event[ASS_EVENT_TYPE_LEN];     //事件名称(Dialogue/Comment)
     int layer;          //字幕图层
-    float start;        //开始时间(秒)
-    float end;          //结束时间(秒)
+    int start;          //开始时间(毫秒)
+    int end;            //结束时间(毫秒)
     char style[ASS_EVENT_STYLE_LEN];     //样式 
     char name[ASS_EVENT_NAME_LEN];      //角色名称
     int marginL;        //左边距 四位整数
@@ -125,7 +125,7 @@ struct MessageList
     DANMAKU *message;
 
     BOOL isShown;
-    BOOL isLifted;  // 该消息在特殊情况下是否已向上滚动
+    BOOL isUpMoved; // 该消息是否已完成向上滚动
     int height;
     int width;
     int posY;
@@ -138,7 +138,7 @@ struct MessageListPtrList
 {
     struct MessageList *msgListPtr;
 
-    float thisMsgEndTime;
+    int thisMsgEndTime; // 精度为 10 毫秒
     int height;
     int posY;
 

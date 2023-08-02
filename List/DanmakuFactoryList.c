@@ -51,7 +51,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
 
     DANMAKU **bucket = NULL, *now = NULL, *last = NULL, *ptr = NULL;
     int cnt, index, danmakuNum = 0, bucketNum = 0;
-    float max, min;
+    int max, min;
     BOOL isSorted = TRUE;
 
     /* 统计弹幕数量并找出最大最小值 */
@@ -74,7 +74,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
             }
         }
 
-        if (isSorted == TRUE && now -> next != NULL && now->time > now->next->time+EPS)
+        if (isSorted == TRUE && now -> next != NULL && now->time > now->next->time)
         {
             isSorted = FALSE;
         }
@@ -103,7 +103,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     /* 入桶 */
     while(*listHead != NULL)
     {
-        index = (int)((now -> time - min) / (max - min + 1) * bucketNum);
+        index = bucketNum * (now->time - min) / (max - min + 1);
         if (index >= bucketNum || index < 0) {
             /* 溢出非法索引处理 */
             index = bucketNum - 1;
@@ -126,8 +126,8 @@ int sortList(DANMAKU **listHead, STATUS *const status)
             else
             {
                 ptr = ptr -> next;
-                while(ptr != NULL && now -> time > ptr -> time - EPS)
-                {/* 即ptr != NULL && now->time >= ptr->time */
+                while(ptr != NULL && now->time >= ptr->time)
+                {
                     last = ptr;
                     ptr = ptr -> next;
                 }

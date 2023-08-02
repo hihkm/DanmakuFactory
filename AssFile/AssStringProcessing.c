@@ -33,6 +33,8 @@ const struct AssEscapeListNode assEscapeList[] =
     {"&lt;", "<"},
     {"&gt;", ">"},
     {"&amp;", "&"},
+    {"&apos;", "\'"},
+    {"&quot;", "\""},
     {NULL, NULL}
 };
 
@@ -155,14 +157,14 @@ char *deStyleNamePrefix(char *str)
 }
 
 /* 
-以ass标准读取时间
-输出单位：秒 
+  以ass标准读取时间
+  输出单位：毫秒 
  */
-float timeToFloat(const char *ipStr)
+int timeToInt(const char *ipStr)
 {
     /* 0:00:01.60 */
     int num = 0;
-    float time = 0.00;
+    int time = 0;
     char *ptr = (char *)ipStr;
     
     /* 小时部分 */
@@ -213,19 +215,25 @@ float timeToFloat(const char *ipStr)
     num = 0;
     ptr++;
     
-    /* 秒部分 */
-    while (*ptr != '.' && *ptr != ':' && *ptr != '\0')
-    {
-        if (*ptr == ' ')
-        {
+    /* 毫秒部分 */
+    while (*ptr != '.' && *ptr != ':' && *ptr != '\0') {
+        if (*ptr == ' ') {
             ptr++;
             continue;
         }
-        num *= 10;
-        num += *ptr - '0';
+        if (++num > 3) {    // 最多 3 位有效数字
+            if ((*ptr - '0') >= 5) {
+                time++;     // 四舍五入
+            }
+            break;
+        }
+        time *= 10;
+        time += *ptr - '0';
         ptr++;
     }
-    time += num / 100.0;
+    for (int i = 0; i < 3 - num; i++) {
+        time *= 10;
+    }
     
     return time;
 }

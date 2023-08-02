@@ -86,7 +86,7 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
     }
     else
     {
-        cnt = strlen(str);
+        cnt = (int)strlen(str);
     }
 
     int len = (fontSizeSet + (fontSizeInFile - 25)) / 2 * cnt;
@@ -95,43 +95,76 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
 }
 
 /* 
+ * 以指定精度的最小数位将整数转换为字符串 
+ * 参数：输出字符串(秒)/输入整数(毫秒)/精度 
+ */ 
+char *intTimeToStr(char *const outputStr, const int input, const int accuracy) {
+    int seconds = input / 1000;
+    int milliseconds = input - seconds * 1000;
+
+    /* 整数 */
+    if (milliseconds == 0) {
+        sprintf(outputStr, "%d", seconds);
+        return outputStr;
+    }
+
+    char tempStr[32], *tempPtr;
+    sprintf(tempStr, "%d.%03d", seconds, milliseconds);
+    tempPtr = strchr(tempStr, '.');
+
+    /* 小数 */
+    for (int cnt = 0; cnt <= accuracy; cnt++) {
+        tempPtr++;
+        if (*tempPtr == '\0') {
+            break;
+        }
+    }
+
+    /* 寻找末尾第一位非 0 位 */
+    while (*(tempPtr - 1) == '0') {
+        tempPtr--;
+    }
+
+    /* 去除小数点 */
+    if (*(tempPtr - 1) == '.') {
+        tempPtr--;
+    }
+    *tempPtr = '\0';
+
+    strcpy(outputStr, tempStr);
+    return outputStr;
+}
+
+/* 
  * 以指定精度的最小数位将浮点数转换为字符串 
  * 参数：输出字符数组/输入浮点数/精度 
   */ 
-char *floatToStr(char *const outputStr, const double input, const int accuracy)
-{
-    int cnt;
-    char tempStr[32];
-    char *tempPtr;
+char *floatToStr(char *const outputStr, const double input, const int accuracy) {
+    char tempStr[32], *tempPtr;
     sprintf(tempStr, "%lf", input);
     tempPtr = strchr(tempStr, '.');
     
     /* 整数 */
-    if (tempPtr == NULL)
-    {
-        strcpy(outputStr, tempPtr);
+    if (tempPtr == NULL) {
+        strcpy(outputStr, tempStr);
         return outputStr;
     }
     
     /* 小数 */ 
-    for (cnt = 0; cnt <= accuracy; cnt++)
-    {
-        if (*tempPtr == '\0')
-        {
+    for (int cnt = 0; cnt <= accuracy; cnt++) {
+        tempPtr++;
+        if (*tempPtr == '\0') {
             break;
         }
-        tempPtr++;
     }
     
-    /* 寻找末尾第一位非0位 */ 
-    while (*(tempPtr-1) == '0')
-    {
+    /* 寻找末尾第一位非 0 位 */ 
+    while (*(tempPtr - 1) == '0') {
         tempPtr--;
     }
     
     /* 去除小数点 */ 
-    if (*(tempPtr-1) == '.')
-    {
+    if (*(tempPtr - 1) == '.') {
         tempPtr--;
     }
     *tempPtr = '\0';

@@ -227,15 +227,12 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
             }
         }
         
-        /* 如果时间加偏移量是负数则置0 */
-        if(t_time + timeShift < EPS)
-        {
-            now -> time = 0.00;
+        /* 如果时间加偏移量是负数则置 0 */
+        t_time += timeShift;
+        if (t_time < EPS) {
+            t_time = 0.0f;
         }
-        else
-        {
-            now -> time = t_time + timeShift;
-        }
+        now->time = GET_MS_FLT(t_time);
         now -> fontSize = t_fontSize;
         now -> color = t_color;
         strcpy(now -> text, t_text);
@@ -302,6 +299,7 @@ int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const st
     }
     
     int typeInJson;
+    char tempText[32];
     DANMAKU *ptr = danmakuHead;
     
     fprintf(opF, "[[],[],[");
@@ -341,8 +339,8 @@ int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const st
             continue;
         }
         
-        fprintf(opF, "\n{\"c\":\"%f,%d,%d,%d,,,\",\"m\":\"%s\"},",
-                     ptr -> time,
+        fprintf(opF, "\n{\"c\":\"%s,%d,%d,%d,,,\",\"m\":\"%s\"},",
+                     intTimeToStr(tempText, ptr->time, 3),
                      ptr -> color,
                      typeInJson,
                      ptr -> fontSize, 

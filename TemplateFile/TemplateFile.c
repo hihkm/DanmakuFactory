@@ -556,7 +556,6 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
 
     /* 读取弹幕文件 */
     FILE *ipfptr;
-    char ch;
     char readBuffer[READ_BUFFER_SIZE];
     char *bufferPtr = readBuffer;
     char *startPtr;
@@ -574,7 +573,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         {
             if (readSize != 0)
             {
-                fseek(ipfptr, -(readBuffer + readSize - bufferPtr), SEEK_CUR);
+                fseek(ipfptr, -(long)(readBuffer + readSize - bufferPtr), SEEK_CUR);
             }
             
             readSize = fread(readBuffer, 1, READ_BUFFER_SIZE, ipfptr);
@@ -612,14 +611,18 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     *tempPtr = *bufferPtr;
                     tempPtr++;
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
                     }
                 }
                 *tempPtr = '\0';
-                readDanmaku->time = atof(tempStr) / setTime.ratioToSeconds + timeShift;
+                float tempTime = atof(tempStr) / setTime.ratioToSeconds + timeShift;
+                if (tempTime < EPS) {
+                    tempTime = 0.0f;
+                }
+                readDanmaku->time = GET_MS_FLT(tempTime);
             }
             else if (format.formatTable[cnt] == FORMAT_TYPE)
             {
@@ -629,7 +632,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     *tempPtr = *bufferPtr;
                     tempPtr++;
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -668,7 +671,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     *tempPtr = *bufferPtr;
                     tempPtr++;
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -685,7 +688,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     *tempPtr = *bufferPtr;
                     tempPtr++;
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -703,7 +706,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     *tempPtr = *bufferPtr;
                     tempPtr++;
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -728,7 +731,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                 while (isDesignatedChar(*bufferPtr, "0123456789"))
                 {
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -741,7 +744,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                 while (!isStartWith(bufferPtr, formatStr))
                 {
                     bufferPtr++;
-                    if (bufferPtr - readBuffer >= readSize)
+                    if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -758,7 +761,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     while (!isStartWith(bufferPtr, formatStr))
                     {
                         bufferPtr++;
-                        if (bufferPtr - readBuffer >= readSize)
+                        if ((size_t)(bufferPtr - readBuffer) >= readSize)
                         {
                             isSuccess = FALSE;
                             goto LINE_END;

@@ -99,9 +99,6 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     char tempText[MAX_TEXT_LENGTH];
     char *textPtr;
     
-    int giftCount;
-    char giftName[GIFT_NAME_LEN];
-
     char label[LABEL_LEN];
     char key[MAX_TEXT_LENGTH];
     char raw[LABEL_LEN];
@@ -122,7 +119,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     
     while (!feof(ipF))
     {
-        int type = 0;
+        type = 0;
         isDanmaku = FALSE;
         hasUserInfo = FALSE;
         hasGiftInfo = FALSE;
@@ -132,10 +129,10 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         gift.price = -1.00;
         gift.count = -1;
         gift.name[0] = '\0';
-        gift.duration = 0.00;
+        gift.duration = 0;
         user.level = -1;
         user.medalLevel = -1;
-        user.uid = -1;
+        user.uid = 0;
         user.medalName[0] = '\0';
         user.name[0] = '\0';
 
@@ -224,16 +221,21 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
                 strGetLeftPart(NULL, &labelPtr, '\"', MAX_TEXT_LENGTH);
             }
+            else if (strcmp(key, "ts") == 0)
+            {
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                time = atof(deQuotMarks(tempText));
+            }
             else if (strcmp(key, "user") == 0)
             {
                 getNextWord(&labelPtr, user.name, USER_NAME_LEN, ' ', TRUE);
                 deQuotMarks(user.name);
                 hasUserInfo = TRUE;
             }
-            else if (strcmp(key, "ts") == 0)
+            else if (strcmp(key, "uid") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                time = atof(deQuotMarks(tempText));
+                user.uid = strtoull(deQuotMarks(tempText), NULL, 10);
             }
             else if (strcmp(key, "giftname") == 0)
             {
@@ -252,8 +254,9 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             else if (strcmp(key, "time") == 0)
             {
+                // sc node
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.duration = atof(deQuotMarks(tempText));
+                gift.duration = GET_MS_FLT(atof(deQuotMarks(tempText)));
             }
             else if (strcmp(key, "level") == 0)
             {
@@ -262,19 +265,19 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 {
                     case 1:
                     // 总督
-                        gift.duration = 19998;
+                        gift.duration = 19998000;
                         break;
                     case 2:
                     // 提督
-                        gift.duration = 1998;
+                        gift.duration = 1998000;
                         break;
                     case 3:
                     // 舰长
-                        gift.duration = 198;
+                        gift.duration = 198000;
                         break;
                     default:
                     // 未知
-                        gift.duration = 18;
+                        gift.duration = 18000;
                         break;
                 }
             }
@@ -308,6 +311,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                             IS_FREE_GIFT = TRUE;
                         }
                     }
+                    else if (strcmp(rawKey, "uid") == 0)
+                    {
+                        if (user.uid == 0) {
+                            user.uid = strtoull(rawValue, NULL, 10);
+                        }
+                    }
                     else if (strcmp(rawKey, "price") == 0)
                     {
                         if (FLOAT_IS_EQUAL(gift.price, -1.00))
@@ -321,9 +330,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                     }
                     else if (strcmp(rawKey, "combo_stay_time") == 0)
                     {
-                        if (FLOAT_IS_EQUAL(gift.duration, 0.00))
-                        {
-                            gift.duration = atof(rawValue);
+                        if (gift.duration == 0) {
+                            gift.duration = GET_MS_FLT(atof(rawValue));
                         }
                     }
                 }
@@ -421,20 +429,16 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
 
             /* 计算时轴偏移量 */
-            if (time + timeShift < EPS)
-            {/* 如果时间加偏移量是负数则置0 */
-                time = 0.00;
-            }
-            else
-            {
-                time = time + timeShift;
+            time += timeShift;
+            if (time < EPS) {
+                time = 0.0f;    /* 如果时间加偏移量是负数则置 0 */
             }
 
             /* 数据部分赋值 */
             xmlUnescape(text);/* 文本内容xml反转义 */
             danmakuNode -> text = text;
             danmakuNode -> type = type;
-            danmakuNode -> time = time;
+            danmakuNode -> time = GET_MS_FLT(time);
             danmakuNode -> fontSize = fontSize;
             danmakuNode -> color = color;
             danmakuNode -> special = NULL;
@@ -455,6 +459,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
 
             strSafeCopy(userNode->name, user.name, USER_NAME_LEN);
+            userNode->uid = user.uid;
             danmakuNode->user = userNode;
         }
         
@@ -492,7 +497,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             specialNode->startY = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             specialNode->fadeStart = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,'-',MAX_TEXT_LENGTH)))) * 255);
             specialNode->fadeEnd = (int)((1-atof(deQuotMarks(strGetLeftPart(tempText,&textPtr,',',MAX_TEXT_LENGTH)))) * 255);
-            specialNode->existTime = atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
+            specialNode->existTime = GET_MS_FLT(atof(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH))));
             
             /* 文本部分 */
             strGetLeftPart(NULL, &textPtr, '\"', MAX_TEXT_LENGTH);
@@ -639,7 +644,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
             continue;
         }
         fprintf(opF, "\n    <d p=\"%s,%d,%d,%d,0,0,NULL,0\">",
-                     floatToStr(tempText, ptr -> time, 3),
+                     intTimeToStr(tempText, ptr->time, 3),
                      typeInXml, ptr->fontSize, ptr->color
                );
         
@@ -653,7 +658,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
             fprintf(opF, "%s,", floatToStr(tempText, ptr->special -> startY, 2));
             fprintf(opF, "\"%s", floatToStr(tempText, 1 - (ptr->special->fadeStart / 255.00), 2));
             fprintf(opF, "-%s\",", floatToStr(tempText, 1 - (ptr->special->fadeEnd / 255.00), 2));
-            fprintf(opF, "%s,", floatToStr(tempText, ptr->special -> existTime, 1));
+            fprintf(opF, "%s,", intTimeToStr(tempText, ptr->special->existTime, 1));
             fprintf(opF, "\"%s\",", ptr->text);
             fprintf(opF, "%d,%d,", ptr->special -> frZ, ptr->special -> frY);
             fprintf(opF, "%s,", floatToStr(tempText, ptr->special -> endX, 2));

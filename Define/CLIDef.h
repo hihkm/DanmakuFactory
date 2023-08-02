@@ -40,7 +40,7 @@ struct fileInfo
 {
     char fileName[FILENAME_LEN];
     char template[FILENAME_LEN];
-    float timeShift;
+    float timeShift;    // 秒
     BOOL isSet;
 };
 
