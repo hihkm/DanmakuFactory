@@ -1359,6 +1359,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
             } else {
                 printEndMessage(opF, msgUpMoveStartTime, msgStartTime, lastMsgEndTime, msgEndTime, totalUpHeight,
                                 msgBoxSize, msgFontSize, msgBoxClip, msgListPtr, msgBoxPos);
+                msgListPtr->isUpMoved = FALSE;
                 msgListPtr = msgListPtr->lastNode;
             }
         }
@@ -2203,7 +2204,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         msgEndTime = msgStartTime + msgAnimationTime;
         /* 最后一屏按需常驻显示 */
         writeAliveMessage(opF, &msgBoxSize, &msgBoxPos, msgFontSize, msgDuration, &msgListHead, &msgListTail,
-                          msgAnimationTime, msgEndTime, INT_MAX, INT_MAX, msgBoxClip);
+                          msgAnimationTime, msgEndTime, MAX_ASS_MS_INT, MAX_ASS_MS_INT, msgBoxClip);
     }
     
     /* 归还空间 */
