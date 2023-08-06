@@ -70,9 +70,9 @@ static CONFIG defaultConfig =
     {500, 1080},    /* 消息框大小 */
     {20, 0},        /* 消息框位置 */
     38,             /* 消息框内文字大小 */
-    0.00,           /* 消息框持续时长 */
-    0.00,           /* 消息框礼物最低价格限制 */
-    5.0,            /* 消息框礼物合并时间窗 */
+    0.0f,           /* 消息框持续时长 */
+    0.0f,           /* 消息框礼物最低价格限制 */
+    0.0f,           /* 消息框礼物合并时间窗 */
 
     0,              /* 屏蔽模式 */
     0,              /* 统计模式 */
@@ -248,7 +248,7 @@ int main(int argc, char **argv)
                         }
                     }
                     
-                    infile[infileNum].timeShift = 0.00;
+                    infile[infileNum].timeShift = 0.0f;
                     deQuotMarks(infile[infileNum].fileName);
 
                     infileNum++;
@@ -828,13 +828,6 @@ int main(int argc, char **argv)
                             "\n\"MsgBoxSize\" must be an integer greater than the \"msgboxFontsize\".\n");
             return 0;
         }
-        /* 消息框持续时长 */
-        if (config.msgboxDuration < 0)
-        {
-            fprintf(stderr, "\nERROR"
-                            "\n\"MsgBoxDuration\" must be a real number greater or equal to 0.00.\n");
-            return 0;
-        }
     }
     
     /* 保存配置文件 */
@@ -1200,7 +1193,7 @@ int main(int argc, char **argv)
         {
             case 0:
                 break;
-            case 100:
+            case 1:
                 fprintf(stderr, "\nERROR [code wa%d]"
                                 "\nFailed to create file \"%s\".\n",
                        returnValue, outfile.fileName
@@ -1362,14 +1355,16 @@ void printHelpInfo()
            "\n                    Use any character to connect posX and posY, like \"50x50\"."
            "\n--msgboxfontsize    Specify the fontsize of message box."
            "\n--msgboxduration    Specify the duration of message box."
+           "\n                    If set, will overwrite default value read from xml."
            "\n--giftminprice      Specify the the minimum price of the gifts."
            "\n--giftmergetoleranceSpecify the the time window of merging same user, same type gifts."
+           "\n                    If set, will overwrite default value read from xml raw data."
            "\n"
            "\nOther options:"
-           "\n--ignore-warnings   Ignore all warnings, like `-y, --yes`."
            "\n-h, --help          Display this help and version information than exit."
            "\n-c, --config        Display configuration information and exit."
            "\n--save              Save configuration as current command settings."
+           "\n--ignore-warnings   Ignore all warnings, like `-y, --yes`."
            "\n"
            "\nExample:"
            "\nDanmakuFactory -o ass \"outfile.ass\" -i xml \"infile1.xml\""
