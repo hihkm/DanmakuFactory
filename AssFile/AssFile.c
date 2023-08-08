@@ -1263,29 +1263,28 @@ void writeAssStylesPart(FILE *opF, const int numOfStyles, STYLE *const styles)
     }
 }
 
-static inline void freeMessage(FILE *opF, const int width, const int fontSize, char *effect, MSGLIST *msgListPtr) {
+static inline void freeMessage(FILE *opF, const int width, const int fontSize, MSGLIST *msgListPtr) {
     for (DMKLIST *dmkListPtr = msgListPtr->dmkListTail; dmkListPtr != NULL; dmkListPtr = msgListPtr->dmkListTail) {
         printMessage(opF, dmkListPtr->startPosX, dmkListPtr->startPosY, dmkListPtr->endPosX, dmkListPtr->endPosY,
-                     dmkListPtr->startTime, dmkListPtr->endTime, width, fontSize, effect, dmkListPtr->message);
+                     dmkListPtr->startTime, dmkListPtr->endTime,
+                     width, fontSize, dmkListPtr->effect, dmkListPtr->message);
         msgListPtr->dmkListTail = msgListPtr->dmkListTail->lastNode;
         free(dmkListPtr);
     }
     free(msgListPtr);
 }
 
-static inline void appendDmkList(MSGLIST *msgListPtr, const int startTime, const int endTime,
+static inline void appendDmkList(MSGLIST *msgListPtr, char *effect, const int startTime, const int endTime,
                                  const int startPosX, const int startPosY, const int endPosX, const int endPosY) {
     DMKLIST *newDmkListPtr = (DMKLIST *)malloc(sizeof(DMKLIST));
     newDmkListPtr->message = msgListPtr->message;
-
     newDmkListPtr->startPosX = startPosX;
     newDmkListPtr->startPosY = startPosY;
     newDmkListPtr->endPosX = endPosX;
     newDmkListPtr->endPosY = endPosY;
-
     newDmkListPtr->startTime = startTime;
     newDmkListPtr->endTime = endTime;
-
+    newDmkListPtr->effect = effect;
     newDmkListPtr->lastNode = msgListPtr->dmkListTail;
     msgListPtr->dmkListTail = newDmkListPtr;
 }
@@ -1300,7 +1299,8 @@ static inline void popComboList(MSGLIST *msgListPtr) {
 }
 
 static inline void showMessage(int startPosX, int startPosY, const int endPosX, const int endPosY,
-                               const int startTime, const int endTime, MSGLIST *msgListPtr, const int boxPosY) {
+                               int startTime, const int endTime, MSGLIST *msgListPtr,
+                               const int boxPosY, char *msgBoxClip) {
     if (startPosY + msgListPtr->height >= boxPosY || endPosY + msgListPtr->height >= boxPosY) {
         int msgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
         if (msgEndTime >= endTime
@@ -1318,18 +1318,32 @@ static inline void showMessage(int startPosX, int startPosY, const int endPosX, 
                 popComboList(msgListPtr);
                 msgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
             }
+            if (msgListPtr->dmkListTail != NULL
+                && msgListPtr->dmkListTail->message == msgListPtr->message
+                && msgListPtr->dmkListTail->startPosX == startPosX
+                && msgListPtr->dmkListTail->startPosY == startPosY
+                && msgListPtr->dmkListTail->endPosX == endPosX
+                && msgListPtr->dmkListTail->endPosY == endPosY
+                && msgListPtr->dmkListTail->endTime == startTime) {
+                msgListPtr->dmkListTail->endTime = msgEndTime;
+                popComboList(msgListPtr);
+                startTime = msgEndTime;
+                msgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
+            }
+            if (startPosY >= boxPosY && endPosY >= boxPosY) {
+                msgBoxClip = "";
+            }
             if (msgListPtr->comboListHead == NULL || msgEndTime >= endTime) {
-                appendDmkList(msgListPtr, startTime, endTime, startPosX, startPosY, endPosX, endPosY);
+                appendDmkList(msgListPtr, msgBoxClip, startTime, endTime, startPosX, startPosY, endPosX, endPosY);
             } else {
-                int msgStartTime = startTime;
                 if (startPosX == endPosX && startPosY == endPosY) {
                     do {
-                        appendDmkList(msgListPtr, msgStartTime, msgEndTime, startPosX, startPosY, endPosX, endPosY);
+                        appendDmkList(msgListPtr, msgBoxClip, startTime, msgEndTime, startPosX, startPosY, endPosX, endPosY);
                         popComboList(msgListPtr);
-                        msgStartTime = msgEndTime;
+                        startTime = msgEndTime;
                         msgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
                     } while (msgEndTime < endTime);
-                    appendDmkList(msgListPtr, msgStartTime, endTime, startPosX, startPosY, endPosX, endPosY);
+                    appendDmkList(msgListPtr, msgBoxClip, startTime, endTime, startPosX, startPosY, endPosX, endPosY);
                 } else {
                     int count = 1;
                     // 计算需要分成多少段
@@ -1343,13 +1357,13 @@ static inline void showMessage(int startPosX, int startPosY, const int endPosX, 
                     int deltaX = (endPosX - startPosX) / count, deltaY = (endPosY - startPosY) / count;
                     while (--count > 0) {
                         msgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
-                        appendDmkList(msgListPtr, msgStartTime, msgEndTime, startPosX, startPosY, startPosX + deltaX, startPosY + deltaY);
+                        appendDmkList(msgListPtr, msgBoxClip, startTime, msgEndTime, startPosX, startPosY, startPosX + deltaX, startPosY + deltaY);
                         popComboList(msgListPtr);
-                        msgStartTime = msgEndTime;
+                        startTime = msgEndTime;
                         startPosX += deltaX;
                         startPosY += deltaY;
                     }
-                    appendDmkList(msgListPtr, msgStartTime, endTime, startPosX, startPosY, endPosX, endPosY);
+                    appendDmkList(msgListPtr, msgBoxClip, startTime, endTime, startPosX, startPosY, endPosX, endPosY);
                 }
             }
         }
@@ -1358,25 +1372,25 @@ static inline void showMessage(int startPosX, int startPosY, const int endPosX, 
 
 static inline void printEndMessage(const int msgUpMoveStartTime, const int msgStartTime,
                                    int startTime, const int endTime, const int totalUpHeight,
-                                   MSGLIST *msgListPtr, COORDIN *msgBoxPos) {
+                                   MSGLIST *msgListPtr, COORDIN *msgBoxPos, char *msgBoxClip) {
     if (endTime <= msgUpMoveStartTime) {
         showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                    startTime, endTime, msgListPtr, msgBoxPos->y);
+                    startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
     } else if (endTime <= msgStartTime) {
         if (msgListPtr->isUpMoved == TRUE) {
             if (startTime < endTime) {
                 showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                            startTime, endTime, msgListPtr, msgBoxPos->y);
+                            startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
             }
         } else {
             if (startTime < msgUpMoveStartTime) {
                 showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                            startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y);
+                            startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 startTime = msgUpMoveStartTime;
             }
             if (startTime < endTime) {
                 showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY - totalUpHeight,
-                            startTime, endTime, msgListPtr, msgBoxPos->y);
+                            startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 msgListPtr->posY -= totalUpHeight;
                 msgListPtr->isUpMoved = TRUE;
             }
@@ -1385,13 +1399,13 @@ static inline void printEndMessage(const int msgUpMoveStartTime, const int msgSt
         if (msgListPtr->isUpMoved == FALSE) {
             if (startTime < msgUpMoveStartTime) {
                 showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                            startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y);
+                            startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 startTime = msgUpMoveStartTime;
             }
             /* 旧消息向上滚动 */
             if (startTime < msgStartTime) {
                 showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY - totalUpHeight,
-                            startTime, msgStartTime, msgListPtr, msgBoxPos->y);
+                            startTime, msgStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 msgListPtr->posY -= totalUpHeight;
                 msgListPtr->isUpMoved = TRUE;
                 startTime = msgStartTime;
@@ -1402,13 +1416,13 @@ static inline void printEndMessage(const int msgUpMoveStartTime, const int msgSt
         }
         if (startTime < endTime) {
             showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                        startTime, endTime, msgListPtr, msgBoxPos->y);
+                        startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
         }
     }
 }
 
 void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const int msgFontSize,
-                       BOOL giftComboSwitch, MSGLIST **msgListHead, MSGLIST **msgListTail,
+                       const BOOL giftComboSwitch, MSGLIST **msgListHead, MSGLIST **msgListTail,
                        const int msgAnimationTime, int lastMsgEndTime,
                        const int msgStartTime, const int msgEndTime, char *msgBoxClip) {
     MSGLIST *msgListPtr, *msgListLastPtr, *msgListNextPtr;
@@ -1425,6 +1439,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
             if (IS_MSG_GIFT(now) && now->gift != NULL) {
                 for (msgListLastPtr = *msgListTail; msgListLastPtr != NULL && msgListLastPtr->isShown == TRUE; msgListLastPtr = msgListLastPtr->lastNode) {
                     prev = msgListLastPtr->message;
+                    // 移动到最后的礼物消息节点
                     for (comboListNextPtr = msgListLastPtr->comboListHead; comboListNextPtr != NULL; comboListNextPtr = comboListPtr->nextNode) {
                         comboListPtr = comboListNextPtr;
                         prev = comboListPtr->message;
@@ -1448,6 +1463,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
                         }
                         msgListNextPtr->lastNode = msgListPtr->lastNode;
                         free(msgListPtr);
+                        // 将 now 添加到 comboList 末尾
                         comboListNextPtr = (COMBOLIST *)malloc(sizeof(COMBOLIST));
                         comboListNextPtr->message = now;
                         comboListNextPtr->nextNode = NULL;
@@ -1470,6 +1486,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
         newMsgPtrListPtr = (MSGPTRLIST *)malloc(sizeof(MSGPTRLIST));
         newMsgPtrListPtr->msgListPtr = msgListPtr;
         now = msgListPtr->message;
+        // 获取该消息真正的结束时间
         for (comboListPtr = msgListPtr->comboListHead; comboListPtr != NULL; comboListPtr = comboListPtr->nextNode) {
             now = comboListPtr->message;
         }
@@ -1506,10 +1523,11 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
             for (msgPtrListNextPtr = msgPtrListPtr; msgPtrListNextPtr != NULL && msgPtrListNextPtr->thisMsgEndTime <= msgDownMoveEndTime; msgPtrListNextPtr = msgPtrListNextPtr->nextNode) {
                 msgPtrListPtr = msgPtrListNextPtr;
                 msgListPtr = msgPtrListPtr->msgListPtr;
-                printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, thisMsgEndTime, totalUpHeight, msgListPtr, msgBoxPos);
+                printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, thisMsgEndTime,
+                                totalUpHeight, msgListPtr, msgBoxPos, msgBoxClip);
                 if (msgPtrListPtr->thisMsgEndTime > thisMsgEndTime) {
                     showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x - 100, msgListPtr->posY,
-                                thisMsgEndTime, msgPtrListPtr->thisMsgEndTime, msgListPtr, msgBoxPos->y);
+                                thisMsgEndTime, msgPtrListPtr->thisMsgEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 }
                 // 按消息纵坐标由低到高排序
                 newMsgPtrListPtr = (MSGPTRLIST *)malloc(sizeof(MSGPTRLIST));
@@ -1544,7 +1562,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
                 } else {
                     *msgListTail = msgListPtr->lastNode;
                 }
-                freeMessage(opF, msgBoxSize->x, msgFontSize, msgBoxClip, msgListPtr);
+                freeMessage(opF, msgBoxSize->x, msgFontSize, msgListPtr);
             }
             // 根据不同消息的停留时长向下滚动
             if (msgListLastPtr != NULL) {
@@ -1555,7 +1573,8 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
             totalDownHeight = 0;
             msgPtrPosYListPtr = msgPtrPosYListHead.nextNode;
             for (msgListPtr = msgListNextPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->nextNode) {
-                printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, thisMsgEndTime, totalUpHeight, msgListPtr, msgBoxPos);
+                printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, thisMsgEndTime,
+                                totalUpHeight, msgListPtr, msgBoxPos, msgBoxClip);
                 // 计算需要向下滚动的高度
                 while (msgPtrPosYListPtr != NULL && msgPtrPosYListPtr->posY > msgListPtr->posY) {
                     totalDownHeight += msgPtrPosYListPtr->height;
@@ -1565,12 +1584,12 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
                     && thisMsgEndTime <= msgUpMoveStartTime
                     && msgDownMoveEndTime > msgUpMoveStartTime) {
                     showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY - totalUpHeight + totalDownHeight,
-                                thisMsgEndTime, msgDownMoveEndTime, msgListPtr, msgBoxPos->y);
+                                thisMsgEndTime, msgDownMoveEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                     msgListPtr->posY -= totalUpHeight;
                     msgListPtr->isUpMoved = TRUE;
                 } else if (thisMsgEndTime < msgDownMoveEndTime) {
                     showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY + totalDownHeight,
-                                thisMsgEndTime, msgDownMoveEndTime, msgListPtr, msgBoxPos->y);
+                                thisMsgEndTime, msgDownMoveEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 }
                 msgListPtr->posY += totalDownHeight;
             }
@@ -1580,13 +1599,15 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
             }
             // 其余消息常驻显示
             for (msgListPtr = msgListLastPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE; msgListPtr = msgListPtr->lastNode) {
-                printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, msgDownMoveEndTime, totalUpHeight, msgListPtr, msgBoxPos);
+                printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, msgDownMoveEndTime,
+                                totalUpHeight, msgListPtr, msgBoxPos, msgBoxClip);
             }
             lastMsgEndTime = msgDownMoveEndTime;
         } else {
             // 较长消息承接上方的 lastMsgEndTime 常驻显示
             msgListPtr = msgPtrListPtr->msgListPtr;
-            printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, msgEndTime, totalUpHeight, msgListPtr, msgBoxPos);
+            printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, msgEndTime,
+                            totalUpHeight, msgListPtr, msgBoxPos, msgBoxClip);
             msgListPtr->isUpMoved = FALSE;
         }
     }
@@ -1602,7 +1623,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
         msgListPtr->posY = totalHeight;
 
         showMessage(msgBoxPos->x - 100, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                    msgStartTime, msgEndTime, msgListPtr, msgBoxPos->y);
+                    msgStartTime, msgEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
     }
 }
 
@@ -1629,13 +1650,13 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     const int density = config.density;
     const int blockMode = config.blockmode;
     const BOOL saveBlockedPart = config.saveBlockedPart;
-    BOOL showMsgBox = config.showMsgBox;
+    const BOOL showMsgBox = config.showMsgBox;
     const BOOL showUserName = config.showUserNames;
     COORDIN msgBoxSize = config.msgBoxSize;
     COORDIN msgBoxPos = config.msgBoxPos;
     int msgFontSize = config.msgboxFontsize;
     const int msgDuration = GET_ASS_MS_FLT(config.msgboxDuration);  // 精度为 10 毫秒
-    BOOL giftComboSwitch = GET_ASS_MS_FLT(config.giftMergeTolerance) >= 0;
+    const BOOL giftComboSwitch = GET_ASS_MS_FLT(config.giftMergeTolerance) >= 0;
 
     /* 刷新status */
     if (status != NULL)
@@ -2224,7 +2245,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             {
                 goto NEXTNODE;
             }
-            if (msgDuration > 10) {
+            if (msgDuration >= 10) {
                 now->gift->duration = msgDuration;  // 持续时间至少为 0.01 秒
             } else {
                 now->gift->duration = GET_ASS_MS_INT(now->gift->duration);  // 修正为 ASS 的时间精度(10 毫秒)

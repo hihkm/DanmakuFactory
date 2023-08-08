@@ -160,6 +160,8 @@ struct DanmakuList
     int startTime;
     int endTime;
 
+    char *effect;
+
     struct DanmakuList *lastNode;
 };
 
