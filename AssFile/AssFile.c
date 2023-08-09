@@ -1057,6 +1057,7 @@ static void mergeGiftDanmaku(DANMAKU *head, int giftMergeTolerance) {
             while (next != NULL) {
                 if (IS_MSG_GIFT(next) && next->gift != NULL &&
                     current->user->uid == next->user->uid &&
+                    strcmp(current->user->name, next->user->name) == 0 &&
                     strcmp(current->gift->name, next->gift->name) == 0 &&
                     next->time - time <= giftMergeTolerance) {
                     // 合并礼物
@@ -1446,6 +1447,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
                     }
                     if (IS_MSG_GIFT(prev) && prev->gift != NULL
                         && prev->user->uid == now->user->uid
+                        && strcmp(prev->user->name, now->user->name) == 0
                         && strcmp(prev->gift->name, now->gift->name) == 0
                         && now->time - prev->time <= prev->gift->duration) {
                         // 合并礼物
