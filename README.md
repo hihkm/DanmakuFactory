@@ -10,11 +10,11 @@ DanmakuFactory是一款弹幕文件转换工具，支持弹幕姬的礼物读取
 
 ##### Windows
 
-[DanmakuFactory_1.62GUI  Release(蓝奏云)](https://hihkm.lanzoui.com/b01hjk83e)
+[DanmakuFactory_1.63GUI  Release(蓝奏云)](https://hihkm.lanzoui.com/b01hjk83e)
 
-[DanmakuFactory_1.62CLI  Release(蓝奏云)](https://hihkm.lanzoui.com/b01hgf1xe)
+[DanmakuFactory_1.70CLI  Release(蓝奏云)](https://hihkm.lanzoui.com/b01hgf1xe)
 
-[DanmakuFactory_1.62  Release(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
+[DanmakuFactory_1.70  Release(GITHUB)](https://github.com/hihkm/DanmakuFactory/releases)
 
 
 
@@ -226,5 +226,12 @@ make
 **1.63**
 
 - 修复了转换的xml文件在弹弹play上无法正常识别的问题
-
 - 修复了一处内存非法访问造成的崩溃问题
+
+##### 1.70
+
+- 新增更精细的下划线和阴影支持
+- 新增同一用户相同礼物合并
+- 新增sc读取、礼物显示时长设置
+- 调整礼物框样式
+- 修复了一系列的bug
