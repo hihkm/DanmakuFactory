@@ -1129,6 +1129,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                   "PlayResX: %d\n"
                   "PlayResY: %d\n"
                   "Timer: 100.0000\n"
+                  "WrapStyle: 2\n"
                   "ScaledBorderAndShadow: yes\n\n",
             config.resolution.x, config.resolution.y
            );
@@ -1302,7 +1303,9 @@ static inline void popComboList(MSGLIST *msgListPtr) {
 static inline void showMessage(int startPosX, int startPosY, const int endPosX, const int endPosY,
                                int startTime, const int endTime, MSGLIST *msgListPtr,
                                const int boxPosY, char *msgBoxClip) {
-    if (startPosY + msgListPtr->height >= boxPosY || endPosY + msgListPtr->height >= boxPosY) {
+    if (startTime < endTime
+        && (startPosY + msgListPtr->height >= boxPosY
+            || endPosY + msgListPtr->height >= boxPosY)) {
         int msgEndTime = msgListPtr->message->time + msgListPtr->message->gift->duration;
         if (msgEndTime >= endTime
             && msgListPtr->dmkListTail != NULL
@@ -1371,54 +1374,31 @@ static inline void showMessage(int startPosX, int startPosY, const int endPosX, 
     }
 }
 
-static inline void printEndMessage(const int msgUpMoveStartTime, const int msgStartTime,
+static inline void printEndMessage(const int msgUpMoveStartTime, int msgStartTime,
                                    int startTime, const int endTime, const int totalUpHeight,
                                    MSGLIST *msgListPtr, COORDIN *msgBoxPos, char *msgBoxClip) {
-    if (endTime <= msgUpMoveStartTime) {
+    if (endTime <= msgUpMoveStartTime || msgListPtr->isUpMoved == TRUE) {
         showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
                     startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-    } else if (endTime <= msgStartTime) {
-        if (msgListPtr->isUpMoved == TRUE) {
-            if (startTime < endTime) {
-                showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                            startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-            }
-        } else {
-            if (startTime < msgUpMoveStartTime) {
-                showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                            startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-                startTime = msgUpMoveStartTime;
-            }
-            if (startTime < endTime) {
-                showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY - totalUpHeight,
-                            startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-                msgListPtr->posY -= totalUpHeight;
-                msgListPtr->isUpMoved = TRUE;
-            }
-        }
     } else {
-        if (msgListPtr->isUpMoved == FALSE) {
-            if (startTime < msgUpMoveStartTime) {
-                showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                            startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-                startTime = msgUpMoveStartTime;
-            }
-            /* 旧消息向上滚动 */
-            if (startTime < msgStartTime) {
-                showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY - totalUpHeight,
-                            startTime, msgStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-                msgListPtr->posY -= totalUpHeight;
-                msgListPtr->isUpMoved = TRUE;
-                startTime = msgStartTime;
-            } else if (startTime == msgStartTime) {
-                msgListPtr->posY -= totalUpHeight;
-                msgListPtr->isUpMoved = TRUE;
-            }
-        }
-        if (startTime < endTime) {
+        if (startTime < msgUpMoveStartTime) {
             showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
-                        startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
+                        startTime, msgUpMoveStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
+            startTime = msgUpMoveStartTime;
         }
+        /* 旧消息向上滚动 */
+        if (endTime < msgStartTime) {
+            msgStartTime = endTime;
+        }
+        if (startTime < msgStartTime) {
+            showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY - totalUpHeight,
+                        startTime, msgStartTime, msgListPtr, msgBoxPos->y, msgBoxClip);
+            startTime = msgStartTime;
+        }
+        msgListPtr->posY -= totalUpHeight;
+        msgListPtr->isUpMoved = TRUE;
+        showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY,
+                    startTime, endTime, msgListPtr, msgBoxPos->y, msgBoxClip);
     }
 }
 
@@ -1527,10 +1507,8 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
                 msgListPtr = msgPtrListPtr->msgListPtr;
                 printEndMessage(msgUpMoveStartTime, msgStartTime, lastMsgEndTime, thisMsgEndTime,
                                 totalUpHeight, msgListPtr, msgBoxPos, msgBoxClip);
-                if (msgPtrListPtr->thisMsgEndTime > thisMsgEndTime) {
-                    showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x - 100, msgListPtr->posY,
-                                thisMsgEndTime, msgPtrListPtr->thisMsgEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
-                }
+                showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x - 100, msgListPtr->posY,
+                            thisMsgEndTime, msgPtrListPtr->thisMsgEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 // 按消息纵坐标由低到高排序
                 newMsgPtrListPtr = (MSGPTRLIST *)malloc(sizeof(MSGPTRLIST));
                 newMsgPtrListPtr->height = msgListPtr->height;
@@ -1589,7 +1567,7 @@ void writeAliveMessage(FILE *opF, COORDIN *msgBoxSize, COORDIN *msgBoxPos, const
                                 thisMsgEndTime, msgDownMoveEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                     msgListPtr->posY -= totalUpHeight;
                     msgListPtr->isUpMoved = TRUE;
-                } else if (thisMsgEndTime < msgDownMoveEndTime) {
+                } else {
                     showMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY + totalDownHeight,
                                 thisMsgEndTime, msgDownMoveEndTime, msgListPtr, msgBoxPos->y, msgBoxClip);
                 }
@@ -1857,7 +1835,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 for(cnt = 0; cnt < fontSize; cnt++)
                 {
                     if(now->time < R2LToRightTime[PositionY + cnt] || 
-                       now->time + GET_ASS_MS_INT(rollTime * resolution.x / (resolution.x + textLen)) < R2LToLeftTime[PositionY + cnt])
+                       now->time + GET_ASS_MS_FLT(rollTime / 1000.0f * resolution.x / (resolution.x + textLen)) < R2LToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕右边 或 
                         当本条弹幕到达左端时该行最后一条弹幕没有完全退出屏幕 */
                         PositionY = PositionY + cnt + 1;
@@ -1886,7 +1864,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             {
                 for(cnt = 0; cnt < textHei; cnt++)
                 {/* 登记位置占用信息 */
-                    R2LToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_INT(rollTime * textLen / (resolution.x + textLen)); 
+                    R2LToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_FLT(rollTime / 1000.0f * textLen / (resolution.x + textLen)); 
                     R2LToLeftTime[PositionY + cnt] = now -> time + rollTime;
                 }
                 fprintf(opF, "\nDialogue: 0,");
@@ -1898,10 +1876,10 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             
             printTime(opF, now->time, ",");
             printTime(opF, now->time + rollTime, ",");
-            fprintf(opF, "R2L,,0000,0000,0000,,{\\move(%d,%d,%d,%d)\\q2",
+            fprintf(opF, "R2L,,0000,0000,0000,,{\\move(%d,%d,%d,%d)",
                     resolution.x + textLen/2, PositionY, -1 * textLen / 2, PositionY);
             
-            if(textHei != 25)
+            if(textHei != fontSize)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -1928,7 +1906,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 for(cnt = 0; cnt < textHei; cnt++)
                 {
                     if (now->time < L2RToRightTime[PositionY + cnt] || 
-                        now->time + GET_ASS_MS_INT(rollTime * resolution.x / (resolution.x + textLen)) < L2RToLeftTime[PositionY + cnt])
+                        now->time + GET_ASS_MS_FLT(rollTime / 1000.0f * resolution.x / (resolution.x + textLen)) < L2RToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕左边 或 
                         当本条弹幕到达右端时该行最后一条弹幕没有完全退出屏幕 */
                         PositionY = PositionY + cnt + 1;
@@ -1957,7 +1935,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             {
                 for(cnt = 0; cnt < textHei; cnt++)
                 {/* 登记位置占用信息 */
-                    L2RToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_INT(rollTime * textLen / (resolution.x + textLen)); 
+                    L2RToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_FLT(rollTime / 1000.0f * textLen / (resolution.x + textLen)); 
                     L2RToLeftTime[PositionY + cnt] = now -> time + rollTime;
                 }
                 
@@ -1970,10 +1948,10 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             
             printTime(opF, now->time, ",");
             printTime(opF, now->time + rollTime, ",");
-            fprintf(opF, "L2R,,0000,0000,0000,,{\\move(%d,%d,%d,%d)\\q2",
+            fprintf(opF, "L2R,,0000,0000,0000,,{\\move(%d,%d,%d,%d)",
                     -1 * textLen / 2, PositionY, resolution.x + textLen/2, PositionY);
             
-            if(textHei != 25)
+            if(textHei != fontSize)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -2038,9 +2016,9 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
-            fprintf(opF, "TOP,,0000,0000,0000,,{\\pos(%d,%d)\\q2", resolution.x / 2, PositionY);
+            fprintf(opF, "TOP,,0000,0000,0000,,{\\pos(%d,%d)", resolution.x / 2, PositionY);
             
-            if(textHei != 25)
+            if(textHei != fontSize)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -2109,10 +2087,10 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
-            fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)\\q2",
+            fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)",
                     resolution.x / 2, PositionY - textHei + 2);
             
-            if(textHei != 25)
+            if(textHei != fontSize)
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
@@ -2197,7 +2175,6 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                     fprintf(opF, ",%d,%d)", n7PauseTime, n7MoveTime + n7PauseTime);
                 }
             }
-            fprintf(opF, "\\q2");
             
             if(now -> fontSize != 25)
             {/* 字号 */ 
@@ -3156,7 +3133,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\q2}{\\c&HBCACF7\\b1}%s: {\\c&HFFFFFF\\b0}%s x%d",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s}{\\c&HBCACF7\\b1}%s: {\\c&HFFFFFF\\b0}%s x%d",
             getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             message->user->name, message->gift->name, message->gift->count /* 礼物信息 */
@@ -3296,7 +3273,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\q2\\bord0\\shad0}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\b1\\bord0\\shad0}%s",
             getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             userIDColor, /* 颜色 */
@@ -3308,7 +3285,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shad0}SuperChat CNY %d",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\bord0\\shad0}SuperChat CNY %d",
             getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             textColor, /* 颜色 */
@@ -3320,7 +3297,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\q2\\bord0\\shad0}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\bord0\\shad0}%s",
             getActionStr(actionStr, radius/2, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             scMsgStr /* SC内容 */
@@ -3375,7 +3352,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shad0}%s",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\bord0\\shad0}%s",
             getActionStr(actionStr, radius/2, radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             userIDColor, /* 颜色 */
@@ -3387,7 +3364,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 1,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\q2\\bord0\\shad0}Welcome new %s!",
+        fprintf(filePtr, "message_box,,0000,0000,0000,,{%s%s%s\\fs%d\\bord0\\shad0}Welcome new %s!",
             getActionStr(actionStr, radius/2, fontSize+radius/3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
             textColor, /* 颜色 */

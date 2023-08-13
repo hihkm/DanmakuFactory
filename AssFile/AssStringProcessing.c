@@ -32,7 +32,8 @@ const struct AssEscapeListNode assEscapeList[] =
     {"\\n", "\\​n"},
     {"\\N", "\\​N"},
     {"\\h", "\\​h"},
-    {"{", "\\{"},   // only works in VLC
+    {"{", "\\{"},   // compatible with libass
+    {"}", "\\}"},   // compatible with libass
     {" ", "\\h"},
     {"\n", "\\N"},
     {"&lt;", "<"},
