@@ -122,7 +122,8 @@ struct AssSubtitleFileEvents
  */
 struct MessageList
 {
-    DANMAKU *message;
+    struct DanmakuList *dmkListHead;
+    struct DanmakuList *dmkListTail;
 
     BOOL isShown;
     BOOL isUpMoved; // 该消息是否已完成向上滚动
@@ -130,8 +131,8 @@ struct MessageList
     // int width;
     int posY;
 
-    struct ComboList *comboListHead;
-    struct DanmakuList *dmkListTail;
+    struct DialogueList *dlgListHead;
+    struct DialogueList *dlgListTail;
 
     struct MessageList *lastNode;
     struct MessageList *nextNode;
@@ -152,6 +153,11 @@ struct DanmakuList
 {
     DANMAKU *message;
 
+    struct DanmakuList *nextNode;
+};
+
+struct DialogueList
+{
     int startPosX;
     int startPosY;
     int endPosX;
@@ -162,14 +168,7 @@ struct DanmakuList
 
     char *effect;
 
-    struct DanmakuList *lastNode;
-};
-
-struct ComboList
-{
-    DANMAKU *message;
-
-    struct ComboList *nextNode;
+    struct DialogueList *nextNode;
 };
 
 typedef struct AssSubtitleFile ASSFILE;
@@ -178,7 +177,7 @@ typedef struct AssSubtitleFileEvents EVENT;
 typedef struct MessageList MSGLIST;
 typedef struct MessageListPtrList MSGPTRLIST;
 typedef struct DanmakuList DMKLIST;
-typedef struct ComboList COMBOLIST;
+typedef struct DialogueList DLGLIST;
 
 /* ass */
 extern int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode, ASSFILE *assSub, const float timeShift,
