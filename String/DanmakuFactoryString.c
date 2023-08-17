@@ -89,7 +89,7 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
         cnt = (int)strlen(str);
     }
 
-    int len = (fontSizeSet + (fontSizeInFile - 25)) / 2 * cnt;
+    int len = cnt * (fontSizeSet + (fontSizeInFile - 25)) / 2;
     
     return len;
 }

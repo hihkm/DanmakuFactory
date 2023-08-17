@@ -3207,19 +3207,23 @@ int getMsgBoxHeight(DANMAKU *message, int fontSize, int width)
     else if (message->type == MSG_SUPER_CHAT)
     {
         int lineNum;
-        int charCount = 0;
+        int charCountFull = 0, charCountHalf = 0;
+        int pixelWidthFull, pixelWidthHalf;
         unsigned char *textPtr = message->text;
 
         while (*textPtr != '\0')
         {
-            if (*textPtr >= 0xC0 || *textPtr < 0x80)
-            {/* 一个字符的开头 */
-                charCount++;
+            /* 一个字符的开头 */
+            if (*textPtr >= 0xC0) {
+                charCountFull += 2;
+            } else if (*textPtr < 0x80) {
+                charCountHalf += 1;
             }
             textPtr++;
         }
-
-        lineNum = (charCount * fontSize * SCBOX_TXT_LEN_COMPENSATION) / width + 1;
+        pixelWidthFull = charCountFull * fontSize / SCBOX_TXT_LEN_COMPENSATION_FULL;
+        pixelWidthHalf = charCountHalf * fontSize / SCBOX_TXT_LEN_COMPENSATION_HALF;
+        lineNum = (pixelWidthFull + pixelWidthHalf) / width + 1;
 
         int topBoxHeight = fontSize + fontSize*(4.0/5.0) + radius/2;
         int btmBoxHeight = lineNum * fontSize + radius/2;
@@ -3263,15 +3267,20 @@ int printMessage(FILE *filePtr,
 
         /* 文本消息加入换行符 */
         int lineNum = 1;
-        int charCount = 0;
+        int charCountFull = 0, charCountHalf = 0;
+        int pixelWidthFull, pixelWidthHalf;
         while (*srcStrPtr != '\0' && resStrPtr-scMsgStr < MAX_TEXT_LENGTH)
         {
-            if (*srcStrPtr >= 0xC0 || *srcStrPtr < 0x80)
-            {/* 一个字符的开头 */
-                charCount++;
+            /* 一个字符的开头 */
+            if (*srcStrPtr >= 0xC0) {
+                charCountFull += 2;
+            } else if (*srcStrPtr < 0x80) {
+                charCountHalf += 1;
             }
 
-            if (charCount * fontSize * SCBOX_TXT_LEN_COMPENSATION >= width)
+            pixelWidthFull = charCountFull * fontSize / SCBOX_TXT_LEN_COMPENSATION_FULL;
+            pixelWidthHalf = charCountHalf * fontSize / SCBOX_TXT_LEN_COMPENSATION_HALF;
+            if (pixelWidthFull + pixelWidthHalf > width)
             {/* 填入换行符 */
                 *resStrPtr = '\\';
                 resStrPtr++;
@@ -3279,7 +3288,8 @@ int printMessage(FILE *filePtr,
                 resStrPtr++;
 
                 lineNum++;
-                charCount = 0;
+                charCountFull = 0;
+                charCountHalf = 0;
             }
 
             *resStrPtr = *srcStrPtr;
