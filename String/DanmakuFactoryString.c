@@ -73,13 +73,10 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
          */
         while (*str != '\0')
         {
-            if (*str >= 0xC0)
-            {
-                cnt += 2;
-            }
-            else if (*str < 0x80)
-            {
-                cnt += 1;
+            if (*str >= 0xC0) {
+                cnt++;
+            } else if (*str < 0x80) {
+                cnt++;
             }
             str++;
         }
@@ -89,7 +86,7 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
         cnt = (int)strlen(str);
     }
 
-    int len = cnt * (fontSizeSet + (fontSizeInFile - 25)) / 2;
+    int len = cnt * (fontSizeSet + (fontSizeInFile - 25)) / 1.2;
     
     return len;
 }

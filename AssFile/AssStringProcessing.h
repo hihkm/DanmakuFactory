@@ -31,8 +31,7 @@ extern "C" {
 #include "../CDanmakuFactory.h"
 
 //TODO: sc框文本宽度补偿值 有准确测长方法请移除
-#define SCBOX_TXT_LEN_COMPENSATION_FULL 2.35
-#define SCBOX_TXT_LEN_COMPENSATION_HALF 1.26
+#define SCBOX_TXT_LEN_COMPENSATION 1.2
 
 #define ASS_ESCAPE 0
 #define ASS_UNESCAPE 1
