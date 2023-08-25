@@ -1,3 +1,7 @@
+# Visual Studio
+.vs/
+obj/
+
 #pdf文档草稿
 *.docx
 

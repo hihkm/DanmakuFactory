@@ -41,6 +41,9 @@
                 Else
                     checkStatus = status_parsingErr '解析错误
                 End If
+                If newVersion <> "" And Convert.ToDouble(newVersion) < Convert.ToDouble(Define.guiVersion) Then
+                    checkStatus = status_isLastest
+                End If
             Else
                 checkStatus = status_isLastest '当前为最新
             End If

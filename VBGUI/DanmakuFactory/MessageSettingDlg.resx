@@ -125,7 +125,7 @@
   <data name="PictureBox1.InitialImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAa4AAAEsCAIAAAAU78AeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EwAACxMBAJqcGAAAIvFJREFUeF7tnduOHMd5x/0Aeo48QHzrqyA3eYLkwg9gwDEM+CJBDBsQDNgXhA0I
+        DAAACwwBP0AiyAAAIvFJREFUeF7tnduOHMd5x/0Aeo48QHzrqyA3eYLkwg9gwDEM+CJBDBsQDNgXhA0I
         kIkgUSw4kSMaUizTNhR7bcjLgyTSa1GWNpTEg/fApRbUelckl4flkksu82d/3xR6qw/TM1s70z39+6Ew
         qPq6qqa5Qv30VU/3zBeeAgD0HlQIAIAKAQBQIQCAQIUAAKgQAAAVAgAIVAgAgAoBAFAhAIBAhQAAqBAA
         oLkKvwAA0GXcZRWgQgDoBe6yClAhAPQCd1kFI6vwueee+yIAQBeQr9xcyVX4pS99yUO94W+PLVQV7wEA
@@ -278,10 +278,10 @@
 </value>
   </data>
   <data name="PictureBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 1</value>
+    <value>0, 0</value>
   </data>
   <data name="PictureBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>435, 309</value>
+    <value>430, 300</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="PictureBox1.TabIndex" type="System.Int32, mscorlib">
@@ -297,7 +297,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;PictureBox1.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>24</value>
   </data>
   <data name="Label15.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -312,7 +312,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label15.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 25</value>
+    <value>26, 24</value>
   </data>
   <data name="Label15.TabIndex" type="System.Int32, mscorlib">
     <value>20</value>
@@ -330,7 +330,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label15.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>20</value>
   </data>
   <data name="PosYNUD.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
@@ -357,7 +357,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;PosYNUD.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>21</value>
   </data>
   <data name="PosXNUD.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
@@ -384,7 +384,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;PosXNUD.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>22</value>
   </data>
   <data name="Label14.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -399,7 +399,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label14.Size" type="System.Drawing.Size, System.Drawing">
-    <value>107, 25</value>
+    <value>100, 24</value>
   </data>
   <data name="Label14.TabIndex" type="System.Int32, mscorlib">
     <value>17</value>
@@ -417,7 +417,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label14.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>23</value>
   </data>
   <data name="Label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -432,7 +432,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 25</value>
+    <value>25, 24</value>
   </data>
   <data name="Label1.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
@@ -450,7 +450,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label1.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>19</value>
   </data>
   <data name="Label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -465,7 +465,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>107, 25</value>
+    <value>100, 24</value>
   </data>
   <data name="Label2.TabIndex" type="System.Int32, mscorlib">
     <value>22</value>
@@ -483,7 +483,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label2.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>18</value>
   </data>
   <data name="Label3.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -498,7 +498,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>309, 20</value>
+    <value>288, 19</value>
   </data>
   <data name="Label3.TabIndex" type="System.Int32, mscorlib">
     <value>23</value>
@@ -516,7 +516,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label3.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>17</value>
   </data>
   <data name="Label4.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -531,7 +531,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>36, 25</value>
+    <value>32, 24</value>
   </data>
   <data name="Label4.TabIndex" type="System.Int32, mscorlib">
     <value>27</value>
@@ -549,7 +549,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label4.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>13</value>
   </data>
   <data name="Label5.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -564,7 +564,7 @@
     <value>4, 0, 4, 0</value>
   </data>
   <data name="Label5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>36, 25</value>
+    <value>32, 24</value>
   </data>
   <data name="Label5.TabIndex" type="System.Int32, mscorlib">
     <value>26</value>
@@ -582,7 +582,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label5.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>14</value>
   </data>
   <data name="HeightNUD.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
@@ -609,7 +609,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;HeightNUD.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>15</value>
   </data>
   <data name="WidthNUD.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
@@ -636,40 +636,40 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;WidthNUD.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>16</value>
   </data>
-  <data name="Label6.AutoSize" type="System.Boolean, mscorlib">
+  <data name="FontSizeLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="Label6.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="FontSizeLabel.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 10.8pt</value>
   </data>
-  <data name="Label6.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="FontSizeLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>13, 445</value>
   </data>
-  <data name="Label6.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+  <data name="FontSizeLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 0, 4, 0</value>
   </data>
-  <data name="Label6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 25</value>
+  <data name="FontSizeLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 24</value>
   </data>
-  <data name="Label6.TabIndex" type="System.Int32, mscorlib">
+  <data name="FontSizeLabel.TabIndex" type="System.Int32, mscorlib">
     <value>28</value>
   </data>
-  <data name="Label6.Text" xml:space="preserve">
+  <data name="FontSizeLabel.Text" xml:space="preserve">
     <value>消息框文字大小</value>
   </data>
-  <data name="&gt;&gt;Label6.Name" xml:space="preserve">
-    <value>Label6</value>
+  <data name="&gt;&gt;FontSizeLabel.Name" xml:space="preserve">
+    <value>FontSizeLabel</value>
   </data>
-  <data name="&gt;&gt;Label6.Type" xml:space="preserve">
+  <data name="&gt;&gt;FontSizeLabel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;Label6.Parent" xml:space="preserve">
+  <data name="&gt;&gt;FontSizeLabel.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;Label6.ZOrder" xml:space="preserve">
-    <value>5</value>
+  <data name="&gt;&gt;FontSizeLabel.ZOrder" xml:space="preserve">
+    <value>12</value>
   </data>
   <data name="FontSizeNUD.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 9pt</value>
@@ -696,13 +696,346 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;FontSizeNUD.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="DurationLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="DurationLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 10.8pt</value>
+  </data>
+  <data name="DurationLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="DurationLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>13, 485</value>
+  </data>
+  <data name="DurationLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="DurationLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 24</value>
+  </data>
+  <data name="DurationLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>34</value>
+  </data>
+  <data name="DurationLabel.Text" xml:space="preserve">
+    <value>消息框持续时长</value>
+  </data>
+  <data name="&gt;&gt;DurationLabel.Name" xml:space="preserve">
+    <value>DurationLabel</value>
+  </data>
+  <data name="&gt;&gt;DurationLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;DurationLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;DurationLabel.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="DurationNUD.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 9pt</value>
+  </data>
+  <data name="DurationNUD.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 485</value>
+  </data>
+  <data name="DurationNUD.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
+  <data name="DurationNUD.Size" type="System.Drawing.Size, System.Drawing">
+    <value>76, 27</value>
+  </data>
+  <data name="DurationNUD.TabIndex" type="System.Int32, mscorlib">
+    <value>35</value>
+  </data>
+  <data name="&gt;&gt;DurationNUD.Name" xml:space="preserve">
+    <value>DurationNUD</value>
+  </data>
+  <data name="&gt;&gt;DurationNUD.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;DurationNUD.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;DurationNUD.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="DurationUnitLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="DurationUnitLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 10.8pt</value>
+  </data>
+  <data name="DurationUnitLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="DurationUnitLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>263, 485</value>
+  </data>
+  <data name="DurationUnitLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="DurationUnitLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 24</value>
+  </data>
+  <data name="DurationUnitLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>37</value>
+  </data>
+  <data name="DurationUnitLabel.Text" xml:space="preserve">
+    <value>秒</value>
+  </data>
+  <data name="&gt;&gt;DurationUnitLabel.Name" xml:space="preserve">
+    <value>DurationUnitLabel</value>
+  </data>
+  <data name="&gt;&gt;DurationUnitLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;DurationUnitLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;DurationUnitLabel.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="DurationInfoLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 7.8pt</value>
+  </data>
+  <data name="DurationInfoLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="DurationInfoLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>291, 470</value>
+  </data>
+  <data name="DurationInfoLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="DurationInfoLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>145, 65</value>
+  </data>
+  <data name="DurationInfoLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>40</value>
+  </data>
+  <data name="DurationInfoLabel.Text" xml:space="preserve">
+    <value>*默认为录播姬导出文件中自带的时长（若设置则将全体覆盖）</value>
+  </data>
+  <data name="DurationInfoLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleLeft</value>
+  </data>
+  <data name="&gt;&gt;DurationInfoLabel.Name" xml:space="preserve">
+    <value>DurationInfoLabel</value>
+  </data>
+  <data name="&gt;&gt;DurationInfoLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;DurationInfoLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;DurationInfoLabel.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="GiftMinPriceLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="GiftMinPriceLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 10.8pt</value>
+  </data>
+  <data name="GiftMinPriceLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="GiftMinPriceLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>13, 527</value>
+  </data>
+  <data name="GiftMinPriceLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="GiftMinPriceLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>154, 24</value>
+  </data>
+  <data name="GiftMinPriceLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>31</value>
+  </data>
+  <data name="GiftMinPriceLabel.Text" xml:space="preserve">
+    <value>礼物最低显示价格</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceLabel.Name" xml:space="preserve">
+    <value>GiftMinPriceLabel</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceLabel.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="GiftMinPriceNUD.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 9pt</value>
+  </data>
+  <data name="GiftMinPriceNUD.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 527</value>
+  </data>
+  <data name="GiftMinPriceNUD.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
+  <data name="GiftMinPriceNUD.Size" type="System.Drawing.Size, System.Drawing">
+    <value>76, 27</value>
+  </data>
+  <data name="GiftMinPriceNUD.TabIndex" type="System.Int32, mscorlib">
+    <value>32</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceNUD.Name" xml:space="preserve">
+    <value>GiftMinPriceNUD</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceNUD.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceNUD.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceNUD.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 10.8pt</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>263, 527</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 24</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>33</value>
+  </data>
+  <data name="GiftMinPriceUnitLabel.Text" xml:space="preserve">
+    <value>元</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceUnitLabel.Name" xml:space="preserve">
+    <value>GiftMinPriceUnitLabel</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceUnitLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceUnitLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GiftMinPriceUnitLabel.ZOrder" xml:space="preserve">
     <value>4</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 10.8pt</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>5, 569</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>172, 24</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>36</value>
+  </data>
+  <data name="GiftMergeToleranceLabel.Text" xml:space="preserve">
+    <value>相同礼物合并时间窗</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceLabel.Name" xml:space="preserve">
+    <value>GiftMergeToleranceLabel</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceLabel.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="GiftMergeToleranceNUD.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 9pt</value>
+  </data>
+  <data name="GiftMergeToleranceNUD.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 569</value>
+  </data>
+  <data name="GiftMergeToleranceNUD.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
+  <data name="GiftMergeToleranceNUD.Size" type="System.Drawing.Size, System.Drawing">
+    <value>76, 27</value>
+  </data>
+  <data name="GiftMergeToleranceNUD.TabIndex" type="System.Int32, mscorlib">
+    <value>38</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceNUD.Name" xml:space="preserve">
+    <value>GiftMergeToleranceNUD</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceNUD.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceNUD.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceNUD.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 10.8pt</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>263, 569</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 24</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>39</value>
+  </data>
+  <data name="GiftMergeToleranceUnitLabel.Text" xml:space="preserve">
+    <value>秒</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceUnitLabel.Name" xml:space="preserve">
+    <value>GiftMergeToleranceUnitLabel</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceUnitLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceUnitLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GiftMergeToleranceUnitLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="OkButton.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
     <value>Flat</value>
   </data>
   <data name="OkButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>304, 514</value>
+    <value>303, 566</value>
   </data>
   <data name="OkButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 4, 4, 4</value>
@@ -726,115 +1059,16 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;OkButton.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="Label7.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="Label7.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 10.8pt</value>
-  </data>
-  <data name="Label7.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="Label7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 487</value>
-  </data>
-  <data name="Label7.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 0, 4, 0</value>
-  </data>
-  <data name="Label7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>164, 25</value>
-  </data>
-  <data name="Label7.TabIndex" type="System.Int32, mscorlib">
-    <value>31</value>
-  </data>
-  <data name="Label7.Text" xml:space="preserve">
-    <value>礼物最低显示价格</value>
-  </data>
-  <data name="&gt;&gt;Label7.Name" xml:space="preserve">
-    <value>Label7</value>
-  </data>
-  <data name="&gt;&gt;Label7.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;Label7.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;Label7.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="GiftMinPriceNUD.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 9pt</value>
-  </data>
-  <data name="GiftMinPriceNUD.Location" type="System.Drawing.Point, System.Drawing">
-    <value>185, 487</value>
-  </data>
-  <data name="GiftMinPriceNUD.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
-  </data>
-  <data name="GiftMinPriceNUD.Size" type="System.Drawing.Size, System.Drawing">
-    <value>76, 27</value>
-  </data>
-  <data name="GiftMinPriceNUD.TabIndex" type="System.Int32, mscorlib">
-    <value>32</value>
-  </data>
-  <data name="&gt;&gt;GiftMinPriceNUD.Name" xml:space="preserve">
-    <value>GiftMinPriceNUD</value>
-  </data>
-  <data name="&gt;&gt;GiftMinPriceNUD.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;GiftMinPriceNUD.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;GiftMinPriceNUD.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="Label8.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="Label8.Font" type="System.Drawing.Font, System.Drawing">
-    <value>微软雅黑, 10.8pt</value>
-  </data>
-  <data name="Label8.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="Label8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>263, 487</value>
-  </data>
-  <data name="Label8.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 0, 4, 0</value>
-  </data>
-  <data name="Label8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>31, 25</value>
-  </data>
-  <data name="Label8.TabIndex" type="System.Int32, mscorlib">
-    <value>33</value>
-  </data>
-  <data name="Label8.Text" xml:space="preserve">
-    <value>元</value>
-  </data>
-  <data name="&gt;&gt;Label8.Name" xml:space="preserve">
-    <value>Label8</value>
-  </data>
-  <data name="&gt;&gt;Label8.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;Label8.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;Label8.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>8, 15</value>
+    <value>120, 120</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>437, 556</value>
+    <value>432, 603</value>
   </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>

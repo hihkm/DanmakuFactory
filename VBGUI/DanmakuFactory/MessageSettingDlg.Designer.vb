@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class MessageSettingDlg
     Inherits System.Windows.Forms.Form
 
     'Form 重写 Dispose，以清理组件列表。
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class MessageSettingDlg
     '注意: 以下过程是 Windows 窗体设计器所必需的
     '可以使用 Windows 窗体设计器修改它。  
     '不要使用代码编辑器修改它。
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MessageSettingDlg))
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
@@ -35,19 +35,28 @@ Partial Class MessageSettingDlg
         Me.Label5 = New System.Windows.Forms.Label()
         Me.HeightNUD = New System.Windows.Forms.NumericUpDown()
         Me.WidthNUD = New System.Windows.Forms.NumericUpDown()
-        Me.Label6 = New System.Windows.Forms.Label()
+        Me.FontSizeLabel = New System.Windows.Forms.Label()
         Me.FontSizeNUD = New System.Windows.Forms.NumericUpDown()
-        Me.OkButton = New System.Windows.Forms.Button()
-        Me.Label7 = New System.Windows.Forms.Label()
+        Me.DurationLabel = New System.Windows.Forms.Label()
+        Me.DurationNUD = New System.Windows.Forms.NumericUpDown()
+        Me.DurationUnitLabel = New System.Windows.Forms.Label()
+        Me.DurationInfoLabel = New System.Windows.Forms.Label()
+        Me.GiftMinPriceLabel = New System.Windows.Forms.Label()
         Me.GiftMinPriceNUD = New System.Windows.Forms.NumericUpDown()
-        Me.Label8 = New System.Windows.Forms.Label()
+        Me.GiftMinPriceUnitLabel = New System.Windows.Forms.Label()
+        Me.GiftMergeToleranceLabel = New System.Windows.Forms.Label()
+        Me.GiftMergeToleranceNUD = New System.Windows.Forms.NumericUpDown()
+        Me.GiftMergeToleranceUnitLabel = New System.Windows.Forms.Label()
+        Me.OkButton = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PosYNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PosXNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HeightNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.WidthNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FontSizeNUD, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DurationNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GiftMinPriceNUD, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.GiftMergeToleranceNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'PictureBox1
@@ -128,10 +137,10 @@ Partial Class MessageSettingDlg
         Me.WidthNUD.Name = "WidthNUD"
         Me.WidthNUD.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
-        'Label6
+        'FontSizeLabel
         '
-        resources.ApplyResources(Me.Label6, "Label6")
-        Me.Label6.Name = "Label6"
+        resources.ApplyResources(Me.FontSizeLabel, "FontSizeLabel")
+        Me.FontSizeLabel.Name = "FontSizeLabel"
         '
         'FontSizeNUD
         '
@@ -142,16 +151,34 @@ Partial Class MessageSettingDlg
         Me.FontSizeNUD.Name = "FontSizeNUD"
         Me.FontSizeNUD.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
-        'OkButton
+        'DurationLabel
         '
-        resources.ApplyResources(Me.OkButton, "OkButton")
-        Me.OkButton.Name = "OkButton"
-        Me.OkButton.UseVisualStyleBackColor = True
+        resources.ApplyResources(Me.DurationLabel, "DurationLabel")
+        Me.DurationLabel.Name = "DurationLabel"
         '
-        'Label7
+        'DurationNUD
         '
-        resources.ApplyResources(Me.Label7, "Label7")
-        Me.Label7.Name = "Label7"
+        Me.DurationNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.DurationNUD.DecimalPlaces = 2
+        resources.ApplyResources(Me.DurationNUD, "DurationNUD")
+        Me.DurationNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
+        Me.DurationNUD.Name = "DurationNUD"
+        '
+        'DurationUnitLabel
+        '
+        resources.ApplyResources(Me.DurationUnitLabel, "DurationUnitLabel")
+        Me.DurationUnitLabel.Name = "DurationUnitLabel"
+        '
+        'DurationInfoLabel
+        '
+        Me.DurationInfoLabel.AutoEllipsis = True
+        resources.ApplyResources(Me.DurationInfoLabel, "DurationInfoLabel")
+        Me.DurationInfoLabel.Name = "DurationInfoLabel"
+        '
+        'GiftMinPriceLabel
+        '
+        resources.ApplyResources(Me.GiftMinPriceLabel, "GiftMinPriceLabel")
+        Me.GiftMinPriceLabel.Name = "GiftMinPriceLabel"
         '
         'GiftMinPriceNUD
         '
@@ -161,21 +188,52 @@ Partial Class MessageSettingDlg
         Me.GiftMinPriceNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
         Me.GiftMinPriceNUD.Name = "GiftMinPriceNUD"
         '
-        'Label8
+        'GiftMinPriceUnitLabel
         '
-        resources.ApplyResources(Me.Label8, "Label8")
-        Me.Label8.Name = "Label8"
+        resources.ApplyResources(Me.GiftMinPriceUnitLabel, "GiftMinPriceUnitLabel")
+        Me.GiftMinPriceUnitLabel.Name = "GiftMinPriceUnitLabel"
+        '
+        'GiftMergeToleranceLabel
+        '
+        resources.ApplyResources(Me.GiftMergeToleranceLabel, "GiftMergeToleranceLabel")
+        Me.GiftMergeToleranceLabel.Name = "GiftMergeToleranceLabel"
+        '
+        'GiftMergeToleranceNUD
+        '
+        Me.GiftMergeToleranceNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.GiftMergeToleranceNUD.DecimalPlaces = 2
+        resources.ApplyResources(Me.GiftMergeToleranceNUD, "GiftMergeToleranceNUD")
+        Me.GiftMergeToleranceNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
+        Me.GiftMergeToleranceNUD.Name = "GiftMergeToleranceNUD"
+        '
+        'GiftMergeToleranceUnitLabel
+        '
+        resources.ApplyResources(Me.GiftMergeToleranceUnitLabel, "GiftMergeToleranceUnitLabel")
+        Me.GiftMergeToleranceUnitLabel.Name = "GiftMergeToleranceUnitLabel"
+        '
+        'OkButton
+        '
+        resources.ApplyResources(Me.OkButton, "OkButton")
+        Me.OkButton.Name = "OkButton"
+        Me.OkButton.UseVisualStyleBackColor = True
         '
         'MessageSettingDlg
         '
         resources.ApplyResources(Me, "$this")
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.Label8)
-        Me.Controls.Add(Me.GiftMinPriceNUD)
-        Me.Controls.Add(Me.Label7)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Controls.Add(Me.OkButton)
+        Me.Controls.Add(Me.GiftMergeToleranceUnitLabel)
+        Me.Controls.Add(Me.GiftMergeToleranceNUD)
+        Me.Controls.Add(Me.GiftMergeToleranceLabel)
+        Me.Controls.Add(Me.GiftMinPriceUnitLabel)
+        Me.Controls.Add(Me.GiftMinPriceNUD)
+        Me.Controls.Add(Me.GiftMinPriceLabel)
+        Me.Controls.Add(Me.DurationInfoLabel)
+        Me.Controls.Add(Me.DurationUnitLabel)
+        Me.Controls.Add(Me.DurationNUD)
+        Me.Controls.Add(Me.DurationLabel)
         Me.Controls.Add(Me.FontSizeNUD)
-        Me.Controls.Add(Me.Label6)
+        Me.Controls.Add(Me.FontSizeLabel)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.HeightNUD)
@@ -198,7 +256,9 @@ Partial Class MessageSettingDlg
         CType(Me.HeightNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.WidthNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FontSizeNUD, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DurationNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GiftMinPriceNUD, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.GiftMergeToleranceNUD, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -216,10 +276,17 @@ Partial Class MessageSettingDlg
     Friend WithEvents Label5 As Label
     Friend WithEvents HeightNUD As NumericUpDown
     Friend WithEvents WidthNUD As NumericUpDown
-    Friend WithEvents Label6 As Label
+    Friend WithEvents FontSizeLabel As Label
     Friend WithEvents FontSizeNUD As NumericUpDown
-    Friend WithEvents OkButton As Button
-    Friend WithEvents Label7 As Label
+    Friend WithEvents DurationLabel As Label
+    Friend WithEvents DurationNUD As NumericUpDown
+    Friend WithEvents DurationUnitLabel As Label
+    Friend WithEvents DurationInfoLabel As Label
+    Friend WithEvents GiftMinPriceLabel As Label
     Friend WithEvents GiftMinPriceNUD As NumericUpDown
-    Friend WithEvents Label8 As Label
+    Friend WithEvents GiftMinPriceUnitLabel As Label
+    Friend WithEvents GiftMergeToleranceLabel As Label
+    Friend WithEvents GiftMergeToleranceNUD As NumericUpDown
+    Friend WithEvents GiftMergeToleranceUnitLabel As Label
+    Friend WithEvents OkButton As Button
 End Class

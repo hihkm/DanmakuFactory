@@ -1,4 +1,5 @@
-﻿Imports System
+﻿Imports System.Resources
+Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -31,5 +32,6 @@ Imports System.Runtime.InteropServices
 '通过使用 "*"，如下所示:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.62")>
-<Assembly: AssemblyFileVersion("1.62")>
+<Assembly: AssemblyVersion("1.7.1.0")>
+<Assembly: AssemblyFileVersion("1.7.0.0")>
+<Assembly: NeutralResourcesLanguage("zh-Hans")>
