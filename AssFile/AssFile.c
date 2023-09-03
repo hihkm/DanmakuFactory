@@ -1121,7 +1121,12 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
     {
         return 100;
     }
-    
+
+#if defined(_WIN32)
+    unsigned char bom[] = {0xEF, 0xBB, 0xBF};
+    fwrite(bom, sizeof(unsigned char), 3, fptr);
+#endif
+
     /* 写info部分 */
     fprintf(fptr, "[Script Info]\n"
                   "ScriptType: v4.00+\n"
