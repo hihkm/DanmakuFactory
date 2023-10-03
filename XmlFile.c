@@ -198,7 +198,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             continue;
         }
 
-        BOOL IS_FREE_GIFT = FALSE;
+        double giftPriceUnit = 1.0;
         while (*labelPtr != '\0')
         {
             strGetLeftPart(key, &labelPtr, '=', MAX_TEXT_LENGTH);
@@ -263,37 +263,40 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
                 switch (atoi(deQuotMarks(tempText)))
                 {
-                    case 1:
+                case 1:
                     // 总督
-                        gift.duration = 19998000;
-                        break;
-                    case 2:
+                    gift.duration = 19998000;
+                    break;
+                case 2:
                     // 提督
-                        gift.duration = 1998000;
-                        break;
-                    case 3:
+                    gift.duration = 1998000;
+                    break;
+                case 3:
                     // 舰长
-                        gift.duration = 198000;
-                        break;
-                    default:
+                    gift.duration = 198000;
+                    break;
+                default:
                     // 未知
-                        gift.duration = 18000;
-                        break;
+                    gift.duration = 18000;
+                    break;
                 }
             }
+            // BililiveRecorder
             else if (strcmp(key, "raw") == 0)
             {
                 strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
                 strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
-                
+
                 /* 解析raw部分 */
                 char rawKey[KEY_LEN];
                 char rawValue[VALUE_LEN];
                 char *rawPtr = raw;
 
+                char coinTypeValue[VALUE_LEN] = {0};
+
                 xmlUnescape(raw);
                 strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
-                
+
                 while (*rawPtr != '\0')
                 {
                     strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
@@ -306,10 +309,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                     }
                     else if (strcmp(rawKey, "coin_type") == 0)
                     {
-                        if (strcmp(rawValue, "silver") == 0)
-                        {
-                            IS_FREE_GIFT = TRUE;
-                        }
+                        strSafeCopy(coinTypeValue, rawValue, GIFT_NAME_LEN);
                     }
                     else if (strcmp(rawKey, "uid") == 0)
                     {
@@ -322,10 +322,6 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                         if (FLOAT_IS_EQUAL(gift.price, -1.00))
                         {
                             gift.price = atof(rawValue);
-                            if (messageType != MSG_SUPER_CHAT)
-                            {
-                                gift.price /= 1000;
-                            }
                         }
                     }
                     else if (strcmp(rawKey, "combo_stay_time") == 0)
@@ -335,6 +331,26 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                         }
                     }
                 }
+
+                if (strcmp(coinTypeValue, "silver") == 0)
+                {
+                    giftPriceUnit = 0.0;
+                }
+                else if (messageType != MSG_SUPER_CHAT)
+                {
+                    giftPriceUnit = 1e-3;
+                }
+            }
+            // blrec
+            else if (strcmp(key, "cointype") == 0) {
+                char coinTypeValue[VALUE_LEN];
+                getNextWord(&labelPtr, coinTypeValue, GIFT_NAME_LEN, ' ', TRUE);
+                if (strcmp(coinTypeValue, "\xe9\x93\xb6\xe7\x93\x9c\xe5\xad\x90") == 0) {
+                    giftPriceUnit = 0.0;
+                }
+                else if (strcmp(coinTypeValue, "\xe9\x87\x91\xe7\x93\x9c\xe5\xad\x90") == 0) {
+                    giftPriceUnit = 1e-3;
+                }
             }
             else
             {
@@ -342,10 +358,13 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
         }
 
-        /* 如果是免费礼物 价格清空（有免费代币） */
-        if (IS_FREE_GIFT == TRUE && messageType == MSG_GIFT)
+        if (messageType == MSG_GIFT)
         {
-            gift.price = 0.00;
+            gift.price *= giftPriceUnit;
+        }
+
+        if (messageType == MSG_GIFT && gift.duration == 0) {
+            gift.duration = 5 * 1000;
         }
 
         if (messageType == UNKNOW_TYPE_DANMAKU || messageType == MSG_SUPER_CHAT)
