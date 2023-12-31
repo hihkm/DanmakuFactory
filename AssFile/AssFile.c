@@ -1838,6 +1838,11 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         fclose(opF);
         return 7;
     }
+    memset(R2LToRightTime, 0, rollResY * sizeof(int));
+    memset(R2LToLeftTime, 0, rollResY * sizeof(int));
+    memset(L2RToRightTime, 0, rollResY * sizeof(int));
+    memset(L2RToLeftTime, 0, rollResY * sizeof(int));
+    memset(fixEndTime, 0, holdResY * sizeof(int));
 
     /* 信息框边框与蒙版 */
     char msgBoxClip[MAX_TEXT_LENGTH];
