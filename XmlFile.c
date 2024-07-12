@@ -116,7 +116,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     BOOL isDanmaku;
     BOOL hasUserInfo;
     BOOL hasGiftInfo;
-    
+
     while (!feof(ipF))
     {
         type = 0;
@@ -284,62 +284,71 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             // BililiveRecorder
             else if (strcmp(key, "raw") == 0)
             {
-                strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
-                strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
-
-                /* 解析raw部分 */
-                char rawKey[KEY_LEN];
-                char rawValue[VALUE_LEN];
-                char *rawPtr = raw;
-
-                char coinTypeValue[VALUE_LEN] = {0};
-
-                xmlUnescape(raw);
-                strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
-
-                while (*rawPtr != '\0')
+                if(hasGiftInfo == TRUE) 
                 {
-                    strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
-                    strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
-                    deQuotMarks(rawKey);
-                    deQuotMarks(rawValue);
-                    if (strcmp(rawKey, "gift_name") == 0)
+                    strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
+                    strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
+
+                    /* 解析raw部分 */
+                    char rawKey[KEY_LEN];
+                    char rawValue[VALUE_LEN];
+                    char *rawPtr = raw;
+
+                    char coinTypeValue[VALUE_LEN] = {0};
+            clock_t start2 = clock();
+
+                    xmlUnescape(raw);
+                                            clock_t end2 = clock();
+            duration2 += (double)(end2 - start2) / CLOCKS_PER_SEC; 
+                    strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
+
+
+                    while (*rawPtr != '\0')
                     {
-                        strSafeCopy(gift.name, rawValue, GIFT_NAME_LEN);
-                    }
-                    else if (strcmp(rawKey, "coin_type") == 0)
-                    {
-                        strSafeCopy(coinTypeValue, rawValue, GIFT_NAME_LEN);
-                    }
-                    else if (strcmp(rawKey, "uid") == 0)
-                    {
-                        if (user.uid == 0) {
-                            user.uid = strtoull(rawValue, NULL, 10);
-                        }
-                    }
-                    else if (strcmp(rawKey, "price") == 0)
-                    {
-                        if (FLOAT_IS_EQUAL(gift.price, -1.00))
+                        strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
+                        strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
+                        deQuotMarks(rawKey);
+                        deQuotMarks(rawValue);
+                        if (strcmp(rawKey, "gift_name") == 0)
                         {
-                            gift.price = atof(rawValue);
+                            strSafeCopy(gift.name, rawValue, GIFT_NAME_LEN);
+                        }
+                        else if (strcmp(rawKey, "coin_type") == 0)
+                        {
+                            strSafeCopy(coinTypeValue, rawValue, GIFT_NAME_LEN);
+                        }
+                        else if (strcmp(rawKey, "uid") == 0)
+                        {
+                            if (user.uid == 0) {
+                                user.uid = strtoull(rawValue, NULL, 10);
+                            }
+                        }
+                        else if (strcmp(rawKey, "price") == 0)
+                        {
+                            if (FLOAT_IS_EQUAL(gift.price, -1.00))
+                            {
+                                gift.price = atof(rawValue);
+                            }
+                        }
+                        else if (strcmp(rawKey, "combo_stay_time") == 0)
+                        {
+                            if (gift.duration == 0) {
+                                gift.duration = GET_MS_FLT(atof(rawValue));
+                            }
                         }
                     }
-                    else if (strcmp(rawKey, "combo_stay_time") == 0)
+
+                    if (strcmp(coinTypeValue, "silver") == 0)
                     {
-                        if (gift.duration == 0) {
-                            gift.duration = GET_MS_FLT(atof(rawValue));
-                        }
+                        giftPriceUnit = 0.0;
                     }
+                    else if (messageType != MSG_SUPER_CHAT)
+                    {
+                        giftPriceUnit = 1e-3;
+                    }
+                            
                 }
 
-                if (strcmp(coinTypeValue, "silver") == 0)
-                {
-                    giftPriceUnit = 0.0;
-                }
-                else if (messageType != MSG_SUPER_CHAT)
-                {
-                    giftPriceUnit = 1e-3;
-                }
             }
             // blrec
             else if (strcmp(key, "cointype") == 0) {
