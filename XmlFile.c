@@ -295,13 +295,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                     char *rawPtr = raw;
 
                     char coinTypeValue[VALUE_LEN] = {0};
-            clock_t start2 = clock();
-
                     xmlUnescape(raw);
-                                            clock_t end2 = clock();
-            duration2 += (double)(end2 - start2) / CLOCKS_PER_SEC; 
                     strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
-
 
                     while (*rawPtr != '\0')
                     {
