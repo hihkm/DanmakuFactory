@@ -732,88 +732,59 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
   */
 static char *xmlUnescape(char *const str)
 {
-    /* 非法检查 */
     if (str == NULL)
     {
         return NULL;
     }
 
-    char *leftPtr, *rightPtr, *reWritePtr;
-    leftPtr = str;
-    while (*leftPtr != '\0')
+    char *srcPtr = str; // 源字符串指针
+    char *dstPtr = str; // 目标字符串指针，也用于就地修改字符串
+
+    while (*srcPtr != '\0')
     {
-        if (*leftPtr == '&')
+        if (*srcPtr == '&')
         {
-            if (strstr(leftPtr, "&amp;") == leftPtr)
+            if (strncmp(srcPtr, "&amp;", 5) == 0)
             {
-                *leftPtr = '&';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 5;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
+                *dstPtr++ = '&';
+                srcPtr += 5;
             }
-            else if (strstr(leftPtr, "&apos;") == leftPtr)
+            else if (strncmp(srcPtr, "&apos;", 6) == 0)
             {
-                *leftPtr = '\'';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 6;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
+                *dstPtr++ = '\'';
+                srcPtr += 6;
             }
-            else if (strstr(leftPtr, "&gt;") == leftPtr)
+            else if (strncmp(srcPtr, "&gt;", 4) == 0)
             {
-                *leftPtr = '>';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 4;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
+                *dstPtr++ = '>';
+                srcPtr += 4;
             }
-            else if (strstr(leftPtr, "&lt;") == leftPtr)
+            else if (strncmp(srcPtr, "&lt;", 4) == 0)
             {
-                *leftPtr = '<';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 4;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
+                *dstPtr++ = '<';
+                srcPtr += 4;
             }
-            else if (strstr(leftPtr, "&quot;") == leftPtr)
+            else if (strncmp(srcPtr, "&quot;", 6) == 0)
             {
-                *leftPtr = '\"';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 6;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
+                *dstPtr++ = '\"';
+                srcPtr += 6;
+            }
+            else
+            {
+                // 如果不是已知的转义序列，就原样复制
+                *dstPtr++ = *srcPtr++;
             }
         }
-        
-        leftPtr++;
+        else
+        {
+            // 如果当前字符不是 '&'，就原样复制
+            *dstPtr++ = *srcPtr++;
+        }
     }
-    
+
+    // 字符串结束
+    *dstPtr = '\0';
+
     return str;
 }
 
