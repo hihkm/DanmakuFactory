@@ -685,7 +685,10 @@ int main(int argc, char **argv)
                 char* tokens[4096];
                 int i = 0;
                 while (fgets(buf, 4096, fp) != NULL) {
-                    buf[strlen(buf) - 1] = '\0';
+                    size_t len = strlen(buf);
+                    if (buf[len - 1] == '\n') { // 检查最后一个字符是否为换行符
+                        buf[len - 1] = '\0'; // 如果是，移除它
+                    }
                     tokens[i] = strdup(buf);
                     i++;
                 }
