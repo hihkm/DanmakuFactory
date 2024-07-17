@@ -671,6 +671,29 @@ int main(int argc, char **argv)
             { /* 为GUI提供程序版本确认 如果是错误的版本将会报非法参数错误 */
                 argCnt++;
             }
+            else if(!(strcmp("--blacklist", argv[argCnt])))
+            { /* 弹幕黑名单 */
+                // 读取黑名单文件
+                char *filename = argv[argCnt+1];
+                
+                FILE *fp = fopen(filename, "r");  
+                if (fp == NULL) {
+                    printf("open file blacklist failed\n");
+                    return 0;
+                }
+                char buf[4096];
+                char* tokens[4096];
+                int i = 0;
+                while (fgets(buf, 4096, fp) != NULL) {
+                    buf[strlen(buf) - 1] = '\0';
+                    tokens[i] = strdup(buf);
+                    i++;
+                }
+                fclose(fp);
+                config.blocklist = tokens;
+
+                argCnt += 2;
+            }
             else
             {
                 fprintf(stderr, "\nERROR"
@@ -1129,7 +1152,7 @@ int main(int argc, char **argv)
     }
 
     /* 屏蔽 */
-    blockByType(danmakuPool, config.blockmode, NULL);
+    blockByType(danmakuPool, config.blockmode, (const char **)config.blocklist);
     
     /* 读完成提示 */
     printf("\nFile Loading Complete.");
