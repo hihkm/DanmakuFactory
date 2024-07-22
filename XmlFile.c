@@ -358,7 +358,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
         }
 
-        if (messageType == MSG_GIFT)
+        if (hasGiftInfo == TRUE && messageType != MSG_SUPER_CHAT)
         {
             gift.price *= giftPriceUnit;
         }
