@@ -742,42 +742,41 @@ static char *xmlUnescape(char *const str)
 
     while (*srcPtr != '\0')
     {
-        if (*srcPtr == '&')
+        if (*srcPtr != '&')
         {
-            if (strncmp(srcPtr, "&amp;", 5) == 0)
-            {
-                *dstPtr++ = '&';
-                srcPtr += 5;
-            }
-            else if (strncmp(srcPtr, "&apos;", 6) == 0)
-            {
-                *dstPtr++ = '\'';
-                srcPtr += 6;
-            }
-            else if (strncmp(srcPtr, "&gt;", 4) == 0)
-            {
-                *dstPtr++ = '>';
-                srcPtr += 4;
-            }
-            else if (strncmp(srcPtr, "&lt;", 4) == 0)
-            {
-                *dstPtr++ = '<';
-                srcPtr += 4;
-            }
-            else if (strncmp(srcPtr, "&quot;", 6) == 0)
-            {
-                *dstPtr++ = '\"';
-                srcPtr += 6;
-            }
-            else
-            {
-                // 如果不是已知的转义序列，就原样复制
-                *dstPtr++ = *srcPtr++;
-            }
+            // 如果当前字符不是 '&'，就原样复制
+            *dstPtr++ = *srcPtr++;
+            continue;
+        }
+
+        if (strncmp(srcPtr, "&amp;", 5) == 0)
+        {
+            *dstPtr++ = '&';
+            srcPtr += 5;
+        }
+        else if (strncmp(srcPtr, "&apos;", 6) == 0)
+        {
+            *dstPtr++ = '\'';
+            srcPtr += 6;
+        }
+        else if (strncmp(srcPtr, "&gt;", 4) == 0)
+        {
+            *dstPtr++ = '>';
+            srcPtr += 4;
+        }
+        else if (strncmp(srcPtr, "&lt;", 4) == 0)
+        {
+            *dstPtr++ = '<';
+            srcPtr += 4;
+        }
+        else if (strncmp(srcPtr, "&quot;", 6) == 0)
+        {
+            *dstPtr++ = '\"';
+            srcPtr += 6;
         }
         else
         {
-            // 如果当前字符不是 '&'，就原样复制
+            // 如果不是已知的转义序列，就原样复制
             *dstPtr++ = *srcPtr++;
         }
     }
