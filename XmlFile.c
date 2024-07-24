@@ -345,10 +345,11 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 }
 
             }
-            // blrec
+            // blrec的礼物，不包含sc和guard
             else if (strcmp(key, "cointype") == 0) {
                 char coinTypeValue[VALUE_LEN];
                 getNextWord(&labelPtr, coinTypeValue, GIFT_NAME_LEN, ' ', TRUE);
+                deQuotMarks(coinTypeValue);
                 if (strcmp(coinTypeValue, "\xe9\x93\xb6\xe7\x93\x9c\xe5\xad\x90") == 0) {
                     giftPriceUnit = 0.0;
                 }
