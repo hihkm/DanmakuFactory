@@ -261,27 +261,32 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "level") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                giftPriceUnit = 1;
                 switch (atoi(deQuotMarks(tempText)))
                 {
                 case 1:
                     // 总督
                     gift.duration = 19998000;
+                    gift.price = 19998;
                     break;
                 case 2:
                     // 提督
                     gift.duration = 1998000;
+                    gift.price = 1998;
                     break;
                 case 3:
                     // 舰长
                     gift.duration = 198000;
+                    gift.price = 198;
                     break;
                 default:
                     // 未知
                     gift.duration = 18000;
+                    gift.price = 0;
                     break;
                 }
             }
-            // BililiveRecorder
+            // BililiveRecorder，开启记录raw
             else if (strcmp(key, "raw") == 0)
             {
                 if(hasGiftInfo == TRUE) 
