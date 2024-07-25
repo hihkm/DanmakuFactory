@@ -92,8 +92,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     /* 读取xml文件 */
     float time;
     short type;
-    short fontSize;
-    int color;
+    short fontSize = 0;
+    int color = 0;
     int messageType;
     char *text;
     char tempText[MAX_TEXT_LENGTH];
@@ -126,7 +126,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
 
         text = NULL;
        
-        gift.price = -1.00;
+        gift.price = -1;
         gift.count = -1;
         gift.name[0] = '\0';
         gift.duration = 0;
@@ -198,7 +198,6 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             continue;
         }
 
-        double giftPriceUnit = 1.0;
         while (*labelPtr != '\0')
         {
             strGetLeftPart(key, &labelPtr, '=', MAX_TEXT_LENGTH);
@@ -245,12 +244,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "giftcount") == 0 || strcmp(key, "count") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.count = atof(deQuotMarks(tempText));
+                gift.count = atoi(deQuotMarks(tempText));
             }
             else if (strcmp(key, "price") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.price = atof(deQuotMarks(tempText));
+                gift.price = atoi(deQuotMarks(tempText));
             }
             else if (strcmp(key, "time") == 0)
             {
@@ -261,28 +260,23 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "level") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                giftPriceUnit = 1;
                 switch (atoi(deQuotMarks(tempText)))
                 {
                 case 1:
                     // 总督
-                    gift.duration = 19998000;
-                    gift.price = 19998;
+                    gift.duration = gift.price = 19998000;
                     break;
                 case 2:
                     // 提督
-                    gift.duration = 1998000;
-                    gift.price = 1998;
+                    gift.duration = gift.price = 1998000;
                     break;
                 case 3:
                     // 舰长
-                    gift.duration = 198000;
-                    gift.price = 198;
+                    gift.duration = gift.price = 198000;
                     break;
                 default:
                     // 未知
-                    gift.duration = 18000;
-                    gift.price = 0;
+                    gift.duration = gift.price = 18000;
                     break;
                 }
             }
@@ -325,9 +319,9 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                         }
                         else if (strcmp(rawKey, "price") == 0)
                         {
-                            if (FLOAT_IS_EQUAL(gift.price, -1.00))
+                            if (gift.price == -1)
                             {
-                                gift.price = atof(rawValue);
+                                gift.price = atoi(rawValue);
                             }
                         }
                         else if (strcmp(rawKey, "combo_stay_time") == 0)
@@ -340,13 +334,13 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
 
                     if (strcmp(coinTypeValue, "silver") == 0)
                     {
-                        giftPriceUnit = 0.0;
+                        gift.price = 0;
                     }
-                    else if (messageType != MSG_SUPER_CHAT)
+                    // 录播姬的 SC 金额特殊处理
+                    if (messageType == MSG_SUPER_CHAT)
                     {
-                        giftPriceUnit = 1e-3;
+                        gift.price *= 1000;
                     }
-                            
                 }
 
             }
@@ -355,22 +349,15 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 char coinTypeValue[VALUE_LEN];
                 getNextWord(&labelPtr, coinTypeValue, GIFT_NAME_LEN, ' ', TRUE);
                 deQuotMarks(coinTypeValue);
+                // 银瓜子 —— 免费礼物
                 if (strcmp(coinTypeValue, "\xe9\x93\xb6\xe7\x93\x9c\xe5\xad\x90") == 0) {
-                    giftPriceUnit = 0.0;
-                }
-                else if (strcmp(coinTypeValue, "\xe9\x87\x91\xe7\x93\x9c\xe5\xad\x90") == 0) {
-                    giftPriceUnit = 1e-3;
+                    gift.price = 0;
                 }
             }
             else
             {
                 getNextWord(&labelPtr, NULL, MAX_TEXT_LENGTH, ' ', TRUE);
             }
-        }
-
-        if (hasGiftInfo == TRUE && messageType != MSG_SUPER_CHAT)
-        {
-            gift.price *= giftPriceUnit;
         }
 
         if (messageType == MSG_GIFT && gift.duration == 0) {
