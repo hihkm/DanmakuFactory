@@ -1740,6 +1740,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     COORDIN msgBoxPos = config.msgBoxPos;
     int msgFontSize = config.msgboxFontsize;
     const int msgDuration = GET_ASS_MS_FLT(config.msgboxDuration);  // 精度为 10 毫秒
+    const int giftMinPrice = config.giftMinPrice * 1000.0f;         // 单位：厘
     const BOOL giftComboSwitch = GET_ASS_MS_FLT(config.giftMergeTolerance) >= 0;
 
     /* 刷新status */
@@ -2336,7 +2337,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         else if (IS_MSG(now) && showMsgBox)/* 消息 */
         {
             /* 按最低价格屏蔽 */
-            if (now->gift->price < config.giftMinPrice && now->gift->price > -EPS)
+            if (now->gift->price < giftMinPrice && now->gift->price >= 0)
             {
                 goto NEXTNODE;
             }
@@ -3310,13 +3311,13 @@ int printMessage(FILE *filePtr,
 
         strcpy(textColor, "\\c&H313131");
 
-        if (message->gift->price + EPS > 2000)
+        if (message->gift->price >= 2000 * 1000)
         { /* 2k及以上 */
             strcpy(topBoxColor, "\\c&HD8D8FF");
             strcpy(btmBoxColor, "\\c&H321AAB");
             strcpy(userIDColor, "\\c&H1B0E5E");
         }
-        else if (message->gift->price + EPS > 1000)
+        else if (message->gift->price >= 1000 * 1000)
         { /* 1k及以上 */
             // strcpy(topBoxColor, "\\c&HE5E5FF");
             // strcpy(btmBoxColor, "\\c&H8C8CF7");
@@ -3325,7 +3326,7 @@ int printMessage(FILE *filePtr,
             strcpy(btmBoxColor, "\\c&H4D4DE5");
             strcpy(userIDColor, "\\c&H333398");
         }
-        else if (message->gift->price + EPS > 500)
+        else if (message->gift->price >= 500 * 1000)
         { /* 500及以上 */
             // strcpy(topBoxColor, "\\c&HD4F6FF");
             // strcpy(btmBoxColor, "\\c&H8CCEF7");
@@ -3334,7 +3335,7 @@ int printMessage(FILE *filePtr,
             strcpy(btmBoxColor, "\\c&H4394E0");
             strcpy(userIDColor, "\\c&H2C6193");
         }
-        else if (message->gift->price + EPS > 100)
+        else if (message->gift->price >= 100 * 1000)
         { /* 100及以上 */
             // strcpy(topBoxColor, "\\c&HCAF9F8");
             // strcpy(btmBoxColor, "\\c&H76E8E9");
@@ -3343,7 +3344,7 @@ int printMessage(FILE *filePtr,
             strcpy(btmBoxColor, "\\c&H2BB5E2");
             strcpy(userIDColor, "\\c&H1C7795");
         }
-        else if (message->gift->price + EPS > 50)
+        else if (message->gift->price >= 50 * 1000)
         { /* 50及以上 */
             strcpy(topBoxColor, "\\c&HFDFFDB");
             strcpy(btmBoxColor, "\\c&H9E7D42");
@@ -3413,7 +3414,7 @@ int printMessage(FILE *filePtr,
             effect, /* 补充特效 */
             textColor, /* 颜色 */
             (int)(fontSize*(4.0/5.0)), /* 金额文字大小 */
-            (int)message->gift->price /* SC金额 */
+            message->gift->price / 1000/* SC金额 */
         );
 
         /* SC内容 */
@@ -3436,12 +3437,12 @@ int printMessage(FILE *filePtr,
         char textColor[ASS_COLOR_LEN];
 
         strcpy(textColor, "\\c&H313131");
-        if (message->gift->price + EPS > 19800)
+        if (message->gift->price >= 19998 * 1000)
         { /* 总督 */
             strcpy(boxColor, "\\c&HE5E5FF");
             strcpy(userIDColor, "\\c&H0F0F75");
         }
-        else if (message->gift->price + EPS > 1980)
+        else if (message->gift->price >= 1998 * 1000)
         { /* 提督 */
             strcpy(boxColor, "\\c&HCAF9F8");
             strcpy(userIDColor, "\\c&H1A8B87");
