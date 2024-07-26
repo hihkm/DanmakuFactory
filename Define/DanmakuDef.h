@@ -111,7 +111,7 @@ struct UserPart
 struct GiftPart
 {
     char name[GIFT_NAME_LEN];
-    float price;
+    int price;      // 礼物金额(厘)
     int count;
     int duration;   // 持续时间(毫秒)
 };

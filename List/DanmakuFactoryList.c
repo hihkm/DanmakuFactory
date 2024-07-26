@@ -36,7 +36,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     /* 刷新status */
     if (status != NULL)
     {
-        status -> function = (void *)sortList;
+        status -> function = (void *)&sortList;
         (status -> completedNum) = 0;
         status -> isDone = FALSE;
     }
@@ -49,37 +49,28 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         return 1;
     }
 
-    DANMAKU **bucket = NULL, *now = NULL, *last = NULL, *ptr = NULL;
-    int cnt, index, danmakuNum = 0, bucketNum = 0;
-    int max, min;
+    DANMAKU *now = NULL;
     BOOL isSorted = TRUE;
 
     /* 统计弹幕数量并找出最大最小值 */
-    now = *listHead;
-    while(now != NULL)
+    int danmakuNum; // 弹幕条数
+    int max;        // 最大值
+    int min;        // 最小值
+    for (now = *listHead, danmakuNum = 0, max = min = now -> time; now != NULL; now = now -> next, ++danmakuNum)
     {
-        if(now == *listHead)
+        if(now -> time > max)
         {
-            max = min = (*listHead) -> time;
+            max = now -> time;
         }
-        else
+        else if(now -> time < min)
         {
-            if(now -> time > max)
-            {
-                max = now -> time;
-            }
-            else if(now -> time < min)
-            {
-                min = now -> time;
-            }
+            min = now -> time;
         }
 
         if (isSorted == TRUE && now -> next != NULL && now->time > now->next->time)
         {
             isSorted = FALSE;
         }
-        danmakuNum++;
-        now = now -> next;
     }
 
     /* 如果本来就排序好了直接退出 */
@@ -89,8 +80,8 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     }
 
     /* 申请桶空间并清0 */
-    now = *listHead;
-    bucketNum = danmakuNum / 128 + 1;
+    int bucketNum = danmakuNum / 128 + 1;
+    DANMAKU **bucket = NULL;
     if((bucket = (DANMAKU **)malloc(sizeof(DANMAKU *) * bucketNum)) == NULL)
     {
         #if PRINT_ERR == TRUE
@@ -101,9 +92,13 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     memset(bucket, 0, sizeof(DANMAKU *) * bucketNum);
 
     /* 入桶 */
-    while(*listHead != NULL)
-    {
-        index = bucketNum * (now->time - min) / (max - min + 1);
+    int index;  // 桶号
+    double denominator = max - min + 1;
+    DANMAKU *ptr;
+    DANMAKU *last;
+    do{
+        now = *listHead;
+        index = (int)(bucketNum * ((now->time - min) / denominator));
         if (index >= bucketNum || index < 0) {
             /* 溢出非法索引处理 */
             index = bucketNum - 1;
@@ -118,48 +113,39 @@ int sortList(DANMAKU **listHead, STATUS *const status)
         else
         {
             ptr = last = bucket[index];
-            if(now -> time < ptr -> time)
+            if(now -> time <= ptr -> time)
             {/* 判断是否为该桶最小值 */
-                now -> next = ptr;
                 bucket[index] = now;
             }
             else
             {
-                ptr = ptr -> next;
-                while(ptr != NULL && now->time >= ptr->time)
+                while ((ptr = ptr -> next) != NULL && now->time > ptr->time)
                 {
                     last = ptr;
-                    ptr = ptr -> next;
                 }
-                now -> next = ptr;
                 last -> next = now;
             }
+            now -> next = ptr;
         }
-        now = *listHead;
 
         /* 刷新status */
         if (status != NULL)
         {
             (status -> completedNum)++;
         }
-    }/* 结束 while */
+    } while (*listHead != NULL);
 
     /* 出桶 */
-    now = *listHead = NULL;
-    for(cnt = 0; cnt < bucketNum; cnt++)
+    now = *listHead = bucket[0];
+    while (now->next != NULL) {
+        now = now->next;
+    }
+    for (int cnt = 1; cnt < bucketNum; cnt++)
     {
         ptr = bucket[cnt];
-
         if(ptr != NULL)
         {
-            if(*listHead == NULL)
-            {
-                *listHead = now = ptr;
-            }
-            else
-            {
-                now -> next = ptr;
-            }
+            now -> next = ptr;
             while(ptr -> next != NULL)
             {
                 ptr = ptr -> next;
