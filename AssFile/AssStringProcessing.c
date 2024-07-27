@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 
-#include "AssFile.h"
 #include "AssStringProcessing.h"
 
 const struct AssEscapeListNode assEscapeList[] = 
