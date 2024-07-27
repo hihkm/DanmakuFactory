@@ -5,5 +5,7 @@
         "assfile.h": "c",
         "templatefile.h": "c",
         "assstringprocessing.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": true,
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\build\\compile_commands.json"
 }
