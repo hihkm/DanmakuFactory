@@ -44,9 +44,6 @@ Partial Class MessageSettingDlg
         Me.GiftMinPriceLabel = New System.Windows.Forms.Label()
         Me.GiftMinPriceNUD = New System.Windows.Forms.NumericUpDown()
         Me.GiftMinPriceUnitLabel = New System.Windows.Forms.Label()
-        Me.GiftMergeToleranceLabel = New System.Windows.Forms.Label()
-        Me.GiftMergeToleranceNUD = New System.Windows.Forms.NumericUpDown()
-        Me.GiftMergeToleranceUnitLabel = New System.Windows.Forms.Label()
         Me.OkButton = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PosYNUD, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -56,7 +53,6 @@ Partial Class MessageSettingDlg
         CType(Me.FontSizeNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DurationNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GiftMinPriceNUD, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.GiftMergeToleranceNUD, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'PictureBox1
@@ -193,24 +189,6 @@ Partial Class MessageSettingDlg
         resources.ApplyResources(Me.GiftMinPriceUnitLabel, "GiftMinPriceUnitLabel")
         Me.GiftMinPriceUnitLabel.Name = "GiftMinPriceUnitLabel"
         '
-        'GiftMergeToleranceLabel
-        '
-        resources.ApplyResources(Me.GiftMergeToleranceLabel, "GiftMergeToleranceLabel")
-        Me.GiftMergeToleranceLabel.Name = "GiftMergeToleranceLabel"
-        '
-        'GiftMergeToleranceNUD
-        '
-        Me.GiftMergeToleranceNUD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.GiftMergeToleranceNUD.DecimalPlaces = 2
-        resources.ApplyResources(Me.GiftMergeToleranceNUD, "GiftMergeToleranceNUD")
-        Me.GiftMergeToleranceNUD.Maximum = New Decimal(New Integer() {2139062143, 0, 0, 0})
-        Me.GiftMergeToleranceNUD.Name = "GiftMergeToleranceNUD"
-        '
-        'GiftMergeToleranceUnitLabel
-        '
-        resources.ApplyResources(Me.GiftMergeToleranceUnitLabel, "GiftMergeToleranceUnitLabel")
-        Me.GiftMergeToleranceUnitLabel.Name = "GiftMergeToleranceUnitLabel"
-        '
         'OkButton
         '
         resources.ApplyResources(Me.OkButton, "OkButton")
@@ -222,9 +200,6 @@ Partial Class MessageSettingDlg
         resources.ApplyResources(Me, "$this")
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Controls.Add(Me.OkButton)
-        Me.Controls.Add(Me.GiftMergeToleranceUnitLabel)
-        Me.Controls.Add(Me.GiftMergeToleranceNUD)
-        Me.Controls.Add(Me.GiftMergeToleranceLabel)
         Me.Controls.Add(Me.GiftMinPriceUnitLabel)
         Me.Controls.Add(Me.GiftMinPriceNUD)
         Me.Controls.Add(Me.GiftMinPriceLabel)
@@ -258,7 +233,6 @@ Partial Class MessageSettingDlg
         CType(Me.FontSizeNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DurationNUD, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GiftMinPriceNUD, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.GiftMergeToleranceNUD, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -285,8 +259,5 @@ Partial Class MessageSettingDlg
     Friend WithEvents GiftMinPriceLabel As Label
     Friend WithEvents GiftMinPriceNUD As NumericUpDown
     Friend WithEvents GiftMinPriceUnitLabel As Label
-    Friend WithEvents GiftMergeToleranceLabel As Label
-    Friend WithEvents GiftMergeToleranceNUD As NumericUpDown
-    Friend WithEvents GiftMergeToleranceUnitLabel As Label
     Friend WithEvents OkButton As Button
 End Class
