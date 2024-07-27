@@ -50,7 +50,7 @@ int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode,
     /* 刷新status */
     if (status != NULL)
     {
-        status -> function = (void *)readAss;
+        status -> function = (void *)&readAss;
         status -> completedNum = 0;
         status -> isDone = FALSE;
     }
@@ -1047,50 +1047,6 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
     return 0;
 }
 
-static void mergeGiftDanmaku(DANMAKU *head, int giftMergeTolerance) {
-    DANMAKU *current = head, *prev, *next;
-    int time;
-    while (current != NULL) {
-        if (IS_MSG_GIFT(current) && current->gift != NULL) {
-            prev = current;
-            next = current->next;
-            time = current->time;
-            while (next != NULL) {
-                if (IS_MSG_GIFT(next) && next->gift != NULL &&
-                    current->user->uid == next->user->uid &&
-                    strcmp(current->user->name, next->user->name) == 0 &&
-                    strcmp(current->gift->name, next->gift->name) == 0 &&
-                    next->time - time <= giftMergeTolerance) {
-                    // 合并礼物
-                    time = next->time;
-                    current->gift->price += next->gift->price;
-                    current->gift->count += next->gift->count;
-                    if (current->time + current->gift->duration < next->time + next->gift->duration) {
-                        current->gift->duration = next->time - current->time + next->gift->duration;
-                    }
-
-                    // 移除 next 节点
-                    prev->next = next->next;
-                    free(next->gift);
-                    free(next->user);
-                    free(next->text);
-                    free(next);
-                    next = prev->next;
-                }
-                else if (next->time - time > giftMergeTolerance) {
-                    // 时间相差大于 giftMergeTolerance 毫秒，跳出内部循环
-                    break;
-                }
-                else {
-                    prev = next;
-                    next = next->next;
-                }
-            }
-        }
-        current = current->next;
-    }
-}
-
 
 /*  
  * 写ass文件
@@ -1548,51 +1504,48 @@ static inline void appendEndMessage(const int msgStartTime, const int startTime,
 }
 
 void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos, COORDIN *msgBoxSize, char *msgBoxClip,
-                       const int msgFontSize, const int msgAnimationTime, const BOOL giftComboSwitch,
-                       MSGLIST **msgListHead, MSGLIST **msgListTail,
+                       const int msgFontSize, const int msgAnimationTime, MSGLIST **msgListHead, MSGLIST **msgListTail,
                        int lastMsgEndTime, const int msgStartTime, const int msgEndTime) {
     MSGLIST *msgListPtr, *msgListLastPtr, *msgListNextPtr;
     int thisMsgEndTime; // 精度为 10 毫秒
     int totalHeight, totalUpHeight, totalDownHeight;
     // Gift Combo
-    if (giftComboSwitch == TRUE) {
-        DANMAKU *prev, *now;
-        for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == FALSE; msgListPtr = msgListNextPtr) {
-            msgListNextPtr = msgListPtr->nextNode;
-            now = msgListPtr->comboListHead->message;
-            if (IS_MSG_GIFT(now) && now->gift != NULL) {
-                for (msgListLastPtr = *msgListTail; msgListLastPtr != NULL && msgListLastPtr->isShown == TRUE; msgListLastPtr = msgListLastPtr->lastNode) {
-                    prev = msgListLastPtr->comboListTail->message;
-                    if (IS_MSG_GIFT(prev) && prev->gift != NULL
-                        && prev->user->uid == now->user->uid
-                        && strcmp(prev->user->name, now->user->name) == 0
-                        && strcmp(prev->gift->name, now->gift->name) == 0
-                        && now->time - prev->time <= prev->gift->duration) {
-                        // 合并礼物
-                        now->gift->price += prev->gift->price;
-                        now->gift->count += prev->gift->count;
-                        if (now->time + now->gift->duration < prev->time + prev->gift->duration) {
-                            now->gift->duration = prev->time - now->time + prev->gift->duration;
-                        }
-                        prev->gift->duration = now->time - prev->time;
-                        // 移除 now 所在的节点
-                        if (msgListPtr->lastNode != NULL) {
-                            msgListPtr->lastNode->nextNode = msgListNextPtr;
-                        } else {
-                            *msgListHead = msgListNextPtr;
-                        }
-                        msgListNextPtr->lastNode = msgListPtr->lastNode;
-                        free(msgListPtr->comboListHead);
-                        free(msgListPtr);
-                        // 将 now 添加到 comboList 末尾
-                        msgListLastPtr->comboListTail->nextNode = (COMBOLIST *)malloc(sizeof(COMBOLIST));
-                        msgListLastPtr->comboListTail->nextNode->message = now;
-                        msgListLastPtr->comboListTail->nextNode->nextNode = NULL;
-                        msgListLastPtr->comboListTail = msgListLastPtr->comboListTail->nextNode;
-                        break;
-                    }
-                }
+    DANMAKU *prev, *now;
+    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == FALSE; msgListPtr = msgListNextPtr) {
+        msgListNextPtr = msgListPtr->nextNode;
+        now = msgListPtr->comboListHead->message;
+        if (!IS_MSG_GIFT(now) || now->gift == NULL) continue;
+        for (msgListLastPtr = *msgListTail; msgListLastPtr != NULL && msgListLastPtr->isShown == TRUE; msgListLastPtr = msgListLastPtr->lastNode) {
+            prev = msgListLastPtr->comboListTail->message;
+            if (!IS_MSG_GIFT(prev) || prev->gift == NULL
+                || prev->user->uid != now->user->uid
+                || strcmp(prev->user->name, now->user->name) != 0
+                || strcmp(prev->gift->name, now->gift->name) != 0
+                || now->time - prev->time > prev->gift->duration) {
+                continue;
             }
+            // 合并礼物
+            now->gift->price += prev->gift->price;
+            now->gift->count += prev->gift->count;
+            if (now->time + now->gift->duration < prev->time + prev->gift->duration) {
+                now->gift->duration = prev->time - now->time + prev->gift->duration;
+            }
+            prev->gift->duration = now->time - prev->time;
+            // 移除 now 所在的节点
+            if (msgListPtr->lastNode != NULL) {
+                msgListPtr->lastNode->nextNode = msgListNextPtr;
+            } else {
+                *msgListHead = msgListNextPtr;
+            }
+            msgListNextPtr->lastNode = msgListPtr->lastNode;
+            free(msgListPtr->comboListHead);
+            free(msgListPtr);
+            // 将 now 添加到 comboList 末尾
+            msgListLastPtr->comboListTail->nextNode = (COMBOLIST *)malloc(sizeof(COMBOLIST));
+            msgListLastPtr->comboListTail->nextNode->message = now;
+            msgListLastPtr->comboListTail->nextNode->nextNode = NULL;
+            msgListLastPtr->comboListTail = msgListLastPtr->comboListTail->nextNode;
+            break;
         }
     }
     // 按消息结束时间由短到长排序
@@ -1746,13 +1699,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     COORDIN msgBoxPos = config.msgBoxPos;
     int msgFontSize = config.msgboxFontsize;
     const int msgDuration = GET_ASS_MS_FLT(config.msgboxDuration);  // 精度为 10 毫秒
-    const int giftMinPrice = config.giftMinPrice * 1000.0f;         // 单位：厘
-    const BOOL giftComboSwitch = GET_ASS_MS_FLT(config.giftMergeTolerance) >= 0;
+    const int giftMinPrice = (int)(config.giftMinPrice * 1000.0f);  // 精度为 1 厘
 
     /* 刷新status */
     if (status != NULL)
     {
-        status -> function = (void *)writeAssDanmakuPart;
+        status -> function = (void *)&writeAssDanmakuPart;
         (status -> completedNum) = 0;
         status -> isDone = FALSE;
     }
@@ -1868,9 +1820,6 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
     for (now = head; now != NULL; now = now->next) {
         now->time = GET_ASS_MS_INT(now->time);  // 修正为 ASS 的时间精度(10 毫秒)
-    }
-    if (showMsgBox == TRUE) {
-        mergeGiftDanmaku(head, GET_ASS_MS_FLT(config.giftMergeTolerance));
     }
 
     now = head;
@@ -2398,11 +2347,11 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             
             /* 刷新显示 */
             if (now->time < msgStartTime + msgAnimationTime) {
-                writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime, giftComboSwitch,
+                writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime,
                                   &msgListHead->nextNode, &msgListTail, msgEndTime, msgStartTime, now->time);
                 msgEndTime = now->time;
             } else {
-                writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime, giftComboSwitch,
+                writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime,
                                   &msgListHead->nextNode, &msgListTail, msgEndTime, msgStartTime, msgStartTime + msgAnimationTime);
                 msgEndTime = msgStartTime + msgAnimationTime;
             }
@@ -2432,12 +2381,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     if (msgListTail != NULL && showMsgBox) {
         msgStartTime = msgListHead->comboListHead->message->time;
         /* 上次在场的消息按需常驻显示 */
-        writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime, giftComboSwitch,
+        writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime,
                           &msgListHead, &msgListTail, msgEndTime, msgStartTime, msgStartTime + msgAnimationTime);
 
         msgEndTime = msgStartTime + msgAnimationTime;
         /* 最后一屏按需常驻显示 */
-        writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime, giftComboSwitch,
+        writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime,
                           &msgListHead, &msgListTail, msgEndTime, MAX_ASS_MS_INT, MAX_ASS_MS_INT);
     }
     

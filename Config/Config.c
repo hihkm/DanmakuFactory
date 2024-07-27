@@ -21,6 +21,11 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../String/DanmakuFactoryString.h"
 #include "Config.h"
 
 static COORDIN jsonGetCoord(const char *const jsonStr);
@@ -263,10 +268,6 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         {
             configOnfile.giftMinPrice = atof(value);
         }
-        else if (strcmp("giftmergetolerance", key) == 0)
-        {
-            configOnfile.giftMergeTolerance = atof(value);
-        }
         else if (strcmp("msgboxsize", key) == 0)
         {
             configOnfile.msgBoxSize = jsonGetCoord(value);
@@ -317,8 +318,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"msgboxPos\": [%d, %d],\n"
             "    \"msgboxFontsize\": %d,\n"
             "    \"msgboxDuration\": %.2f,\n"
-            "    \"giftMinPrice\": %.2f,\n"
-            "    \"giftMergeTolerance\": %.2f,\n",
+            "    \"giftMinPrice\": %.2f,\n",
             newConfigCopy.resolution.x, newConfigCopy.resolution.y,
             newConfigCopy.scrolltime,
             newConfigCopy.fixtime,
@@ -337,8 +337,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.msgBoxPos.x, newConfigCopy.msgBoxPos.y,
             newConfigCopy.msgboxFontsize,
             newConfigCopy.msgboxDuration,
-            newConfigCopy.giftMinPrice,
-            newConfigCopy.giftMergeTolerance
+            newConfigCopy.giftMinPrice
     );
     
 
@@ -552,10 +551,8 @@ void printConfig(CONFIG config)
         printf("true");
     }
 
-    printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f", 
-           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration);
-
-    printf(" | GiftMinPrice: CNY %.2f | GiftMergeTolerance: %.2f", config.giftMinPrice, config.giftMergeTolerance);
+    printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f | GiftMinPrice: CNY %.2f", 
+           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration, config.giftMinPrice);
     
     printf("\nBlockMode: ");
     if (config.blockmode == 0)
