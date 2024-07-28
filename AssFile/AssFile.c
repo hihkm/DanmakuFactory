@@ -1048,6 +1048,42 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
 }
 
 
+static void mergeGiftDanmaku(DANMAKU *head) {
+    for (DANMAKU *curr = head; curr != NULL; curr = curr->next) {
+        if (!IS_MSG_GIFT(curr) || curr->gift == NULL) continue;
+
+        for (DANMAKU *prev = curr, *next = prev->next; next != NULL; next = next->next) {
+            if (next->time != curr->time) {
+                break;
+            }
+
+            if (!IS_MSG_GIFT(next) || next->gift == NULL ||
+                curr->user->uid != next->user->uid ||
+                strcmp(curr->user->name, next->user->name) != 0 ||
+                strcmp(curr->gift->name, next->gift->name) != 0) {
+                prev = next;
+                continue;
+            }
+
+            // 合并礼物
+            curr->gift->price += next->gift->price;
+            curr->gift->count += next->gift->count;
+            if (curr->gift->duration < next->gift->duration) {
+                curr->gift->duration = next->gift->duration;
+            }
+
+            // 移除 next 节点
+            prev->next = next->next;
+            free(next->gift);
+            free(next->user);
+            free(next->text);
+            free(next);
+            next = prev;
+        }
+    }
+}
+
+
 /*  
  * 写ass文件
  * 参数：输出文件名/弹幕池/配置信息/字幕部分/状态
@@ -1819,7 +1855,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     // TODO: add start and end animation structure
 
     for (now = head; now != NULL; now = now->next) {
-        now->time = GET_ASS_MS_INT(now->time);  // 修正为 ASS 的时间精度(10 毫秒)
+        // 四舍五入为 ASS 的时间精度(10 毫秒)
+        now->time = GET_ASS_MS_INT(now->time);
+    }
+    if (showMsgBox == TRUE) {
+        // 合并相同时间的礼物
+        mergeGiftDanmaku(head);
     }
 
     now = head;

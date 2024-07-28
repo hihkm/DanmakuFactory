@@ -28,4 +28,4 @@
 | --msgboxpos      | 礼物框位置               | 两个大于0的整数                                                                  | --msgboxpos 50x50              |
 | --msgboxfontsize | 礼物框文字大小           | 大于0的整数                                                                      | --msgboxfontsize 25            |
 | --msgboxduration | 消息框的持续时长         | 大于0.0的浮点数                                                                  | --msgboxduration 5.0           |
-| --giftminprice   | 显示礼物的最小价值       | 大于0的浮点数                                                                    | --giftminprice 2.5             |
+| --giftminprice   | 显示礼物的最小价值       | 大于0的浮点数                                                                    | --giftminprice 5.20            |

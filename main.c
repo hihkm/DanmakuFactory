@@ -1354,7 +1354,7 @@ void printHelpInfo()
            "\n--msgboxfontsize    Specify the fontsize of message box."
            "\n--msgboxduration    Specify the duration of message box."
            "\n                    If set, will overwrite default value read from xml."
-           "\n--giftminprice      Specify the the minimum price of the gifts, like \"2.5\" Yuan."
+           "\n--giftminprice      Specify the the minimum price of the gifts, like \"5.20\" Yuan."
            "\n"
            "\nOther options:"
            "\n-h, --help          Display this help and version information than exit."
