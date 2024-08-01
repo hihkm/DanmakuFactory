@@ -337,7 +337,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                         gift.price = 0;
                     }
                     // 录播姬的 SC 金额特殊处理
-                    if (messageType == MSG_SUPER_CHAT)
+                    else if (messageType == MSG_SUPER_CHAT)
                     {
                         gift.price *= 1000;
                     }

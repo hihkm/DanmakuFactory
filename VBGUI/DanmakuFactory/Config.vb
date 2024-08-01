@@ -34,7 +34,6 @@
     Public msgboxFontsize As Integer = 35
     Public msgboxDuration As Double = 0.00
     Public giftMinPrice As Double = 0.00
-    Public giftMergeTolerance As Double = 0.00
 
     Public statTable As Boolean = False
     Public statHistogram As Boolean = False
@@ -125,8 +124,6 @@
                     msgboxDuration = Convert.ToDouble(value)
                 ElseIf key = "giftminprice" Then
                     giftMinPrice = Convert.ToDouble(value)
-                ElseIf key = "giftmergetolerance" Then
-                    giftMergeTolerance = Convert.ToDouble(value)
                 End If
             End If
         Next
@@ -163,8 +160,7 @@
                  "msgboxSizeHeight:" + msgboxSize(1).ToString() + ";" + vbCrLf +
                  "msgboxFontsize:" + msgboxFontsize.ToString() + ";" + vbCrLf +
                  "msgboxDuration:" + msgboxDuration.ToString() + ";" + vbCrLf +
-                 "giftMinPrice:" + giftMinPrice.ToString() + ";" + vbCrLf +
-                 "giftMergeTolerance:" + giftMergeTolerance.ToString() + ";" + vbCrLf
+                 "giftMinPrice:" + giftMinPrice.ToString() + ";" + vbCrLf
         Return retStr
     End Function
 
