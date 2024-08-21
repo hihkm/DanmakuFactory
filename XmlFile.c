@@ -43,6 +43,35 @@ static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 /* | B站特殊弹幕 |    5    | */
 /* +-------------+---------+ */
 
+/*
+* 是否包含子串
+* 参数：
+* 文件指针/存储字符串的指针/字符串长度
+* 返回值：
+* 0 读取成功
+* 1 读取失败
+*/
+int includes(FILE *file, const char *substr) {
+    // 保存当前文件指针位置
+    long currentPos = ftell(file);
+    if (currentPos == -1) {
+        return 0; // 获取文件指针位置失败
+    }
+
+    char buffer[1024];
+    int found = 0;
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        if (strstr(buffer, substr) != NULL) {
+            found = 1;
+            break;
+        }
+    }
+
+    // 恢复文件指针位置
+    fseek(file, currentPos, SEEK_SET);
+
+    return found;
+}
 /* 
  * 读取xml文件加入弹幕池 
  * 参数：
@@ -72,6 +101,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     if ((ipF = fopen(ipFile, "r")) == NULL)
     {
         return 1; /* 文件打开失败 */
+    }
+
+    BOOL isBililiveRecorder = FALSE;
+    // 检查文件是否为录播姬生成的文件
+    if (includes(ipF, "<BililiveRecorder")) {
+        isBililiveRecorder = TRUE;
     }
     
     /* 判断读入方式 */
@@ -249,7 +284,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "price") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.price = atoi(deQuotMarks(tempText));
+                // 如果是录播姬的 SC 金额，需要乘以 1000
+                if(isBililiveRecorder && messageType==MSG_SUPER_CHAT) {
+                    gift.price = atoi(deQuotMarks(tempText)) * 1000;
+                } else {
+                    gift.price = atoi(deQuotMarks(tempText));
+                }
             }
             else if (strcmp(key, "time") == 0)
             {
@@ -335,11 +375,6 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                     if (strcmp(coinTypeValue, "silver") == 0)
                     {
                         gift.price = 0;
-                    }
-                    // 录播姬的 SC 金额特殊处理
-                    else if (messageType == MSG_SUPER_CHAT)
-                    {
-                        gift.price *= 1000;
                     }
                 }
 
