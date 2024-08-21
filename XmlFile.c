@@ -44,25 +44,25 @@ static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 /* +-------------+---------+ */
 
 /*
-* 是否包含子串
-* 参数：
-* 文件指针/存储字符串的指针/字符串长度
-* 返回值：
-* 0 读取成功
-* 1 读取失败
+** 是否包含子串
+** 参数：
+** 文件指针/存储字符串的指针/字符串长度
+** 返回值：
+** TRUE 包含
+** FALSE 读取失败/不包含
 */
-int includes(FILE *file, const char *substr) {
+BOOL findSubstr(FILE *file, const char *substr) {
     // 保存当前文件指针位置
     long currentPos = ftell(file);
     if (currentPos == -1) {
-        return 0; // 获取文件指针位置失败
+        return FALSE; // 获取文件指针位置失败
     }
 
     char buffer[1024];
-    int found = 0;
+    BOOL isFound = FALSE;
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         if (strstr(buffer, substr) != NULL) {
-            found = 1;
+            isFound = TRUE;
             break;
         }
     }
@@ -70,8 +70,9 @@ int includes(FILE *file, const char *substr) {
     // 恢复文件指针位置
     fseek(file, currentPos, SEEK_SET);
 
-    return found;
+    return isFound;
 }
+
 /* 
  * 读取xml文件加入弹幕池 
  * 参数：
@@ -103,11 +104,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         return 1; /* 文件打开失败 */
     }
 
-    BOOL isBililiveRecorder = FALSE;
     // 检查文件是否为录播姬生成的文件
-    if (includes(ipF, "<BililiveRecorder")) {
-        isBililiveRecorder = TRUE;
-    }
+    BOOL isBililiveRecorder = findSubstr(ipF, "<BililiveRecorder");
     
     /* 判断读入方式 */
     if (*head == NULL || *mode == 'n')
