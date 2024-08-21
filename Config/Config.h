@@ -28,11 +28,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../String/DanmakuFactoryString.h"
 #include "../Define/DanmakuDef.h"
 
 #define SIZE_OF_BUF 4096
@@ -70,8 +65,7 @@ struct Configurations
     struct Coordinate msgBoxPos;  /* 消息框位置 */
     int msgboxFontsize;           /* 消息框内文字大小 */
     float msgboxDuration;         /* 消息框持续时长(秒数) */
-    float giftMinPrice;           /* 消息框礼物最低价格限制 */
-    float giftMergeTolerance;     /* 相同用户相同礼物合并时间窗(秒数) */
+    float giftMinPrice;           /* 消息框礼物最低价格限制(元) */
 
     int blockmode;     /* 屏蔽模式 */
     int statmode;      /* 统计模式 */

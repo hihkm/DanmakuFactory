@@ -92,8 +92,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     /* 读取xml文件 */
     float time;
     short type;
-    short fontSize;
-    int color;
+    short fontSize = 0;
+    int color = 0;
     int messageType;
     char *text;
     char tempText[MAX_TEXT_LENGTH];
@@ -116,7 +116,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     BOOL isDanmaku;
     BOOL hasUserInfo;
     BOOL hasGiftInfo;
-    
+
     while (!feof(ipF))
     {
         type = 0;
@@ -126,7 +126,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
 
         text = NULL;
        
-        gift.price = -1.00;
+        gift.price = -1;
         gift.count = -1;
         gift.name[0] = '\0';
         gift.duration = 0;
@@ -198,7 +198,6 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             continue;
         }
 
-        double giftPriceUnit = 1.0;
         while (*labelPtr != '\0')
         {
             strGetLeftPart(key, &labelPtr, '=', MAX_TEXT_LENGTH);
@@ -245,12 +244,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "giftcount") == 0 || strcmp(key, "count") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.count = atof(deQuotMarks(tempText));
+                gift.count = atoi(deQuotMarks(tempText));
             }
             else if (strcmp(key, "price") == 0)
             {
                 getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
-                gift.price = atof(deQuotMarks(tempText));
+                gift.price = atoi(deQuotMarks(tempText));
             }
             else if (strcmp(key, "time") == 0)
             {
@@ -265,102 +264,100 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 {
                 case 1:
                     // 总督
-                    gift.duration = 19998000;
+                    gift.duration = gift.price = 19998000;
                     break;
                 case 2:
                     // 提督
-                    gift.duration = 1998000;
+                    gift.duration = gift.price = 1998000;
                     break;
                 case 3:
                     // 舰长
-                    gift.duration = 198000;
+                    gift.duration = gift.price = 198000;
                     break;
                 default:
                     // 未知
-                    gift.duration = 18000;
+                    gift.duration = gift.price = 18000;
                     break;
                 }
             }
-            // BililiveRecorder
+            // BililiveRecorder，开启记录raw
             else if (strcmp(key, "raw") == 0)
             {
-                strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
-                strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
-
-                /* 解析raw部分 */
-                char rawKey[KEY_LEN];
-                char rawValue[VALUE_LEN];
-                char *rawPtr = raw;
-
-                char coinTypeValue[VALUE_LEN] = {0};
-
-                xmlUnescape(raw);
-                strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
-
-                while (*rawPtr != '\0')
+                if(hasGiftInfo == TRUE) 
                 {
-                    strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
-                    strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
-                    deQuotMarks(rawKey);
-                    deQuotMarks(rawValue);
-                    if (strcmp(rawKey, "gift_name") == 0)
+                    strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
+                    strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
+
+                    /* 解析raw部分 */
+                    char rawKey[KEY_LEN];
+                    char rawValue[VALUE_LEN];
+                    char *rawPtr = raw;
+
+                    char coinTypeValue[VALUE_LEN] = {0};
+                    xmlUnescape(raw);
+                    strGetLeftPart(NULL, &rawPtr, '{', LABEL_LEN);
+
+                    while (*rawPtr != '\0')
                     {
-                        strSafeCopy(gift.name, rawValue, GIFT_NAME_LEN);
-                    }
-                    else if (strcmp(rawKey, "coin_type") == 0)
-                    {
-                        strSafeCopy(coinTypeValue, rawValue, GIFT_NAME_LEN);
-                    }
-                    else if (strcmp(rawKey, "uid") == 0)
-                    {
-                        if (user.uid == 0) {
-                            user.uid = strtoull(rawValue, NULL, 10);
-                        }
-                    }
-                    else if (strcmp(rawKey, "price") == 0)
-                    {
-                        if (FLOAT_IS_EQUAL(gift.price, -1.00))
+                        strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
+                        strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
+                        deQuotMarks(rawKey);
+                        deQuotMarks(rawValue);
+                        if (strcmp(rawKey, "gift_name") == 0)
                         {
-                            gift.price = atof(rawValue);
+                            strSafeCopy(gift.name, rawValue, GIFT_NAME_LEN);
+                        }
+                        else if (strcmp(rawKey, "coin_type") == 0)
+                        {
+                            strSafeCopy(coinTypeValue, rawValue, GIFT_NAME_LEN);
+                        }
+                        else if (strcmp(rawKey, "uid") == 0)
+                        {
+                            if (user.uid == 0) {
+                                user.uid = strtoull(rawValue, NULL, 10);
+                            }
+                        }
+                        else if (strcmp(rawKey, "price") == 0)
+                        {
+                            if (gift.price == -1)
+                            {
+                                gift.price = atoi(rawValue);
+                            }
+                        }
+                        else if (strcmp(rawKey, "combo_stay_time") == 0)
+                        {
+                            if (gift.duration == 0) {
+                                gift.duration = GET_MS_FLT(atof(rawValue));
+                            }
                         }
                     }
-                    else if (strcmp(rawKey, "combo_stay_time") == 0)
+
+                    if (strcmp(coinTypeValue, "silver") == 0)
                     {
-                        if (gift.duration == 0) {
-                            gift.duration = GET_MS_FLT(atof(rawValue));
-                        }
+                        gift.price = 0;
+                    }
+                    // 录播姬的 SC 金额特殊处理
+                    else if (messageType == MSG_SUPER_CHAT)
+                    {
+                        gift.price *= 1000;
                     }
                 }
 
-                if (strcmp(coinTypeValue, "silver") == 0)
-                {
-                    giftPriceUnit = 0.0;
-                }
-                else if (messageType != MSG_SUPER_CHAT)
-                {
-                    giftPriceUnit = 1e-3;
-                }
             }
-            // blrec
+            // blrec的礼物，不包含sc和guard
             else if (strcmp(key, "cointype") == 0) {
                 char coinTypeValue[VALUE_LEN];
                 getNextWord(&labelPtr, coinTypeValue, GIFT_NAME_LEN, ' ', TRUE);
+                deQuotMarks(coinTypeValue);
+                // 银瓜子 —— 免费礼物
                 if (strcmp(coinTypeValue, "\xe9\x93\xb6\xe7\x93\x9c\xe5\xad\x90") == 0) {
-                    giftPriceUnit = 0.0;
-                }
-                else if (strcmp(coinTypeValue, "\xe9\x87\x91\xe7\x93\x9c\xe5\xad\x90") == 0) {
-                    giftPriceUnit = 1e-3;
+                    gift.price = 0;
                 }
             }
             else
             {
                 getNextWord(&labelPtr, NULL, MAX_TEXT_LENGTH, ' ', TRUE);
             }
-        }
-
-        if (messageType == MSG_GIFT)
-        {
-            gift.price *= giftPriceUnit;
         }
 
         if (messageType == MSG_GIFT && gift.duration == 0) {
@@ -728,88 +725,58 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
   */
 static char *xmlUnescape(char *const str)
 {
-    /* 非法检查 */
     if (str == NULL)
     {
         return NULL;
     }
 
-    char *leftPtr, *rightPtr, *reWritePtr;
-    leftPtr = str;
-    while (*leftPtr != '\0')
+    char *srcPtr = str; // 源字符串指针
+    char *dstPtr = str; // 目标字符串指针，也用于就地修改字符串
+
+    while (*srcPtr != '\0')
     {
-        if (*leftPtr == '&')
+        if (*srcPtr != '&')
         {
-            if (strstr(leftPtr, "&amp;") == leftPtr)
-            {
-                *leftPtr = '&';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 5;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
-            }
-            else if (strstr(leftPtr, "&apos;") == leftPtr)
-            {
-                *leftPtr = '\'';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 6;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
-            }
-            else if (strstr(leftPtr, "&gt;") == leftPtr)
-            {
-                *leftPtr = '>';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 4;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
-            }
-            else if (strstr(leftPtr, "&lt;") == leftPtr)
-            {
-                *leftPtr = '<';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 4;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
-            }
-            else if (strstr(leftPtr, "&quot;") == leftPtr)
-            {
-                *leftPtr = '\"';
-                reWritePtr = leftPtr + 1;
-                rightPtr = leftPtr + 6;
-                while (*rightPtr != '\0')
-                {
-                    *reWritePtr = *rightPtr;
-                    reWritePtr++;
-                    rightPtr++;
-                }
-                *reWritePtr = '\0';
-            }
+            // 如果当前字符不是 '&'，就原样复制
+            *dstPtr++ = *srcPtr++;
+            continue;
         }
-        
-        leftPtr++;
+
+        if (strncmp(srcPtr, "&amp;", 5) == 0)
+        {
+            *dstPtr++ = '&';
+            srcPtr += 5;
+        }
+        else if (strncmp(srcPtr, "&apos;", 6) == 0)
+        {
+            *dstPtr++ = '\'';
+            srcPtr += 6;
+        }
+        else if (strncmp(srcPtr, "&gt;", 4) == 0)
+        {
+            *dstPtr++ = '>';
+            srcPtr += 4;
+        }
+        else if (strncmp(srcPtr, "&lt;", 4) == 0)
+        {
+            *dstPtr++ = '<';
+            srcPtr += 4;
+        }
+        else if (strncmp(srcPtr, "&quot;", 6) == 0)
+        {
+            *dstPtr++ = '\"';
+            srcPtr += 6;
+        }
+        else
+        {
+            // 如果不是已知的转义序列，就原样复制
+            *dstPtr++ = *srcPtr++;
+        }
     }
-    
+
+    // 字符串结束
+    *dstPtr = '\0';
+
     return str;
 }
 

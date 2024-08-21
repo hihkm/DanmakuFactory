@@ -72,7 +72,6 @@ static CONFIG defaultConfig =
     38,             /* 消息框内文字大小 */
     0.0f,           /* 消息框持续时长 */
     0.0f,           /* 消息框礼物最低价格限制 */
-    0.0f,           /* 消息框礼物合并时间窗 */
 
     0,              /* 屏蔽模式 */
     0,              /* 统计模式 */
@@ -631,9 +630,8 @@ int main(int argc, char **argv)
                 argCnt += 2; 
             }
             else if (!(strcmp("--giftmergetolerance", argv[argCnt])))
-            { /* 相同用户相同礼物合并时间窗 */
-                double returnValue = getArgValDouble(argc, argv, argCnt, "GiftMergeTolerance", 0);
-                config.giftMergeTolerance = (float)returnValue;
+            { /* 相同用户相同礼物合并时间窗 (已废弃！) */
+                printf("\nWarning: `--giftmergetolerance` has been deprecated!\n");
                 
                 argCnt += 2; 
             }
@@ -1382,9 +1380,7 @@ void printHelpInfo()
            "\n--msgboxfontsize    Specify the fontsize of message box."
            "\n--msgboxduration    Specify the duration of message box."
            "\n                    If set, will overwrite default value read from xml."
-           "\n--giftminprice      Specify the the minimum price of the gifts."
-           "\n--giftmergetoleranceSpecify the the time window of merging same user, same type gifts."
-           "\n                    If set, will overwrite default value read from xml raw data."
+           "\n--giftminprice      Specify the the minimum price of the gifts, like \"5.20\" Yuan."
            "\n"
            "\nOther options:"
            "\n-h, --help          Display this help and version information than exit."

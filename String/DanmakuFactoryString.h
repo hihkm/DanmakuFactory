@@ -28,9 +28,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include "../Define/DanmakuDef.h"
 
 #define CHAR_IS_BLANK(ch) (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')

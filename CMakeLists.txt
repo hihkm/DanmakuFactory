@@ -1,6 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 
 project(DanmakuFactory C)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if (MSVC)
+        add_compile_options(/wd4819)
+endif()
 
 add_executable (DanmakuFactory JsonFile.c main.c XmlFile.c
                 AssFile/AssFile.c AssFile/AssStringProcessing.c Config/Config.c

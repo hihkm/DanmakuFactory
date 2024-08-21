@@ -14,7 +14,6 @@
         FontSizeNUD.Value = config.msgboxFontsize
         DurationNUD.Value = config.msgboxDuration
         GiftMinPriceNUD.Value = config.giftMinPrice
-        GiftMergeToleranceNUD.Value = config.giftMergeTolerance
     End Sub
 
     Private Sub FontSizeNUD_ValueChanged(sender As Object, e As EventArgs) Handles FontSizeNUD.ValueChanged
@@ -31,7 +30,6 @@
         config.msgboxFontsize = FontSizeNUD.Value
         config.msgboxDuration = DurationNUD.Value
         config.giftMinPrice = GiftMinPriceNUD.Value
-        config.giftMergeTolerance = GiftMergeToleranceNUD.Value
 
         '返回
         Me.Close()

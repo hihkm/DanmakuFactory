@@ -127,8 +127,7 @@ Public Class ProcessingDlg
                             " --msgboxpos " + config.msgboxPos(0).ToString + " " + config.msgboxPos(1).ToString +
                             " --msgboxfontsize " + config.msgboxFontsize.ToString +
                             " --msgboxduration " + config.msgboxDuration.ToString +
-                            " --giftminprice " + config.giftMinPrice.ToString +
-                            " --giftmergetolerance " + config.giftMergeTolerance.ToString
+                            " --giftminprice " + config.giftMinPrice.ToString
             If Not config.ToBlockString.Equals("") Then
                 arg += " -b " + config.ToBlockString
             End If
