@@ -186,7 +186,7 @@ char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, co
     leftPtr = rightPtr = (char *)*ipStr;
     
     /* 移动指针到指定字符位置 */
-    while (*rightPtr != '\0' && *rightPtr != cutCh && copiedLen < maxLen)
+    while (*rightPtr != '\0' && *rightPtr != cutCh && copiedLen < maxLen - 1) 
     {
         copiedLen++;
         rightPtr++;
