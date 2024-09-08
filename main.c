@@ -75,6 +75,7 @@ static CONFIG defaultConfig =
 
     0,              /* 屏蔽模式 */
     0,              /* 统计模式 */
+    NULL,           /* 弹幕黑名单 */
 };
 
 int main(int argc, char **argv)
@@ -566,6 +567,35 @@ int main(int argc, char **argv)
                 }
                 
                 argCnt += 2; 
+            }
+            else if(!(strcmp("--blacklist", argv[argCnt])))
+            { /* 弹幕黑名单 */
+                // 读取黑名单文件
+                char *filename = argv[argCnt+1];
+                
+                FILE *fp = fopen(filename, "r");  
+                if (fp == NULL) {
+                    fprintf(stderr, "\nERROR"
+                                "\nOpen blacklist file `%s` failed!\n", filename);
+                    return 0;
+                }
+                char buf[4096];
+                char* tokens[4096 + 1];
+                int i = 0;
+                while (fgets(buf, 4096, fp) != NULL && i < 4096) {
+                    size_t len = strlen(buf);
+                    if (buf[len - 1] == '\n') { // 检查最后一个字符是否为换行符
+                        buf[len - 1] = '\0'; // 如果是，移除它
+                    }
+                    if (strlen(buf) == 0) continue;
+                    tokens[i] = strdup(buf);
+                    i++;
+                }
+                tokens[i] = NULL;
+                fclose(fp);
+                config.blocklist = tokens;
+
+                argCnt += 2;
             }
             else if (!strcmp("-t", argv[argCnt]) || !strcmp("--timeshift", argv[argCnt]))
             { /* 时轴偏移 因不确定文件数量，故先跳过，最后解析 */
@@ -1127,7 +1157,7 @@ int main(int argc, char **argv)
     }
 
     /* 屏蔽 */
-    blockByType(danmakuPool, config.blockmode, NULL);
+    blockByType(danmakuPool, config.blockmode, config.blocklist);
     
     /* 读完成提示 */
     printf("\nFile Loading Complete.");
@@ -1338,6 +1368,10 @@ void printHelpInfo()
            "\n-b, --blockmode     Specify the type of danmaku which will not show on the screen."
            "\n                    Use '-' to connect the type-name, like \"L2R-TOP-BOTTOM\"."
            "\n                    Available value: L2R, R2L, TOP, BOTTOM, SPECIAL, COLOR, REPEAT"
+           "\n"
+           "\n--blacklist         Specify the blacklist plain text file which contains no more than 4096 danmakus"
+           "\n                     that separated by lines and will not show on the screen."
+           "\n                    For example: `black.txt`."
            "\n"
            "\n--statmode          Specify the type of statistic box which will show on the screen."
            "\n                    Use '-' to connect the type-name, like \"TABLE-HISTOGRAM\"."

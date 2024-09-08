@@ -51,7 +51,7 @@ static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 ** TRUE 包含
 ** FALSE 读取失败/不包含
 */
-BOOL findSubstr(FILE *file, const char *substr) {
+BOOL findSubstr(FILE *file, const char *substr, int maxlen) {
     // 保存当前文件指针位置
     long currentPos = ftell(file);
     if (currentPos == -1) {
@@ -60,11 +60,12 @@ BOOL findSubstr(FILE *file, const char *substr) {
 
     char buffer[1024];
     BOOL isFound = FALSE;
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    while (maxlen - 1 > 0 && fgets(buffer, maxlen < sizeof(buffer) ? maxlen : sizeof(buffer), file) != NULL) {
         if (strstr(buffer, substr) != NULL) {
             isFound = TRUE;
             break;
         }
+        maxlen -= (int)strlen(buffer);
     }
 
     // 恢复文件指针位置
@@ -105,7 +106,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     }
 
     // 检查文件是否为录播姬生成的文件
-    BOOL isBililiveRecorder = findSubstr(ipF, "<BililiveRecorder");
+    BOOL isBililiveRecorder = findSubstr(ipF, "<BililiveRecorder", 1024);
     
     /* 判断读入方式 */
     if (*head == NULL || *mode == 'n')
@@ -337,6 +338,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
 
                     while (*rawPtr != '\0')
                     {
+                        // TODO: fix json parse.
                         strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
                         strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
                         deQuotMarks(rawKey);
