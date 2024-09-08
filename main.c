@@ -1157,12 +1157,7 @@ int main(int argc, char **argv)
     }
 
     /* 屏蔽 */
-    blockByType(danmakuPool, config.blockmode, (const char **)config.blocklist);
-    if (config.blocklist != NULL) {
-        for (int i = 0; config.blocklist[i] != NULL; ++i) {
-            free(config.blocklist[i]);
-        }
-    }
+    blockByType(danmakuPool, config.blockmode, config.blocklist);
     
     /* 读完成提示 */
     printf("\nFile Loading Complete.");

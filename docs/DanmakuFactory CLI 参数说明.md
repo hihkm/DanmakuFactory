@@ -13,7 +13,7 @@
 | -f, --fixtime    | 指定固定弹幕的显示时间   | 大于 0.0 的浮点数                                                                | -f 12.0                        |
 | -d, --density    | 指定弹幕密度（条）       | -1 不重叠<br />0 无限制<br />其他 表示限定条数                                   | -d -1                          |
 | -S, --fontsize   | 指定文字大小             | 大于 0 的整数                                                                    | -S 38                          |
-| -N, --fontname   | 指定字体名               | 字符串                                                                           | -N “Microsoft YaHei”           |
+| -N, --fontname   | 指定字体名               | 字符串                                                                           | -N “Microsoft YaHei”         |
 | -O, --opacity    | 指定不透明度，越小越透明 | 1-255 的整数                                                                     | -O 255                         |
 | -L, --outline    | 指定描边成都             | 0-4 整数                                                                         | -L 4                           |
 | -D, --shadow     | 指定阴影深度             | 0-4 整数                                                                         | -D 4                           |

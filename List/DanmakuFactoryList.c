@@ -175,7 +175,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
  * BLK_SPECIAL     屏蔽特殊弹幕
  * BLK_COLOR       屏蔽非白色弹幕
   */
-void blockByType(DANMAKU *const danmakuHead, const int mode, const char** keyStrings)
+void blockByType(DANMAKU *const danmakuHead, const int mode, char** keyStrings)
 {
     if (mode == 0 && keyStrings == NULL)
     {
@@ -246,6 +246,12 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, const char** keyStr
             }
         }
         ptr = ptr -> next;
+    }
+
+    if (keyStrings != NULL) {
+        for (int i = 0; keyStrings[i] != NULL; ++i) {
+            free(keyStrings[i]);
+        }
     }
 }
 
