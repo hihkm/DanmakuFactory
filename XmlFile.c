@@ -338,6 +338,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
 
                     while (*rawPtr != '\0')
                     {
+                        // TODO: fix json parse.
                         strGetLeftPart(rawKey, &rawPtr, ':', KEY_LEN);
                         strGetLeftPart(rawValue, &rawPtr, ',', VALUE_LEN);
                         deQuotMarks(rawKey);

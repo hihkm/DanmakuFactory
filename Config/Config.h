@@ -31,7 +31,7 @@ extern "C" {
 #include "../Define/DanmakuDef.h"
 
 #define SIZE_OF_BUF 4096
-#define KEY_LEN 256
+#define KEY_LEN 128
 #define VALUE_LEN 512
 #define TYPENAME_LEN 64
 
