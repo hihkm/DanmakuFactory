@@ -229,17 +229,11 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, const char** keyStr
         }
         //TODO:关键字屏蔽以及正则匹配
         // 如果有关键字串集
-        if (keyStrings != NULL)
+        if (keyStrings != NULL && ptr -> text != NULL)
         {
             // 逐个检查关键字串
             for (int i = 0; keyStrings[i] != NULL; i++)
             {
-                const char *key = keyStrings[i];
-
-                if(ptr -> text == NULL)
-                {
-                    break;
-                }
                 // 如果弹幕文本中包含关键字串
                 if (strstr(ptr -> text, keyStrings[i]) != NULL)
                 {
