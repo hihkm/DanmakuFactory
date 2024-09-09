@@ -84,6 +84,8 @@ extern "C" {
 #define GET_ASS_MS_FLT(sec) ((int)((sec) * 100.0f + 0.55f) * 10)
 #define GET_ASS_MS_INT(ms) ((ms + 5) / 10 * 10)
 
+#define SIZE_NUM(type, name) (sizeof(name) / sizeof(type))
+
 struct SingleDanmaku
 {/* 弹幕节点定义 */
     int time;              /* 开始时间(毫秒) */

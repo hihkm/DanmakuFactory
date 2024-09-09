@@ -60,7 +60,7 @@ BOOL findSubstr(FILE *file, const char *substr, int maxlen) {
 
     char buffer[1024];
     BOOL isFound = FALSE;
-    while (maxlen - 1 > 0 && fgets(buffer, maxlen < sizeof(buffer) ? maxlen : sizeof(buffer), file) != NULL) {
+    while (maxlen - 1 > 0 && fgets(buffer, maxlen < SIZE_NUM(char, buffer) ? maxlen : SIZE_NUM(char, buffer), file) != NULL) {
         if (strstr(buffer, substr) != NULL) {
             isFound = TRUE;
             break;

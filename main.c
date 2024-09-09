@@ -582,13 +582,13 @@ int main(int argc, char **argv)
                 char buf[4096];
                 char* tokens[4096 + 1];
                 int i = 0;
-                while (fgets(buf, 4096, fp) != NULL && i < 4096) {
+                while (i < SIZE_NUM(char *, tokens) - 1 && fgets(buf, SIZE_NUM(char, buf), fp) != NULL) {
                     size_t len = strlen(buf);
-                    if (buf[len - 1] == '\n') { // 检查最后一个字符是否为换行符
+                    if (len >= 1 && buf[len - 1] == '\n') { // 检查最后一个字符是否为换行符
                         buf[len - 1] = '\0'; // 如果是，移除它
                     }
                     if (strlen(buf) == 0) continue;
-                    tokens[i] = strdup(buf);
+                    tokens[i] = strdup(buf);    // malloc here.
                     i++;
                 }
                 tokens[i] = NULL;
