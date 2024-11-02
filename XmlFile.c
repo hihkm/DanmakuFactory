@@ -757,6 +757,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
  *    &amp;       &
  *    &apos;      '
  *    &quot;      " 
+ *    &#34;       "
   */
 static char *xmlUnescape(char *const str)
 {
@@ -801,6 +802,11 @@ static char *xmlUnescape(char *const str)
         {
             *dstPtr++ = '\"';
             srcPtr += 6;
+        }
+        else if (strncmp(srcPtr, "&#34;", 5) == 0)
+        {
+            *dstPtr++ = '\"';
+            srcPtr += 5;
         }
         else
         {

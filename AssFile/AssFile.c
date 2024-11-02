@@ -1937,7 +1937,11 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
         /* 特殊字符替换 */
         char escapedText[MAX_TEXT_LENGTH];
-        assEscape(escapedText, now->text, MAX_TEXT_LENGTH, ASS_ESCAPE);
+        if (IS_SPECIAL(now)) {
+            strcpy_s(escapedText, MAX_TEXT_LENGTH, now->text);
+        } else {
+            assEscape(escapedText, now->text, MAX_TEXT_LENGTH, ASS_ESCAPE);
+        }
         // strSafeCopy(escapedText, now->text, MAX_TEXT_LENGTH);
         
         /* 弹幕按类型解析 */
@@ -2222,7 +2226,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 5 || now -> type == -5)/* 特殊弹幕 */
+        else if (IS_SPECIAL(now))/* 特殊弹幕 */
         {
             if (saveBlockedPart == FALSE)
             {
@@ -2237,7 +2241,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             n7StartY = now -> special -> startY;
             n7FadeStart = now -> special -> fadeStart;    
             n7FadeEnd = now -> special -> fadeEnd;    
-            n7ExistTime = now -> special -> existTime;
+            n7ExistTime = GET_ASS_MS_INT(now -> special -> existTime);
             n7FrZ = now -> special -> frZ;
             n7FrY = now -> special -> frY;
             n7EndX = now -> special -> endX;
@@ -2256,7 +2260,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
             
             printTime(opF, now->time, ",");
-            printTime(opF, now->time + GET_ASS_MS_INT(n7ExistTime), ",");
+            printTime(opF, now->time + n7ExistTime, ",");
             fprintf(opF, "SP,,0000,0000,0000,,{");
             if( (n7StartX < 1+EPS) && (n7EndX < 1+EPS) && (n7StartY < 1+EPS) && (n7EndY < 1+EPS) )
             {
