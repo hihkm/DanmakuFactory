@@ -1938,7 +1938,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         /* 特殊字符替换 */
         char escapedText[MAX_TEXT_LENGTH];
         if (IS_SPECIAL(now)) {
-            strcpy_s(escapedText, MAX_TEXT_LENGTH, now->text);
+            strcpy(escapedText, now->text);
         } else {
             assEscape(escapedText, now->text, MAX_TEXT_LENGTH, ASS_ESCAPE);
         }
