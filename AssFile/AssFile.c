@@ -738,7 +738,15 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
                     
                     codePartPtr++;
                 }
-                
+                *singleCodePtr = '\0';
+                size_t len = strlen(singleCode);
+                if (len < 6) {
+                    int i = 6;
+                    for (int j = 0; j <= len; ++j) {
+                        singleCode[i--] = singleCode[len - j];
+                    }
+                    while (i >= 0) { singleCode[i--] = '0'; }
+                }
                 fontColor = toDecColor(singleCode);
             }
             
@@ -873,9 +881,11 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             {
                 newDanmakuNode -> type = 5;
             }
-            else if(moveTime == 0 && pauseTime == 0 &&
+            else if(// TODO: 特殊弹幕治理
+                // moveTime == 0 && pauseTime == 0 &&
                     fadeStart == 0 && fadeEnd == 0  &&
                     frY == 0 && frZ == 0 &&
+                    strstr(codePart, "\\alpha") == NULL &&
                     strlen(fontName) == 0
                    )
             {/* 其他程序生成的ass 普通弹幕 */ 
