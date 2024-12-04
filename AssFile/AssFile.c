@@ -745,7 +745,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
                     for (int j = 0; j <= len; ++j) {
                         singleCode[i--] = singleCode[len - j];
                     }
-                    while (i >= 0) { singleCode[i--] = '0'; }
+                    do { singleCode[i--] = '0'; } while (i >= 0);
                 }
                 fontColor = toDecColor(singleCode);
             }
