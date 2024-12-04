@@ -303,8 +303,8 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"resolution\": [%d, %d],\n"
             "    \"displayArea\": %f,\n"
             "    \"scrollArea\": %f,\n"
-            "    \"scrolltime\": %f,\n"
-            "    \"fixtime\": %f,\n"
+            "    \"scrolltime\": %.3f,\n"
+            "    \"fixtime\": %.3f,\n"
 
             "    \"density\": %d,\n"
             "    \"fontsize\": %d,\n"
@@ -495,7 +495,7 @@ void printConfig(CONFIG config)
         printf("(full)");
     }
     
-    printf(" | ScrollTime: %.3f | FixTime: %.3f",
+    printf(" | ScrollTime: %.3f sec | FixTime: %.3f sec",
            config.scrolltime, config.fixtime);
 
     printf("\nDensity: %d", config.density);
@@ -561,8 +561,15 @@ void printConfig(CONFIG config)
         printf("true");
     }
 
-    printf("\nMessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f | GiftMinPrice: CNY %.2f", 
-           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration, config.giftMinPrice);
+    printf("\nMessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f", 
+           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration);
+    if (config.msgboxDuration < EPS) {
+        printf("(default)");
+    } else {
+        printf(" sec");
+    }
+
+    printf(" | GiftMinPrice: CNY %.2f", config.giftMinPrice);
     
     printf("\nBlockMode: ");
     if (config.blockmode == 0)

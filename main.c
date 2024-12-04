@@ -1386,7 +1386,7 @@ void printHelpInfo()
            "\n                    Note: width + posX and height + posY should not larger than resolution."
            "\n--msgboxfontsize    Specify the fontsize of message box."
            "\n--msgboxduration    Specify the duration of message box."
-           "\n                    If set, will overwrite default value read from xml."
+           "\n                    If set, will overwrite default seconds value read from xml."
            "\n--giftminprice      Specify the the minimum price of the gifts, like \"5.20\" Yuan."
            "\n"
            "\n-b, --blockmode     Specify the type of danmaku which will not show on the screen."
