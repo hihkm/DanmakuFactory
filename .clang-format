@@ -1,0 +1,8 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: Align
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 3
+PointerAlignment: Right
+SpacesBeforeTrailingComments: 2
