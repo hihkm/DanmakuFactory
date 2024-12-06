@@ -84,7 +84,8 @@ int main(int argc, char **argv)
     FINFO *infile = NULL;
     int infileNum = 0;
     int argCnt = 1;
-    int  arg_num, cnt;
+    int arg_config_num = 0;
+    int cnt;
     BOOL showConfig = FALSE;
     BOOL saveConfig = FALSE;
     BOOL configFileErr = FALSE;
@@ -134,7 +135,21 @@ int main(int argc, char **argv)
     {
         /* 读配置文件 */
         config = readConfig(configFilePath, defaultConfig);
-        
+        for (argCnt = 1; argCnt < argc; ++argCnt)
+        {
+            if (!strcmp("-c", argv[argCnt]) || !strcmp("--config", argv[argCnt]))
+            {
+                arg_config_num = getArgNum(argc, argv, argCnt);
+                for (cnt = 0; cnt < arg_config_num; cnt++)
+                {
+                    config = readConfig(argv[argCnt + cnt + 1], config);
+                }
+
+                break;
+            }
+        }
+
+        argCnt = 1;
         /* 遍历参数 */ 
         while (argCnt < argc)
         {
@@ -146,13 +161,7 @@ int main(int argc, char **argv)
             else if (!strcmp("-c", argv[argCnt]) || !strcmp("--config", argv[argCnt]))
             {   // 读取配置文件
                 showConfig = TRUE;
-                arg_num = getArgNum(argc, argv, argCnt);
-                for (cnt = 0; cnt < arg_num; cnt++)
-                {
-                    config = readConfig(argv[argCnt + cnt + 1], config);
-                }
-
-                argCnt += arg_num + 1;
+                argCnt += arg_config_num + 1;
             }
             else if (!strcmp("--save", argv[argCnt]))
             {
@@ -1380,10 +1389,10 @@ void printHelpInfo()
            "\n"
            "\n--msgboxsize        Specify the size of message box."
            "\n                    Use any character to connect width and height, like \"400x1000\"."
-           "\n                    Note: width + posX and height + posY should not larger than resolution."
+           "\n                    *Note*: width + posX and height + posY should not larger than resolution."
            "\n--msgboxpos         Specify the position of message box."
            "\n                    Use any character to connect posX and posY, like \"50x50\"."
-           "\n                    Note: width + posX and height + posY should not larger than resolution."
+           "\n                    *Note*: width + posX and height + posY should not larger than resolution."
            "\n--msgboxfontsize    Specify the fontsize of message box."
            "\n--msgboxduration    Specify the duration of message box."
            "\n                    If set, will overwrite default seconds value read from xml."
@@ -1405,6 +1414,7 @@ void printHelpInfo()
            "\n-c, --config        Specify configuration file(s) and display information."
            "\n                    Accept multiple file paths, the latter will overwrite the previous values."
            "\n                    For example, `-c \"base config.json\" \"typical value config.json\" ...`"
+           "\n                    *Note*: Arguments read from command line are superior."
            "\n--save              Save configuration as current command settings."
            "\n--ignore-warnings   Ignore all warnings, like `-y, --yes`."
            "\n"
