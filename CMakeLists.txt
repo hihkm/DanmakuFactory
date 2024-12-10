@@ -6,6 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (MSVC)
         add_compile_options(/wd4819)
+        add_compile_options(/wd4996)
 endif()
 
 add_executable (DanmakuFactory JsonFile.c main.c XmlFile.c

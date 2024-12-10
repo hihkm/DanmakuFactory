@@ -301,38 +301,54 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
     fprintf(fptr,
             "{\n"
             "    \"resolution\": [%d, %d],\n"
-            "    \"scrolltime\": %f,\n"
-            "    \"fixtime\": %f,\n"
+            "    \"displayArea\": %f,\n"
+            "    \"scrollArea\": %f,\n"
+            "    \"scrolltime\": %.3f,\n"
+            "    \"fixtime\": %.3f,\n"
+
             "    \"density\": %d,\n"
-            "    \"fontname\": \"%s\",\n"
             "    \"fontsize\": %d,\n"
+            "    \"fontname\": \"%s\",\n"
             "    \"opacity\": %d,\n"
             "    \"outline\": %.1f,\n"
             "    \"shadow\": %.1f,\n"
-            "    \"displayArea\": %f,\n"
-            "    \"scrollArea\": %f,\n"
             "    \"bold\": %s,\n"
-            "    \"showUsernames\": %s,\n"
+            ,
+            newConfigCopy.resolution.x, newConfigCopy.resolution.y,
+            newConfigCopy.displayarea,
+            newConfigCopy.scrollarea,
+            newConfigCopy.scrolltime,
+            newConfigCopy.fixtime,
+
+            newConfigCopy.density,
+            newConfigCopy.fontsize,
+            newConfigCopy.fontname,
+            newConfigCopy.opacity,
+            newConfigCopy.outline,
+            newConfigCopy.shadow,
+            boolToStr(tempStr, newConfigCopy.bold)
+    );
+    
+    /* 写是否保存屏蔽部分 */
+    if (newConfigCopy.saveBlockedPart == FALSE)
+    {
+        fprintf(fptr, "    \"saveblocked\": false, \n");
+    }
+
+    // 为防止一次性写入相同的值，此处分开对同一变量赋值输出。
+    fprintf(fptr, "    \"showUsernames\": %s,\n", boolToStr(tempStr, newConfigCopy.showUserNames));
+    
+    fprintf(fptr,
             "    \"showMsgbox\": %s,\n"
+
             "    \"msgboxSize\": [%d, %d],\n"
             "    \"msgboxPos\": [%d, %d],\n"
             "    \"msgboxFontsize\": %d,\n"
             "    \"msgboxDuration\": %.2f,\n"
-            "    \"giftMinPrice\": %.2f,\n",
-            newConfigCopy.resolution.x, newConfigCopy.resolution.y,
-            newConfigCopy.scrolltime,
-            newConfigCopy.fixtime,
-            newConfigCopy.density,
-            newConfigCopy.fontname,
-            newConfigCopy.fontsize,
-            newConfigCopy.opacity,
-            newConfigCopy.outline,
-            newConfigCopy.shadow,
-            newConfigCopy.displayarea,
-            newConfigCopy.scrollarea,
-            boolToStr(tempStr, newConfigCopy.bold),
-            boolToStr(tempStr, newConfigCopy.showUserNames),
+            "    \"giftMinPrice\": %.2f,\n"
+            ,
             boolToStr(tempStr, newConfigCopy.showMsgBox),
+
             newConfigCopy.msgBoxSize.x, newConfigCopy.msgBoxSize.y,
             newConfigCopy.msgBoxPos.x, newConfigCopy.msgBoxPos.y,
             newConfigCopy.msgboxFontsize,
@@ -340,13 +356,6 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.giftMinPrice
     );
     
-
-    /* 写是否保存屏蔽部分 */
-    if (newConfigCopy.saveBlockedPart == FALSE)
-    {
-        fprintf(fptr, "    \"saveblocked\": false, \n");
-    }
-
     /* 写屏蔽模式 */
     {
         /* L2R, R2L, TOP, BOTTOM, SPECIAL, COLOR, REPEAT */
@@ -472,10 +481,24 @@ void printConfig(CONFIG config)
 {
     printf("\n"
            "Configuration:\n"
-           "Resolution: %dx%d | ScrollTime: %.3f | FixTime: %.3f | Density: %d",
-           config.resolution.x, config.resolution.y,
-           config.scrolltime, config.fixtime, config.density
-          );
+           "Resolution: %dx%d", config.resolution.x, config.resolution.y);
+
+    printf(" | DisplayArea: %.3f", config.displayarea);
+    if (fabs(config.displayarea - 1) < EPS)
+    {
+        printf("(full)");
+    }
+    
+    printf(" | ScrollArea: %.3f", config.scrollarea);
+    if (fabs(config.scrollarea - 1) < EPS)
+    {
+        printf("(full)");
+    }
+    
+    printf(" | ScrollTime: %.3f sec | FixTime: %.3f sec",
+           config.scrolltime, config.fixtime);
+
+    printf("\nDensity: %d", config.density);
     if (config.density == -1)
     {
         printf("(non-overlap)");
@@ -485,9 +508,8 @@ void printConfig(CONFIG config)
         printf("(unlimit)");
     }
     
-    printf(" | Fontname: \"%s\" | Fontsize: %d | Opacity: %d | Outline: %.1f",
-           config.fontname, config.fontsize, config.opacity, config.outline
-          );
+    printf(" | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f",
+           config.fontsize, config.fontname, config.opacity, config.outline);
     if (fabs(config.outline) < EPS)
     {
         printf("(disable)");
@@ -508,20 +530,8 @@ void printConfig(CONFIG config)
     {
         printf("true");
     }
-    
-    printf(" | DisplayArea: %.3f", config.displayarea);
-    if (fabs(config.displayarea - 1) < EPS)
-    {
-        printf("(full)");
-    }
-    
-    printf(" | ScrollArea: %.3f", config.scrollarea);
-    if (fabs(config.scrollarea - 1) < EPS)
-    {
-        printf("(full)");
-    }
 
-    printf(" | SaveBlocked: ");
+    printf("\nSaveBlocked: ");
     if (config.saveBlockedPart == FALSE)
     {
         printf("false");
@@ -541,7 +551,7 @@ void printConfig(CONFIG config)
         printf("true");
     }
 
-    printf("\nShowMessageBox: ");
+    printf(" | ShowMessageBox: ");
     if (config.showMsgBox == FALSE)
     {
         printf("false");
@@ -551,8 +561,15 @@ void printConfig(CONFIG config)
         printf("true");
     }
 
-    printf(" | MessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f | GiftMinPrice: CNY %.2f", 
-           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration, config.giftMinPrice);
+    printf("\nMessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f", 
+           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration);
+    if (config.msgboxDuration < EPS) {
+        printf("(default)");
+    } else {
+        printf(" sec");
+    }
+
+    printf(" | GiftMinPrice: CNY %.2f", config.giftMinPrice);
     
     printf("\nBlockMode: ");
     if (config.blockmode == 0)
