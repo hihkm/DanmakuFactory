@@ -1,0 +1,64 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      is_tag: ${{ startsWith(github.ref, 'refs/tags/') }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: build for linux
+        if: startsWith(matrix.os, 'ubuntu')
+        run: make
+
+      - name: build for windows
+        if: startsWith(matrix.os, 'windows')
+        run: mingw32-make
+
+      - run: ls
+
+      - name: Upload win artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ runner.os }}
+          path: |
+            DanmakuFactory
+            DanmakuFactory.exe
+
+  prebuild-linux-arm:
+    strategy:
+      matrix:
+        arch:
+          - arm64
+    name: Prebuild on Linux (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - run: |
+          docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} ubuntu:latest -c "\
+          apt-get update && \
+          apt-get install -y make gcc && \
+          cd /tmp/project && \
+          make"
+      - name: Upload arm64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-linux-${{ matrix.arch }}
+          path: DanmakuFactory
+
+permissions:
+  contents: write
