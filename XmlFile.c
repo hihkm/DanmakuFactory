@@ -85,7 +85,7 @@ BOOL findSubstr(FILE *file, const char *substr, int maxlen) {
  * 5 6 7 内存空间申请失败
  * 8 文件未能按正确格式读入
   */
-int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status)
+int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status, const CONFIG config)
 {
     FILE *ipF;
     DANMAKU *tailNode = NULL;
@@ -245,13 +245,16 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 type = (short)atoi(deQuotMarks(tempText));
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 fontSize = (short)atoi(deQuotMarks(tempText));
+                if (config.fontSizeStrict) {
+                    fontSize = config.fontsize;
+                }
+                else if (fontSize <= 0) {
+                    fontSize = 1;
+                }
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 color = atoi(deQuotMarks(tempText));
 
-                /* 跳过后四个无价值参数 */
-                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
-                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
-                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
+                /* 跳过后续无价值参数 */
                 strGetLeftPart(NULL, &labelPtr, '\"', MAX_TEXT_LENGTH);
             }
             else if (strcmp(key, "ts") == 0)

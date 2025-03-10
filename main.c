@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 
+#include "Define/DanmakuDef.h"
 #ifdef _WIN32
 /* windows下 */
 #include <windows.h>
@@ -56,6 +57,7 @@ static CONFIG defaultConfig =
 
     0,              /* 弹幕密度 */
     38,             /* 字号 */
+    FALSE,          /* 是否严格保持指定的字号大小 */
                     /* 字体 */
     "Microsoft YaHei", 
     180,            /* 不透明度 */ 
@@ -348,6 +350,12 @@ int main(int argc, char **argv)
                 config.fontsize = (int)returnValue;
                 
                 argCnt += 2; 
+            }
+            else if (!strcmp("--font-size-strict", argv[argCnt]))
+            { /* 是否严格保持指定的字号大小 */
+                config.fontSizeStrict = TRUE;
+
+                argCnt += 1;
             }
             else if (!strcmp("-N", argv[argCnt]) || !strcmp("--fontname", argv[argCnt]))
             { /* 字号 */
@@ -953,7 +961,7 @@ int main(int argc, char **argv)
         
         if (!strcmp("xml", infile[cnt].template))
         {
-            returnValue = readXml(infile[cnt].fileName, &danmakuPool, "a", infile[cnt].timeShift, &status);
+            returnValue = readXml(infile[cnt].fileName, &danmakuPool, "a", infile[cnt].timeShift, &status, config);
             
             switch (returnValue)
             {
@@ -1372,6 +1380,8 @@ void printHelpInfo()
            "\n-d, --density       Specify the maximum number of danmaku could show on the screen at the same time."
            "\n                    Special value: -1 non-overlap, 0 unlimit"
            "\n-S, --fontsize      Specify the fontsize of general danmaku."
+           "\n--font-size-strict  Keep `--fontsize` all the time when read from `xml`."
+           "\n                    For example, `-S 25 --font-size-strict`"
            "\n-N, --fontname      Specify the fontname of general danmaku."
            "\n-O, --opacity       Specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)."
            "\n-L, --outline       Specify the width of outline for each danmaku(range: 0-4)."

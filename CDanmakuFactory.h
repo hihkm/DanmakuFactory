@@ -42,7 +42,7 @@ extern "C" {
 #include "AssFile/AssFile.h"
 
 /* xml */
-extern int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status);
+extern int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift, STATUS *const status, const CONFIG config);
 extern int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const status);
 
 /* json */
