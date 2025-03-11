@@ -40,6 +40,7 @@ int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSiz
         return -1;
     }
 
+    // 字号映射转换
     return fontSizeSet + (fontSizeInFile - 25);
 }
 

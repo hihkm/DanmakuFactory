@@ -245,12 +245,10 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 type = (short)atoi(deQuotMarks(tempText));
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 fontSize = (short)atoi(deQuotMarks(tempText));
-                if (config.fontSizeStrict) {
-                    fontSize = config.fontsize;
-                }
-                else if (fontSize <= 0) {
+                if (config.fontSizeStrict || fontSize <= 0) {
                     fontSize = 25;
                 }
+
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 color = atoi(deQuotMarks(tempText));
 
