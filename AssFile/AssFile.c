@@ -1943,7 +1943,8 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
         /* 计算弹幕内容长度 */
         textLen += getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
-        textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
+        // textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
+        textHei = now->fontSize;
 
         /* 特殊字符替换 */
         char escapedText[MAX_TEXT_LENGTH];
