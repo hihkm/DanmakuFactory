@@ -856,3 +856,28 @@ char *boolToStr(char *opStr, BOOL boolValue)
 
     return opStr;
 }
+
+void unicode_to_utf8(unsigned int codepoint, char *utf8_buffer) {
+    if (codepoint <= 0x7F) {
+        utf8_buffer[0] = (char)codepoint;
+        utf8_buffer[1] = '\0';
+    } else if (codepoint <= 0x7FF) {
+        utf8_buffer[0] = (char)(0xC0 | (codepoint >> 6));
+        utf8_buffer[1] = (char)(0x80 | (codepoint & 0x3F));
+        utf8_buffer[2] = '\0';
+    } else if (codepoint <= 0xFFFF) {
+        utf8_buffer[0] = (char)(0xE0 | (codepoint >> 12));
+        utf8_buffer[1] = (char)(0x80 | ((codepoint >> 6) & 0x3F));
+        utf8_buffer[2] = (char)(0x80 | (codepoint & 0x3F));
+        utf8_buffer[3] = '\0';
+    } else if (codepoint <= 0x10FFFF) {
+        utf8_buffer[0] = (char)(0xF0 | (codepoint >> 18));
+        utf8_buffer[1] = (char)(0x80 | ((codepoint >> 12) & 0x3F));
+        utf8_buffer[2] = (char)(0x80 | ((codepoint >> 6) & 0x3F));
+        utf8_buffer[3] = (char)(0x80 | (codepoint & 0x3F));
+        utf8_buffer[4] = '\0';
+    } else {
+        // Invalid code point
+        utf8_buffer[0] = '\0';
+    }
+}
