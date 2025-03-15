@@ -3385,7 +3385,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "MSG,,0000,0000,0000,,{%s%s\\p1%s\\bord0\\shad0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
+        fprintf(filePtr, "MSG,,0000,0000,0000,,{%s%s\\p1%s\\bord0\\shad0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d "
             "b %d %d %d %d %d %d",
             getActionStr(actionStr, 0, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
