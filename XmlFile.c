@@ -150,6 +150,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     BOOL isDanmaku;
     BOOL hasUserInfo;
     BOOL hasGiftInfo;
+    BOOL fontSizeStrict = FALSE;
 
     while (!feof(ipF))
     {
@@ -245,8 +246,9 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 type = (short)atoi(deQuotMarks(tempText));
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 fontSize = (short)atoi(deQuotMarks(tempText));
-                if (config.fontSizeStrict || fontSize <= 0) {
+                if (config.fontSizeStrict || fontSizeStrict || fontSize <= 0) {
                     fontSize = 25;
+                    fontSizeStrict = TRUE;
                 }
 
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
