@@ -22,6 +22,7 @@
  */
 
 #include "DanmakuFactoryList.h"
+#include <limits.h>
 #include "../Config/Config.h"
 
 /*
