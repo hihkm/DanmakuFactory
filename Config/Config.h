@@ -52,6 +52,7 @@ struct Configurations
     int density;       /* 密度 */
     int fontsize;      /* 字号 */
     BOOL fontSizeStrict;    /* 是否严格保持指定的字号大小 */
+    BOOL fontSizeNorm;  /* 是否修正字号 */
     char fontname[FONTNAME_LEN]; /* 字体 */
     int opacity;       /* 不透明度 */
     float outline;       /* 描边 */

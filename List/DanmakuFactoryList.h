@@ -34,10 +34,12 @@ extern "C" {
 #include <math.h>
 #include "../Define/DanmakuDef.h"
 #include "../Define/Status.h"
+#include "../Config/Config.h"
 
 extern int sortList(DANMAKU **listHead, STATUS *const status);
 extern void blockByType(DANMAKU *const danmakuHead, const int mode, char** keyStrings);
 extern void freeList(DANMAKU *listHead);
+extern void normFontSize(DANMAKU* const danmakuHead, const CONFIG config);
 
 #ifdef __cplusplus
 }

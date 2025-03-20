@@ -22,6 +22,7 @@
  */
 
 #include "DanmakuFactoryList.h"
+#include "../Config/Config.h"
 
 /*
  * 排序整个链表（桶排序）
@@ -269,5 +270,46 @@ void freeList(DANMAKU *listHead)
         free(ptr -> text);/* 释放文本部分的空间 */
         free(ptr);
         ptr = listHead;
+    }
+}
+
+void normFontSize(DANMAKU* const danmakuHead, const CONFIG config)
+{
+    if (!config.fontSizeStrict && !config.fontSizeNorm) {
+        return;
+    }
+
+    BOOL norm = FALSE;
+
+    if (config.fontSizeNorm) {
+        short max_font_size = SHRT_MIN, min_font_size = SHRT_MAX;
+
+        for (DANMAKU* ptr = (DANMAKU*)danmakuHead; ptr != NULL; ptr = ptr->next)
+        {
+            if (ptr->type == 7) {
+                continue;
+            }
+
+            if (max_font_size < ptr->fontSize) {
+                max_font_size = ptr->fontSize;
+            } else if (min_font_size > ptr->fontSize) {
+                min_font_size = ptr->fontSize;
+            }
+        }
+
+        if (min_font_size <= 0 || max_font_size >= config.resolution.y) {
+            norm = TRUE;
+        }
+    }
+
+    if (config.fontSizeStrict || norm) {
+        for (DANMAKU* ptr = (DANMAKU*)danmakuHead; ptr != NULL; ptr = ptr->next)
+        {
+            if (ptr->type == 7) {
+                continue;
+            }
+
+            ptr->fontSize = 25;
+        }
     }
 }
