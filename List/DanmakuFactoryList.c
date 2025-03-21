@@ -24,6 +24,7 @@
 #include "DanmakuFactoryList.h"
 #include <limits.h>
 #include "../Config/Config.h"
+#include "../Define/DanmakuDef.h"
 
 /*
  * 排序整个链表（桶排序）
@@ -276,10 +277,6 @@ void freeList(DANMAKU *listHead)
 
 void normFontSize(DANMAKU* const danmakuHead, const CONFIG config)
 {
-    if (!config.fontSizeStrict && !config.fontSizeNorm) {
-        return;
-    }
-
     BOOL norm = FALSE;
 
     if (config.fontSizeNorm) {
@@ -287,7 +284,7 @@ void normFontSize(DANMAKU* const danmakuHead, const CONFIG config)
 
         for (DANMAKU* ptr = (DANMAKU*)danmakuHead; ptr != NULL; ptr = ptr->next)
         {
-            if (ptr->type == 7) {
+            if (ptr->type == SPECIAL) {
                 continue;
             }
 
@@ -306,7 +303,7 @@ void normFontSize(DANMAKU* const danmakuHead, const CONFIG config)
     if (config.fontSizeStrict || norm) {
         for (DANMAKU* ptr = (DANMAKU*)danmakuHead; ptr != NULL; ptr = ptr->next)
         {
-            if (ptr->type == 7) {
+            if (ptr->type == SPECIAL) {
                 continue;
             }
 
