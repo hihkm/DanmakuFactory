@@ -56,6 +56,7 @@ static CONFIG defaultConfig =
     5.0,            /* 固定时间 */
 
     0,              /* 弹幕密度 */
+    0,              /* 行间距 */
     38,             /* 字号 */
     FALSE,          /* 是否严格保持指定的字号大小 */
     FALSE,          /* 是否修正字号 */
@@ -338,6 +339,17 @@ int main(int argc, char **argv)
                     return 0;
                 }
                 config.density = (int)returnValue;
+                
+                argCnt += 2; 
+            }
+            else if (!strcmp("--line-spacing", argv[argCnt]))
+            { /* 行间距 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "LineSpacing", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.lineSpacing = (int)returnValue;
                 
                 argCnt += 2; 
             }
@@ -1388,6 +1400,7 @@ void printHelpInfo()
            "\n"
            "\n-d, --density       Specify the maximum number of danmaku could show on the screen at the same time."
            "\n                    Special value: -1 non-overlap, 0 unlimit"
+           "\n--line-spacing      Specify the line spacing of general danmaku."
            "\n-S, --fontsize      Specify the fontsize of general danmaku."
            "\n--font-size-strict  Keep `--fontsize` all the time for general danmaku."
            "\n                    For example, `--fontsize 25 --font-size-strict`"

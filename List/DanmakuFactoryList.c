@@ -22,7 +22,6 @@
  */
 
 #include "DanmakuFactoryList.h"
-#include <limits.h>
 #include "../Config/Config.h"
 #include "../Define/DanmakuDef.h"
 
@@ -277,30 +276,23 @@ void freeList(DANMAKU *listHead)
 
 void normFontSize(DANMAKU* const danmakuHead, const CONFIG config)
 {
-    BOOL norm = FALSE;
+    BOOL doNormalize = FALSE;
 
     if (config.fontSizeNorm) {
-        short max_font_size = SHRT_MIN, min_font_size = SHRT_MAX;
-
         for (DANMAKU* ptr = (DANMAKU*)danmakuHead; ptr != NULL; ptr = ptr->next)
         {
             if (ptr->type == SPECIAL) {
                 continue;
             }
 
-            if (max_font_size < ptr->fontSize) {
-                max_font_size = ptr->fontSize;
-            } else if (min_font_size > ptr->fontSize) {
-                min_font_size = ptr->fontSize;
+            if (ptr->fontSize <= 0 || ptr->fontSize >= config.resolution.y) {
+                doNormalize = TRUE;
+                break;
             }
-        }
-
-        if (min_font_size <= 0 || max_font_size >= config.resolution.y) {
-            norm = TRUE;
         }
     }
 
-    if (config.fontSizeStrict || norm) {
+    if (config.fontSizeStrict || doNormalize) {
         for (DANMAKU* ptr = (DANMAKU*)danmakuHead; ptr != NULL; ptr = ptr->next)
         {
             if (ptr->type == SPECIAL) {

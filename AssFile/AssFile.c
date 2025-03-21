@@ -1737,6 +1737,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     const float displayArea = config.displayarea;
     const float rollArea = config.scrollarea;
     const int density = config.density;
+    const int lineSpacing = config.lineSpacing;
     const int blockMode = config.blockmode;
     const BOOL saveBlockedPart = config.saveBlockedPart;
     const BOOL showMsgBox = config.showMsgBox;
@@ -1934,6 +1935,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         
         /* 文本长度计算 */
         int textLen = 0, textHei = 0;
+        int lineHeight;
 
         /* 计算用户ID长度 */
         if (showUserName == TRUE && now->user != NULL)
@@ -1944,6 +1946,10 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         /* 计算弹幕内容长度 */
         textLen += getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
         textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
+        lineHeight = textHei + lineSpacing;
+        if (lineHeight <= 0) {
+            lineHeight = 1;
+        }
 
         /* 特殊字符替换 */
         char escapedText[MAX_TEXT_LENGTH];
@@ -1953,28 +1959,28 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             assEscape(escapedText, now->text, MAX_TEXT_LENGTH, ASS_ESCAPE);
         }
         // strSafeCopy(escapedText, now->text, MAX_TEXT_LENGTH);
-        
+
         /* 弹幕按类型解析 */
         if (IS_R2L(now)) {  /* 右左弹幕 */
             int PositionY;
-            for(PositionY = 1; PositionY < rollResY - textHei; PositionY++)
+            for(PositionY = 0; PositionY <= rollResY - lineHeight; PositionY++)
             {
-                for(cnt = 0; cnt < fontSize; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {
                     if(now->time < R2LToRightTime[PositionY + cnt] || 
                        now->time + GET_ASS_MS_FLT(rollTime / 1000.0f * resolution.x / (resolution.x + textLen)) < R2LToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕右边 或 
                         当本条弹幕到达左端时该行最后一条弹幕没有完全退出屏幕 */
-                        PositionY = PositionY + cnt + 1;
+                        PositionY = PositionY + cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= lineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY >= rollResY - textHei)
+            if(PositionY > rollResY - lineHeight)
             {
                 if(density == -1)
                 {
@@ -1984,12 +1990,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(R2LToRightTime, rollResY, rollResY - textHei, 0);
+                PositionY = findMin(R2LToRightTime, rollResY, rollResY - lineHeight, 0);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {/* 登记位置占用信息 */
                     R2LToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_FLT(rollTime / 1000.0f * textLen / (resolution.x + textLen)); 
                     R2LToLeftTime[PositionY + cnt] = now -> time + rollTime;
@@ -2025,27 +2031,27 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 2 || now -> type == -2)/* 左右弹幕 */ 
+        else if(IS_L2R(now))/* 左右弹幕 */ 
         {
             int PositionY;
-            for(PositionY = 1; PositionY < rollResY - textHei; PositionY++)
+            for(PositionY = 0; PositionY <= rollResY - lineHeight; PositionY++)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {
                     if (now->time < L2RToRightTime[PositionY + cnt] || 
                         now->time + GET_ASS_MS_FLT(rollTime / 1000.0f * resolution.x / (resolution.x + textLen)) < L2RToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕左边 或 
                         当本条弹幕到达右端时该行最后一条弹幕没有完全退出屏幕 */
-                        PositionY = PositionY + cnt + 1;
+                        PositionY = PositionY + cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= lineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY >= rollResY - textHei)
+            if(PositionY > rollResY - lineHeight)
             {
                 if(density == -1)
                 {
@@ -2055,12 +2061,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(L2RToRightTime, rollResY, rollResY - textHei, 0);
+                PositionY = findMin(L2RToRightTime, rollResY, rollResY - lineHeight, 0);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {/* 登记位置占用信息 */
                     L2RToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_FLT(rollTime / 1000.0f * textLen / (resolution.x + textLen)); 
                     L2RToLeftTime[PositionY + cnt] = now -> time + rollTime;
@@ -2097,25 +2103,25 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 3 || now -> type == -3)/* 顶端弹幕 */ 
-        {
+        else if(IS_TOP(now))/* 顶端弹幕 */ 
+        {// TODO: 修复排列到第二层发生堆叠的问题
             int PositionY;
-            for(PositionY = 1; PositionY < holdResY - textHei; PositionY++)
+            for(PositionY = 0; PositionY <= holdResY - lineHeight; PositionY++)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {
                     if(now->time < fixEndTime[PositionY + cnt])
                     {/* 当本条弹幕出现时本行上一条弹幕还没有消失 */
-                        PositionY = PositionY + cnt + 1;
+                        PositionY = PositionY + cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= lineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY >= holdResY - textHei)
+            if(PositionY > holdResY - lineHeight)
             {
                 if(density == -1)
                 {
@@ -2125,12 +2131,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(fixEndTime, holdResY, holdResY - textHei, 0);
+                PositionY = findMin(fixEndTime, holdResY, holdResY - lineHeight, 0);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {/* 登记占用信息 */ 
                     fixEndTime[PositionY + cnt] = now -> time + holdTime;
                 }
@@ -2164,25 +2170,25 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 4 || now -> type == -4)/* 底端弹幕 */ 
-        {
+        else if(IS_BTM(now))/* 底端弹幕 */ 
+        {// TODO: 修复排列到第二层发生堆叠的问题
             int PositionY;
-            for(PositionY = holdResY - 1; PositionY > textHei - 1; PositionY--)
+            for(PositionY = holdResY; PositionY >= lineHeight; PositionY--)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {
-                    if(now->time < fixEndTime[PositionY - cnt])
+                    if(now->time < fixEndTime[PositionY - cnt - 1])
                     {/* 当本条弹幕出现时本行上一条弹幕还没有消失 */
-                        PositionY = PositionY - cnt - 1;
+                        PositionY = PositionY - cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= lineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY < textHei)
+            if(PositionY < lineHeight)
             {
                 if(density == -1)
                 {
@@ -2192,18 +2198,14 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(fixEndTime, holdResY, textHei, 1);
-            }
-            for(cnt = 0; cnt < textHei; cnt++)
-            {
-                fixEndTime[PositionY - cnt] = now -> time + holdTime;
+                PositionY = findMin(fixEndTime, holdResY, lineHeight, 1);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < lineHeight; cnt++)
                 {/* 登记占用信息 */ 
-                    fixEndTime[PositionY - cnt] = now -> time + holdTime;
+                    fixEndTime[PositionY - cnt - 1] = now -> time + holdTime;
                 }
                 fprintf(opF, "\nDialogue: 1,");
             }
@@ -2215,7 +2217,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
             fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)",
-                    resolution.x / 2, PositionY - textHei + 2);
+                    resolution.x / 2, PositionY - lineHeight);
             
             if(textHei != fontSize)
             {
@@ -3506,7 +3508,7 @@ int printMessage(FILE *filePtr,
 /* 
  * 寻找最小值 
  * 参数：
- * 欲找最小值的数组/成员数/终止下标/模式（0正序，1逆序）
+ * 寻找最小值的数组/成员数/终止下标/模式（0正序，1逆序）
  * 返回值：
  * 最小值数组下标 
   */
