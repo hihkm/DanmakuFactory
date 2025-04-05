@@ -22,15 +22,14 @@
  */
 
 #include "AssStringProcessing.h"
-#include <string.h>
 
 const struct AssEscapeListNode assEscapeList[] = 
 { /* 源字符串 转义后字符串 */
     // {"\\n", "\\{}n"},
     // {"\\N", "\\{}N"},
     // {"\\h", "\\{}h"},
-    {"\\n", "\\​n"},
-    {"\\N", "\\​N"},
+    {"\\n", "\\\xe2\x80\x8bn"},
+    {"\\N", "\\\xe2\x80\x8bN"},
     {"\\h", "\\​h"},
     {"{", "\\{"},   // compatible with libass
     {"}", "\\}"},   // compatible with libass

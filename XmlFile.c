@@ -394,6 +394,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
 
         if (messageType == MSG_GIFT && gift.duration == 0) {
+            // issues#111
             gift.duration = 5 * 1000;
         }
 

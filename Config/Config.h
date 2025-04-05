@@ -50,7 +50,7 @@ struct Configurations
     float fixtime;     /* 固定时间 */
 
     int density;       /* 密度 */
-    int lineSpacing;   /* 行间距 */
+    int lineSpacing;   /* 行间距(像素) */
     int fontsize;      /* 字号 */
     BOOL fontSizeStrict;    /* 是否严格保持指定的字号大小 */
     BOOL fontSizeNorm;  /* 是否修正字号 */
