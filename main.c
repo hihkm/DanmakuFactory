@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 
+#include "Define/DanmakuDef.h"
 #ifdef _WIN32
 /* windows下 */
 #include <windows.h>
@@ -55,7 +56,10 @@ static CONFIG defaultConfig =
     5.0,            /* 固定时间 */
 
     0,              /* 弹幕密度 */
+    0,              /* 行间距 */
     38,             /* 字号 */
+    FALSE,          /* 是否严格保持指定的字号大小 */
+    FALSE,          /* 是否修正字号 */
                     /* 字体 */
     "Microsoft YaHei", 
     180,            /* 不透明度 */ 
@@ -338,6 +342,17 @@ int main(int argc, char **argv)
                 
                 argCnt += 2; 
             }
+            else if (!strcmp("--line-spacing", argv[argCnt]))
+            { /* 行间距 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "LineSpacing", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.lineSpacing = (int)returnValue;
+                
+                argCnt += 2; 
+            }
             else if (!strcmp("-S", argv[argCnt]) || !strcmp("--fontsize", argv[argCnt]))
             { /* 字号 */
                 double returnValue = getArgValDouble(argc, argv, argCnt, "Fontsize", -256.00);
@@ -348,6 +363,18 @@ int main(int argc, char **argv)
                 config.fontsize = (int)returnValue;
                 
                 argCnt += 2; 
+            }
+            else if (!strcmp("--font-size-strict", argv[argCnt]))
+            { /* 是否严格保持指定的字号大小 */
+                config.fontSizeStrict = TRUE;
+
+                argCnt += 1;
+            }
+            else if (!strcmp("--font-size-norm", argv[argCnt]))
+            { /* 是否修正字号 */
+                config.fontSizeNorm = TRUE;
+
+                argCnt += 1;
             }
             else if (!strcmp("-N", argv[argCnt]) || !strcmp("--fontname", argv[argCnt]))
             { /* 字号 */
@@ -1173,6 +1200,8 @@ int main(int argc, char **argv)
 
     /* 屏蔽 */
     blockByType(danmakuPool, config.blockmode, config.blocklist);
+    /* 正则化字号 */
+    normFontSize(danmakuPool, config);
     
     /* 读完成提示 */
     printf("\nFile Loading Complete.");
@@ -1371,7 +1400,11 @@ void printHelpInfo()
            "\n"
            "\n-d, --density       Specify the maximum number of danmaku could show on the screen at the same time."
            "\n                    Special value: -1 non-overlap, 0 unlimit"
+           "\n--line-spacing      Specify the line spacing of general danmaku."
            "\n-S, --fontsize      Specify the fontsize of general danmaku."
+           "\n--font-size-strict  Keep `--fontsize` all the time for general danmaku."
+           "\n                    For example, `--fontsize 25 --font-size-strict`"
+           "\n--font-size-norm    Normalize font size for general danmaku."
            "\n-N, --fontname      Specify the fontname of general danmaku."
            "\n-O, --opacity       Specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)."
            "\n-L, --outline       Specify the width of outline for each danmaku(range: 0-4)."

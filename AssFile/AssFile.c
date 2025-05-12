@@ -1275,6 +1275,7 @@ static inline void popComboList(MSGLIST *msgListPtr) {
     COMBOLIST *comboListPtr = msgListPtr->comboListHead;
     // TODO: use comboListHead, not ptr, assign value by comboListHead.message = comboListHead.nextNode->message,.nextNode = .nextNode->nextNode.
     msgListPtr->comboListHead = comboListPtr->nextNode;
+    // free NULL could be Okay & Intentional.
     free(comboListPtr);
 }
 
@@ -1549,7 +1550,7 @@ static inline void appendEndMessage(const int msgStartTime, const int startTime,
     }
 }
 
-void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos, COORDIN *msgBoxSize, char *msgBoxClip,
+static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos, COORDIN *msgBoxSize, char *msgBoxClip,
                        const int msgFontSize, const int msgAnimationTime, MSGLIST **msgListHead, MSGLIST **msgListTail,
                        int lastMsgEndTime, const int msgStartTime, const int msgEndTime) {
     MSGLIST *msgListPtr, *msgListLastPtr, *msgListNextPtr;
@@ -1737,6 +1738,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     const float displayArea = config.displayarea;
     const float rollArea = config.scrollarea;
     const int density = config.density;
+    const int lineSpacing = config.lineSpacing;
     const int blockMode = config.blockmode;
     const BOOL saveBlockedPart = config.saveBlockedPart;
     const BOOL showMsgBox = config.showMsgBox;
@@ -1768,13 +1770,14 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     /* 临时变量 */
     int cnt;
     // char tempText[MAX_TEXT_LENGTH];
+    int ret_code = 0;
 
     DANMAKU *now = NULL;
     DANMAKU *signPtr = head, *scanPtr = head;
 
     MSGLIST *msgListHead = NULL;
     MSGLIST *msgListTail = NULL;
-    MSGLIST *msgListPtr;
+    // MSGLIST *msgListPtr = NULL;
     
     /* 信息框参数 */
     const int msgAnimationTime = 250;           /* 新消息弹出动画时间(毫秒) */
@@ -1784,12 +1787,14 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
     /* 弹幕占用时间 */
     int msgEndTime = -msgAnimationTime;     /* 上一条消息动画结束时间(毫秒) */
-    int *R2LToRightTime, *R2LToLeftTime;    /* 右左滚动行经过特定点时间(毫秒) */
-    int *L2RToRightTime, *L2RToLeftTime;    /* 左右滚动行经过特定点时间(毫秒) */
-    int *fixEndTime;    /* 顶部与底部弹幕消失时间(毫秒) */
+    int *R2LToRightTime = NULL, *R2LToLeftTime = NULL;    /* 右左滚动行经过特定点时间(毫秒) */
+    int *L2RToRightTime = NULL, *L2RToLeftTime = NULL;    /* 左右滚动行经过特定点时间(毫秒) */
+    int *fixEndTime = NULL;    /* 顶部与底部弹幕消失时间(毫秒) */
     
     /* 显示区域限制 */
     int rollResY, holdResY;
+    int rollLineHeight, holdLineHeight;
+
     if(displayArea > EPS && displayArea < 1-EPS)
     {/* 大于 0 但小于 1 的情况 */
         /* TODO: 此处可能有逻辑错误 */
@@ -1815,33 +1820,27 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     }
     if ((R2LToLeftTime = (int *)malloc(rollResY * sizeof(int))) == NULL)
     {
-        free(R2LToRightTime);
         fclose(opF);
-        return 4;
+        ret_code = 4;
+        goto BYE;
     }
     if ((L2RToRightTime = (int *)malloc(rollResY * sizeof(int))) == NULL)
     {
-        free(R2LToRightTime);
-        free(R2LToLeftTime);
         fclose(opF);
-        return 5;
+        ret_code = 5;
+        goto BYE;
     }
     if ((L2RToLeftTime = (int *)malloc(rollResY * sizeof(int))) == NULL)
     {
-        free(R2LToRightTime);
-        free(R2LToLeftTime);
-        free(L2RToRightTime);
         fclose(opF);
-        return 6;
+        ret_code = 6;
+        goto BYE;
     }
     if ((fixEndTime = (int *)malloc(holdResY * sizeof(int))) == NULL)
     {
-        free(R2LToRightTime);
-        free(R2LToLeftTime);
-        free(L2RToRightTime);
-        free(L2RToLeftTime);
         fclose(opF);
-        return 7;
+        ret_code = 7;
+        goto BYE;
     }
     memset(R2LToRightTime, 0, rollResY * sizeof(int));
     memset(R2LToLeftTime, 0, rollResY * sizeof(int));
@@ -1944,6 +1943,17 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         /* 计算弹幕内容长度 */
         textLen += getStrLen((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
         textHei = getStrHei((unsigned char *)(now -> text), fontSize, now -> fontSize, fontName);
+        rollLineHeight = holdLineHeight = textHei + lineSpacing;
+        if (rollLineHeight <= 0) {
+            rollLineHeight = 1;
+        } else if (rollLineHeight > rollResY) {
+            rollLineHeight = rollResY;
+        }
+        if (holdLineHeight <= 0) {
+            holdLineHeight = 1;
+        } else if (holdLineHeight > holdResY) {
+            holdLineHeight = holdResY;
+        }
 
         /* 特殊字符替换 */
         char escapedText[MAX_TEXT_LENGTH];
@@ -1953,28 +1963,28 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             assEscape(escapedText, now->text, MAX_TEXT_LENGTH, ASS_ESCAPE);
         }
         // strSafeCopy(escapedText, now->text, MAX_TEXT_LENGTH);
-        
+
         /* 弹幕按类型解析 */
         if (IS_R2L(now)) {  /* 右左弹幕 */
             int PositionY;
-            for(PositionY = 1; PositionY < rollResY - textHei; PositionY++)
+            for(PositionY = 0; PositionY <= rollResY - rollLineHeight; PositionY++)
             {
-                for(cnt = 0; cnt < fontSize; cnt++)
+                for(cnt = 0; cnt < rollLineHeight; cnt++)
                 {
                     if(now->time < R2LToRightTime[PositionY + cnt] || 
                        now->time + GET_ASS_MS_FLT(rollTime / 1000.0f * resolution.x / (resolution.x + textLen)) < R2LToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕右边 或 
                         当本条弹幕到达左端时该行最后一条弹幕没有完全退出屏幕 */
-                        PositionY = PositionY + cnt + 1;
+                        PositionY = PositionY + cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= rollLineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY >= rollResY - textHei)
+            if(PositionY > rollResY - rollLineHeight)
             {
                 if(density == -1)
                 {
@@ -1984,12 +1994,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(R2LToRightTime, rollResY, rollResY - textHei, 0);
+                PositionY = findMin(R2LToRightTime, rollResY, rollResY - rollLineHeight, 0);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < rollLineHeight; cnt++)
                 {/* 登记位置占用信息 */
                     R2LToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_FLT(rollTime / 1000.0f * textLen / (resolution.x + textLen)); 
                     R2LToLeftTime[PositionY + cnt] = now -> time + rollTime;
@@ -2025,27 +2035,27 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 2 || now -> type == -2)/* 左右弹幕 */ 
+        else if(IS_L2R(now))/* 左右弹幕 */ 
         {
             int PositionY;
-            for(PositionY = 1; PositionY < rollResY - textHei; PositionY++)
+            for(PositionY = 0; PositionY <= rollResY - rollLineHeight; PositionY++)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < rollLineHeight; cnt++)
                 {
                     if (now->time < L2RToRightTime[PositionY + cnt] || 
                         now->time + GET_ASS_MS_FLT(rollTime / 1000.0f * resolution.x / (resolution.x + textLen)) < L2RToLeftTime[PositionY + cnt])
                     {/* 当本条弹幕出现该行最后一条弹幕未离开屏幕左边 或 
                         当本条弹幕到达右端时该行最后一条弹幕没有完全退出屏幕 */
-                        PositionY = PositionY + cnt + 1;
+                        PositionY = PositionY + cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= rollLineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY >= rollResY - textHei)
+            if(PositionY > rollResY - rollLineHeight)
             {
                 if(density == -1)
                 {
@@ -2055,12 +2065,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(L2RToRightTime, rollResY, rollResY - textHei, 0);
+                PositionY = findMin(L2RToRightTime, rollResY, rollResY - rollLineHeight, 0);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < rollLineHeight; cnt++)
                 {/* 登记位置占用信息 */
                     L2RToRightTime[PositionY + cnt] = now -> time + GET_ASS_MS_FLT(rollTime / 1000.0f * textLen / (resolution.x + textLen)); 
                     L2RToLeftTime[PositionY + cnt] = now -> time + rollTime;
@@ -2097,25 +2107,25 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 3 || now -> type == -3)/* 顶端弹幕 */ 
+        else if(IS_TOP(now))/* 顶端弹幕 */ 
         {
             int PositionY;
-            for(PositionY = 1; PositionY < holdResY - textHei; PositionY++)
+            for(PositionY = 0; PositionY <= holdResY - holdLineHeight; PositionY++)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < holdLineHeight; cnt++)
                 {
                     if(now->time < fixEndTime[PositionY + cnt])
                     {/* 当本条弹幕出现时本行上一条弹幕还没有消失 */
-                        PositionY = PositionY + cnt + 1;
+                        PositionY = PositionY + cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= holdLineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY >= holdResY - textHei)
+            if(PositionY > holdResY - holdLineHeight)
             {
                 if(density == -1)
                 {
@@ -2125,12 +2135,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(fixEndTime, holdResY, holdResY - textHei, 0);
+                PositionY = findMin(fixEndTime, holdResY, holdResY - holdLineHeight, 0);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < holdLineHeight; cnt++)
                 {/* 登记占用信息 */ 
                     fixEndTime[PositionY + cnt] = now -> time + holdTime;
                 }
@@ -2164,25 +2174,25 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             fprintf(opF, "%s", escapedText);
         }
-        else if(now -> type == 4 || now -> type == -4)/* 底端弹幕 */ 
+        else if(IS_BTM(now))/* 底端弹幕 */ 
         {
             int PositionY;
-            for(PositionY = holdResY - 1; PositionY > textHei - 1; PositionY--)
+            for(PositionY = holdResY; PositionY >= holdLineHeight; PositionY--)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < holdLineHeight; cnt++)
                 {
-                    if(now->time < fixEndTime[PositionY - cnt])
+                    if(now->time < fixEndTime[PositionY - cnt - 1])
                     {/* 当本条弹幕出现时本行上一条弹幕还没有消失 */
-                        PositionY = PositionY - cnt - 1;
+                        PositionY = PositionY - cnt;
                         break;
                     }
                 }
-                if(cnt >= textHei)
+                if(cnt >= holdLineHeight)
                 {
                     break;
                 }
             }
-            if(PositionY < textHei)
+            if(PositionY < holdLineHeight)
             {
                 if(density == -1)
                 {
@@ -2192,18 +2202,14 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         goto NEXTNODE;
                     }
                 }
-                PositionY = findMin(fixEndTime, holdResY, textHei, 1);
-            }
-            for(cnt = 0; cnt < textHei; cnt++)
-            {
-                fixEndTime[PositionY - cnt] = now -> time + holdTime;
+                PositionY = findMin(fixEndTime, holdResY, holdLineHeight, 1);
             }
             
             if (now -> type > 0)
             {
-                for(cnt = 0; cnt < textHei; cnt++)
+                for(cnt = 0; cnt < holdLineHeight; cnt++)
                 {/* 登记占用信息 */ 
-                    fixEndTime[PositionY - cnt] = now -> time + holdTime;
+                    fixEndTime[PositionY - cnt - 1] = now -> time + holdTime;
                 }
                 fprintf(opF, "\nDialogue: 1,");
             }
@@ -2215,7 +2221,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
             fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)",
-                    resolution.x / 2, PositionY - textHei + 2);
+                    resolution.x / 2, PositionY - holdLineHeight);
             
             if(textHei != fontSize)
             {
@@ -2362,7 +2368,8 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             if ((newMsgNode = (MSGLIST *)malloc(sizeof(MSGLIST))) == NULL) {
                 /* TODO: 异常处理 */
                 fclose(opF);
-                return 3;
+                ret_code = 3;
+                goto BYE;
             }
 
             if (msgListHead != NULL) {
@@ -2444,23 +2451,23 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         writeAliveMessage(opF, &resolution, &msgBoxPos, &msgBoxSize, msgBoxClip, msgFontSize, msgAnimationTime,
                           &msgListHead, &msgListTail, msgEndTime, MAX_ASS_MS_INT, MAX_ASS_MS_INT);
     }
-    
-    /* 归还空间 */
-    free(R2LToRightTime);
-    free(R2LToLeftTime);
-    free(L2RToRightTime);
-    free(L2RToLeftTime);
-    free(fixEndTime);
-
     /* 清空缓冲区 */
     fflush(opF);
+
+BYE:
+    /* 归还空间 */
+    if (R2LToRightTime != NULL) free(R2LToRightTime);
+    if (R2LToLeftTime != NULL) free(R2LToLeftTime);
+    if (L2RToRightTime != NULL) free(L2RToRightTime);
+    if (L2RToLeftTime != NULL) free(L2RToLeftTime);
+    if (fixEndTime != NULL) free(fixEndTime);
     
     /* 刷新status */
     if (status != NULL)
     {
         status -> isDone = TRUE;
     }
-    return 0;
+    return ret_code;
 }
 
 /* 
@@ -3385,7 +3392,7 @@ int printMessage(FILE *filePtr,
         fprintf(filePtr, "\nDialogue: 0,");
         printTime(filePtr, startTime, ",");
         printTime(filePtr, endTime, ",");
-        fprintf(filePtr, "MSG,,0000,0000,0000,,{%s%s\\p1%s\\bord0\\shad0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d"
+        fprintf(filePtr, "MSG,,0000,0000,0000,,{%s%s\\p1%s\\bord0\\shad0}m %d %d l %d %d l %d %d b %d %d %d %d %d %d l %d %d "
             "b %d %d %d %d %d %d",
             getActionStr(actionStr, 0, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
             effect, /* 补充特效 */
@@ -3506,7 +3513,7 @@ int printMessage(FILE *filePtr,
 /* 
  * 寻找最小值 
  * 参数：
- * 欲找最小值的数组/成员数/终止下标/模式（0正序，1逆序）
+ * 寻找最小值的数组/成员数/终止下标/模式（0正序，1逆序）
  * 返回值：
  * 最小值数组下标 
   */
@@ -3516,23 +3523,43 @@ static int findMin(int *array, const int numOfLine, const int stopSubScript, con
     if(!mode)
     {/* 正序查找 */
         minSub = 0;
-        for(cnt = 0; cnt < stopSubScript; cnt++)
+        for(cnt = minSub + 1; cnt < stopSubScript; cnt++)
         {
             if(array[cnt] < array[minSub])
             {
                 minSub = cnt;
             }
         }
+        if (minSub == 0 && array[minSub] == array[stopSubScript -1]) {
+            // refresh array
+            for (cnt = minSub + 1; cnt < stopSubScript; cnt++)
+            {
+                if (array[cnt] == array[minSub]) {
+                    array[cnt] = 0;
+                }
+            }
+            array[minSub] = 0;
+        }
     }
     else
     {/* 逆序查找 */ 
         minSub = numOfLine - 1;
-        for(cnt = numOfLine - 1; cnt >= stopSubScript; cnt--)
+        for(cnt = minSub - 1; cnt >= stopSubScript; cnt--)
         {
             if(array[cnt] < array[minSub])
             {
                 minSub = cnt;
             }
+        }
+        if (minSub == numOfLine - 1 && array[minSub] == array[stopSubScript]) {
+            // refresh array
+            for (cnt = minSub - 1; cnt >= stopSubScript; cnt--)
+            {
+                if (array[cnt] == array[minSub]) {
+                    array[cnt] = 0;
+                }
+            }
+            array[minSub] = 0;
         }
     }
     return minSub;

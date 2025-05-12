@@ -212,6 +212,10 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
         {
             configOnfile.density = atoi(value);
         }
+        else if (strcmp("linespacing", key) == 0)
+        {
+            configOnfile.lineSpacing = atoi(value);
+        }
         else if (strcmp("fontname", key) == 0)
         {
             strSafeCopy(configOnfile.fontname, value, FONTNAME_LEN);
@@ -307,6 +311,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"fixtime\": %.3f,\n"
 
             "    \"density\": %d,\n"
+            "    \"lineSpacing\": %d,\n"
             "    \"fontsize\": %d,\n"
             "    \"fontname\": \"%s\",\n"
             "    \"opacity\": %d,\n"
@@ -321,6 +326,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.fixtime,
 
             newConfigCopy.density,
+            newConfigCopy.lineSpacing,
             newConfigCopy.fontsize,
             newConfigCopy.fontname,
             newConfigCopy.opacity,
@@ -508,8 +514,8 @@ void printConfig(CONFIG config)
         printf("(unlimit)");
     }
     
-    printf(" | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f",
-           config.fontsize, config.fontname, config.opacity, config.outline);
+    printf(" | LineSpacing: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f",
+           config.lineSpacing, config.fontsize, config.fontname, config.opacity, config.outline);
     if (fabs(config.outline) < EPS)
     {
         printf("(disable)");

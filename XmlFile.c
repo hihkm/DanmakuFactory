@@ -245,13 +245,11 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
                 type = (short)atoi(deQuotMarks(tempText));
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 fontSize = (short)atoi(deQuotMarks(tempText));
+
                 strGetLeftPart(tempText, &labelPtr, ',', MAX_TEXT_LENGTH);
                 color = atoi(deQuotMarks(tempText));
 
-                /* 跳过后四个无价值参数 */
-                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
-                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
-                strGetLeftPart(NULL, &labelPtr, ',', MAX_TEXT_LENGTH);
+                /* 跳过后续无价值参数 */
                 strGetLeftPart(NULL, &labelPtr, '\"', MAX_TEXT_LENGTH);
             }
             else if (strcmp(key, "ts") == 0)
@@ -396,6 +394,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
 
         if (messageType == MSG_GIFT && gift.duration == 0) {
+            // issues#111
             gift.duration = 5 * 1000;
         }
 

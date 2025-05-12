@@ -64,6 +64,7 @@ extern char *filenameGetFormat(char *format, const char *const fileName, int max
 extern char *filenameGetPath(char *path, const char *const fileName, int maxLen);
 extern BOOL strToBool(const char *const str);
 extern char *boolToStr(char *opStr, BOOL boolValue);
+extern void unicode_to_utf8(unsigned int codepoint, char *utf8_buffer);
 
 #ifdef __cplusplus
 }

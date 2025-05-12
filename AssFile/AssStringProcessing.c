@@ -28,8 +28,8 @@ const struct AssEscapeListNode assEscapeList[] =
     // {"\\n", "\\{}n"},
     // {"\\N", "\\{}N"},
     // {"\\h", "\\{}h"},
-    {"\\n", "\\​n"},
-    {"\\N", "\\​N"},
+    {"\\n", "\\\xe2\x80\x8bn"},
+    {"\\N", "\\\xe2\x80\x8bN"},
     {"\\h", "\\​h"},
     {"{", "\\{"},   // compatible with libass
     {"}", "\\}"},   // compatible with libass
@@ -40,6 +40,7 @@ const struct AssEscapeListNode assEscapeList[] =
     {"&amp;", "&"},
     {"&apos;", "\'"},
     {"&quot;", "\""},
+    {"&#", ""}, // emoji Unicode 码位占位符
     {NULL, NULL}
 };
 
@@ -278,6 +279,7 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
     int lenCnt = 0;
     char *srcPtr, *dstPtr;
     char *originalTextPtr, *assEscapedTextPtr;
+    char utf8Hex[5];
     srcPtr = srcStr;
     dstPtr = dstStr;
 
@@ -319,6 +321,14 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
 
             if (*originalTextCmpPtr == '\0')
             {
+                if (strcmp(originalTextPtr, "&#") == 0) {
+                    char emojiUnicodeText[8];
+                    strGetLeftPart(emojiUnicodeText, &srcCmpPtr, ';', 8);
+                    unicode_to_utf8(atoi(emojiUnicodeText), utf8Hex);
+                    assEscapedTextPtr = utf8Hex;
+                    srcPtr += strlen(emojiUnicodeText) + 1; // "128514" + ";"
+                }
+
                 /* 拷贝转义后字串 */
                 while (*assEscapedTextPtr != '\0')
                 {
@@ -333,7 +343,7 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
                     lenCnt++;
                 }
                 
-                srcPtr += strlen(originalTextPtr) - 1;
+                srcPtr += strlen(originalTextPtr) - 1;  // "- 1" is for "srcPtr++" later.
                 break;
             }
 
