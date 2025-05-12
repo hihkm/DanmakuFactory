@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  prebuild:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     env:
@@ -15,22 +15,27 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-      - name: build for linux
+
+      - name: Build for linux
         if: startsWith(matrix.os, 'ubuntu')
         run: make
 
-      - name: build for windows
+      - name: Build for Macos
+        if: startsWith(matrix.os, 'macos')
+        run: make
+
+      - name: Build for windows
         if: startsWith(matrix.os, 'windows')
         run: mingw32-make
 
       - run: ls
 
-      - name: Upload win artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: package-${{ runner.os }}
