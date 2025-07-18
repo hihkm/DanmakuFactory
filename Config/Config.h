@@ -73,6 +73,7 @@ struct Configurations
     int blockmode;     /* 屏蔽模式 */
     int statmode;      /* 统计模式 */
     char** blocklist;     /* 弹幕黑名单文件，文件内以换行分隔 */
+    BOOL blocklistRegexEnabled;   /* 黑名单是否启用正则表达式匹配 */
 };
 
 typedef struct Coordinate COORDIN;

@@ -37,7 +37,8 @@ extern "C" {
 #include "../Config/Config.h"
 
 extern int sortList(DANMAKU **listHead, STATUS *const status);
-extern void blockByType(DANMAKU *const danmakuHead, const int mode, char** keyStrings);
+extern void blockByType(DANMAKU *const danmakuHead, const int mode,
+                        char **keyStrings, BOOL blocklistRegexEnabled);
 extern void freeList(DANMAKU *listHead);
 extern void normFontSize(DANMAKU* const danmakuHead, const CONFIG config);
 

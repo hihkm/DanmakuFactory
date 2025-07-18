@@ -20,12 +20,14 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
 
       - name: Build Project
         uses: threeal/cmake-action@v2.1.0
         with:
           options: CMAKE_BUILD_TYPE=Release
-          build-args: --config Release
+          build-args: --config Release --target DanmakuFactory
 
       - run: ls build
 
@@ -53,6 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
       - uses: docker/setup-qemu-action@v3
       - run: |
           docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} ubuntu:latest -c "\
@@ -60,7 +64,7 @@ jobs:
           apt-get install -y make gcc cmake && \
           cd /tmp/project && \
           cmake -S . -B build && \
-          cmake --build build"
+          cmake --build build --target DanmakuFactory"
       - name: Upload arm64 artifact
         uses: actions/upload-artifact@v4
         with:

@@ -22,6 +22,7 @@
  */
 
 #include "Define/DanmakuDef.h"
+#include <string.h>
 #ifdef _WIN32
 /* windows下 */
 #include <windows.h>
@@ -80,6 +81,7 @@ static CONFIG defaultConfig =
     0,              /* 屏蔽模式 */
     0,              /* 统计模式 */
     NULL,           /* 弹幕黑名单 */
+    FALSE,          /* 弹幕黑名单是否启用正则表达式匹配 */
 };
 
 int main(int argc, char **argv)
@@ -636,6 +638,17 @@ int main(int argc, char **argv)
                 tokens[i] = NULL;
                 fclose(fp);
                 config.blocklist = tokens;
+
+                argCnt += 2;
+            }
+            else if (!strcmp("--blacklist-regex", argv[argCnt]))
+            { /* 弹幕黑名单是否启用正则表达式匹配 */
+                BOOL returnValue = getArgValBool(argc, argv, argCnt, "BlacklistRegexEnabled");
+                if (returnValue == BOOL_UNDETERMINED)
+                {
+                    return 0;
+                }
+                config.blocklistRegexEnabled = returnValue;
 
                 argCnt += 2;
             }
@@ -1199,7 +1212,7 @@ int main(int argc, char **argv)
     }
 
     /* 屏蔽 */
-    blockByType(danmakuPool, config.blockmode, config.blocklist);
+    blockByType(danmakuPool, config.blockmode, config.blocklist, config.blocklistRegexEnabled);
     /* 正则化字号 */
     normFontSize(danmakuPool, config);
     
@@ -1441,6 +1454,9 @@ void printHelpInfo()
            "\n--blacklist         Specify the blacklist plain text file which contains no more than 4096 danmakus"
            "\n                     that separated by lines and will not show on the screen."
            "\n                    For example: `black.txt`."
+           "\n"
+           "\n--blacklist-regex   Specify whether lines in the blacklist file should be treated as regular expressions."
+           "\n                    Available value: TRUE, FALSE (default)"
            "\n"
            "\nOther options:"
            "\n-h, --help          Display this help and version information than exit."
