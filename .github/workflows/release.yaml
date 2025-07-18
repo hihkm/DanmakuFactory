@@ -21,27 +21,28 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Build for linux
-        if: startsWith(matrix.os, 'ubuntu')
-        run: make
+      - name: Build Project
+        uses: threeal/cmake-action@v2.1.0
+        with:
+          options: CMAKE_BUILD_TYPE=Release
+          build-args: --config Release
 
-      - name: Build for Macos
-        if: startsWith(matrix.os, 'macos')
-        run: make
-
-      - name: Build for windows
-        if: startsWith(matrix.os, 'windows')
-        run: mingw32-make
-
-      - run: ls
+      - run: ls build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
+        if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: package-${{ runner.os }}
-          path: |
-            DanmakuFactory
-            DanmakuFactory.exe
+          path: build/Release/DanmakuFactory.exe
+  
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'  }}
+        with:
+          name: package-${{ runner.os }}
+          path: build/DanmakuFactory
+
 
   prebuild-linux-arm:
     strategy:
@@ -56,14 +57,15 @@ jobs:
       - run: |
           docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} ubuntu:latest -c "\
           apt-get update && \
-          apt-get install -y make gcc && \
+          apt-get install -y make gcc cmake && \
           cd /tmp/project && \
-          make"
+          cmake -S . -B build && \
+          cmake --build build"
       - name: Upload arm64 artifact
         uses: actions/upload-artifact@v4
         with:
           name: package-linux-${{ matrix.arch }}
-          path: DanmakuFactory
+          path: build/DanmakuFactory
 
 permissions:
   contents: write
