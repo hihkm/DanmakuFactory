@@ -20,7 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+#include <stdio.h>
 #include "DanmakuFactoryList.h"
 #include "../Config/Config.h"
 #include "../Define/DanmakuDef.h"
@@ -167,7 +169,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
 
 /*
  * 弹幕按类型屏蔽
- * 参数：弹幕链表头/屏蔽模式/屏蔽关键字串集
+ * 参数：弹幕链表头/屏蔽模式/屏蔽关键字串集/关键词屏蔽是否启用正则表达式
  * 返回值：空
  * 附屏蔽模式：
  * BLK_R2L         屏蔽右左滚动
@@ -176,12 +178,50 @@ int sortList(DANMAKU **listHead, STATUS *const status)
  * BLK_BOTTOM      屏蔽底端固定
  * BLK_SPECIAL     屏蔽特殊弹幕
  * BLK_COLOR       屏蔽非白色弹幕
-  */
-void blockByType(DANMAKU *const danmakuHead, const int mode, char** keyStrings)
+ */
+void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, BOOL blocklistRegexEnabled)
 {
     if (mode == 0 && keyStrings == NULL)
     {
         return;
+    }
+
+    // 先编译所有正则表达式
+    pcre2_code **regCodes = NULL;
+    int regCodeCount = 0;
+
+    if (blocklistRegexEnabled && keyStrings != NULL)
+    {
+        for (int i = 0; keyStrings[i] != NULL; i++)
+        {
+            int regexErrorCode;
+            PCRE2_SIZE regexErrorOffset;
+            pcre2_code *code = pcre2_compile((PCRE2_SPTR)keyStrings[i], PCRE2_ZERO_TERMINATED, PCRE2_UTF, &regexErrorCode, &regexErrorOffset, NULL);
+            if (code == NULL)
+            {
+                PCRE2_UCHAR errorMsg[256];
+                pcre2_get_error_message(regexErrorCode, errorMsg, sizeof(errorMsg));
+                fprintf(stderr, "\nERROR"
+                                "\nFailed to compile regex expression %d '%s': %s\n",
+                        i, keyStrings[i], errorMsg);
+            }
+            else
+            {
+                pcre2_code **newRegCodes = (pcre2_code **)realloc(regCodes, sizeof(pcre2_code *) * (regCodeCount + 1));
+                if (newRegCodes != NULL)
+                {
+                    regCodes = newRegCodes;
+                    regCodes[regCodeCount] = code;
+                    regCodeCount++;
+                }
+                else
+                {
+                    // 内存分配失败，释放当前编译的正则表达式
+                    pcre2_code_free(code);
+                    fprintf(stderr, "\nERROR: Failed to allocate memory for regex code\n");
+                }
+            }
+        }
     }
 
     DANMAKU *ptr = (DANMAKU *)danmakuHead;
@@ -229,28 +269,78 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, char** keyStrings)
                 ptr -> type *= -1;
             }
         }
-        //TODO:关键字屏蔽以及正则匹配
         // 如果有关键字串集
         if (keyStrings != NULL && ptr -> text != NULL)
         {
             // 逐个检查关键字串
             for (int i = 0; keyStrings[i] != NULL; i++)
             {
-                // 如果弹幕文本中包含关键字串
-                if (strstr(ptr -> text, keyStrings[i]) != NULL)
+                if (blocklistRegexEnabled && i < regCodeCount)
                 {
-                    if (ptr -> type > 0)
+                    // 使用正则表达式匹配
+                    pcre2_match_data *matchData = pcre2_match_data_create_from_pattern(regCodes[i], NULL);
+                    int matchNum = pcre2_match(regCodes[i], (PCRE2_SPTR)ptr->text, PCRE2_ZERO_TERMINATED, 0, 0, matchData, NULL);
+
+                    if (matchNum < 0)
                     {
-                        ptr -> type *= -1;
+                        switch (matchNum)
+                        {
+                        case PCRE2_ERROR_NOMATCH:
+                            // 未能匹配到，无需处理
+                            break;
+                        default:
+                        {
+                            // 其他错误
+                            PCRE2_UCHAR errorMsg[256];
+                            pcre2_get_error_message(matchNum, errorMsg, sizeof(errorMsg));
+                            fprintf(stderr, "\nERROR"
+                                            "\nRegex match failed for '%s': %s\n",
+                                    keyStrings[i], errorMsg);
+                        }
+                        }
+                        pcre2_match_data_free(matchData);
                     }
-                    break;
+                    else
+                    {
+                        // 匹配成功
+                        PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(matchData);
+                        if (ptr->type > 0)
+                        {
+                            ptr->type *= -1;
+                        }
+                        pcre2_match_data_free(matchData);
+                        break;
+                    }
+                }
+                else
+                {
+                    // 使用简单的字符串匹配
+                    if (strstr(ptr->text, keyStrings[i]) != NULL)
+                    {
+                        if (ptr->type > 0)
+                        {
+                            ptr->type *= -1;
+                        }
+                        break;
+                    }
                 }
             }
         }
         ptr = ptr -> next;
     }
 
-    if (keyStrings != NULL) {
+    // 释放编译的正则表达式
+    if (blocklistRegexEnabled && regCodes != NULL)
+    {
+        for (int i = 0; i < regCodeCount; i++)
+        {
+            pcre2_code_free(regCodes[i]);
+        }
+        free(regCodes);
+    }
+
+    if (keyStrings != NULL && !blocklistRegexEnabled)
+    {
         for (int i = 0; keyStrings[i] != NULL; ++i) {
             free(keyStrings[i]);
         }
