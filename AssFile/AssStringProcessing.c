@@ -298,8 +298,8 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
                 originalTextPtr = assEscapeList[listCnt].assEscapedText;
                 assEscapedTextPtr = assEscapeList[listCnt].originalText;
             }
-            
-            if (originalTextPtr == NULL || assEscapedTextPtr == NULL)
+
+            if (originalTextPtr == NULL || assEscapedTextPtr == NULL || *originalTextPtr == '\0')
             { /* 匹配全部失败，直接拷贝文本 */ 
                 *dstPtr = *srcPtr;
                 dstPtr++;
