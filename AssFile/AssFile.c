@@ -528,15 +528,15 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead,
             }
             
             memset(fontName, 0, FONTNAME_LEN);
-            
-            if ((textPart = (char *)malloc(strlen(inEventPtr -> text) * sizeof(char))) == NULL)
+
+            if ((textPart = (char *)malloc(ASS_MAX_LINE_LEN * sizeof(char))) == NULL)
             {
                 freeAssFile(outputSub);
                 //TODO:释放弹幕链表 
                 return 4;
             }
-            
-            memset(textPart, 0, strlen(inEventPtr -> text) * sizeof(char));
+
+            memset(textPart, 0, ASS_MAX_LINE_LEN * sizeof(char));
             leftPtr = rightPtr = inEventPtr -> text;
             textPartPtr = textPart;
             codePartPtr = codePart;
