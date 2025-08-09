@@ -4,11 +4,12 @@
         {
             "type": "shell",
             "label": "build",
-            "command": "make",
+            "command": "cmake",
             "args": [
-                "CARG=-g",
-                "-f",
-                "${workspaceFolder}\\makefile-win"
+                "--build",
+                "${workspaceFolder}/build",
+                "--config",
+                "Debug"
             ],
             "problemMatcher": [
                 "$gcc"
@@ -21,19 +22,16 @@
         {
             "type": "shell",
             "label": "clean",
-            "command": "make",
+            "command": "cmake",
             "args": [
-                "clean",
-                "-f",
-                "${workspaceFolder}\\makefile-win"
+                "--build",
+                "${workspaceFolder}/build",
+                "--target",
+                "clean"
             ],
             "problemMatcher": [
                 "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            ]
         }
     ]
 }

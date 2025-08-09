@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "g++.exe build and debug active file",
+            "name": "g++.exe build and debug project",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\DanmakuFactory.exe",
+            "program": "${workspaceFolder}\\build\\DanmakuFactory.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
