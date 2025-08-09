@@ -1748,6 +1748,8 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     int msgFontSize = config.msgboxFontsize;
     const int msgDuration = GET_ASS_MS_FLT(config.msgboxDuration);  // 精度为 10 毫秒
     const int giftMinPrice = (int)(config.giftMinPrice * 1000.0f);  // 精度为 1 厘
+    const float outlineWidth = config.outline;
+    const float outlineBlur = config.outlineBlur;
 
     /* 刷新status */
     if (status != NULL)
@@ -2020,7 +2022,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
-            
+
+            if (outlineWidth > 0 && outlineBlur > 0)
+            {
+                fprintf(opF, "\\blur%g", outlineBlur);
+            }
+
             fprintf(opF, "}");
             if (showUserName == TRUE && now->user != NULL)
             {
