@@ -58,6 +58,7 @@ struct Configurations
     int opacity;       /* 不透明度 */
     float outline;       /* 描边 */
     float outlineBlur;   /* 描边模糊半径 */
+    int outlineOpacity; /* 描边不透明度 */
     float shadow;        /* 阴影 */
     BOOL bold;         /* 是否加粗 */
 
