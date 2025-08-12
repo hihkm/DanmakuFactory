@@ -65,6 +65,8 @@ static CONFIG defaultConfig =
     "Microsoft YaHei", 
     180,            /* 不透明度 */ 
     0,              /* 描边 */ 
+    0,              /* 描边模糊半径 */ 
+    255,            /* 描边不透明度 */
     1,              /* 阴影 */
     FALSE,          /* 是否加粗 */ 
 
@@ -421,6 +423,28 @@ int main(int argc, char **argv)
                 config.outline = returnValue;
                 
                 argCnt += 2; 
+            }
+            else if (!strcmp("--outline-blur", argv[argCnt]))
+            { /* 描边模糊半径 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "OutlineBlur", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.outlineBlur = returnValue;
+
+                argCnt += 2;
+            }
+            else if (!strcmp("--outline-opacity", argv[argCnt]))
+            { /* 描边不透明度 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "OutlineOpacity", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.outlineOpacity = (int)returnValue;
+
+                argCnt += 2;
             }
             else if (!strcmp("-D", argv[argCnt]) || !strcmp("--shadow", argv[argCnt]))
             { /* 阴影 */
@@ -859,6 +883,26 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "\nERROR"
                             "\n\"Outline\" must be an float greater than or equal to 0 and less than or equal to 4.\n");
+            return 0;
+        }
+        /* 描边模糊半径 */
+        if (config.outlineBlur < 0.0)
+        {
+            fprintf(stderr, "\nERROR"
+                            "\n\"OutlineBlur\" must be an float greater than or equal to 0.\n");
+            return 0;
+        }
+        if (config.outline == 0.0 && config.outlineBlur > 0.0)
+        {
+            fprintf(stderr, "\nWARNING"
+                            "\n\"OutlineBlur\" is ignored since \"Outline\" is set to 0.\n");
+            toPause(ignoreWarnings);
+        }
+        /* 描边不透明度 */
+        if (config.outlineOpacity < 0 || config.outlineOpacity > 255)
+        {
+            fprintf(stderr, "\nERROR"
+                            "\n\"OutlineOpacity\" must be an integer greater than or equal to 0 and less than or equal to 255.\n");
             return 0;
         }
         /* 阴影 */
@@ -1421,6 +1465,10 @@ void printHelpInfo()
            "\n-N, --fontname      Specify the fontname of general danmaku."
            "\n-O, --opacity       Specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)."
            "\n-L, --outline       Specify the width of outline for each danmaku(range: 0-4)."
+           "\n--outline-blur      Specify the blur radius of outline for each danmaku."
+           "\n                    Available value: 0 (default) or positive number"
+           "\n--outline-opacity   Specify the opacity of outline for danmaku EXCEPT the special danmaku"
+           "\n                    Available value: 0-255 (default: 255)"
            "\n-D, --shadow        Specify the depth of shadow for each danmaku(range: 0-4)."
            "\n-B, --bold          Specify whether the font should be boldface."
            "\n                    Available value: TRUE, FALSE (default)"

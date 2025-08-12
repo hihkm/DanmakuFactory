@@ -1154,10 +1154,14 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
                       "MarginL, MarginR, MarginV, Encoding\n"
                );
         char hexOpacity[3];
+        char hexOutlineOpacity[3];
         char primaryColour[ASS_COLOR_LEN];
+        char outlineColour[ASS_COLOR_LEN];
         int bold = 0;
         toHexOpacity(255 - config.opacity, hexOpacity);
+        toHexOpacity(255 - config.outlineOpacity, hexOutlineOpacity);
         sprintf(primaryColour, "&H%sFFFFFF", hexOpacity);
+        sprintf(outlineColour, "&H%s000000", hexOutlineOpacity);
 
         if (config.bold == TRUE)
         {
@@ -1171,42 +1175,36 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead,
         
         /* 样式设定 */
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
-                     "R2L", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
-                     0, 0, 0, 1
-               );
-        
+                "R2L", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", outlineColour, "&H1E6A5149",
+                bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                0, 0, 0, 1);
+
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
-                     "L2R", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
-                     0, 0, 0, 1
-               );
-        
+                "L2R", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", outlineColour, "&H1E6A5149",
+                bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                0, 0, 0, 1);
+
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
-                     "TOP", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
-                     0, 0, 0, 1
-               );
-        
+                "TOP", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", outlineColour, "&H1E6A5149",
+                bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                0, 0, 0, 1);
+
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
-                     "BTM", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
-                     0, 0, 0, 1
-               );
-        
+                "BTM", config.fontname, config.fontsize, primaryColour, "&H00FFFFFF", outlineColour, "&H1E6A5149",
+                bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 8,
+                0, 0, 0, 1);
+
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
-                     "SP", config.fontname, config.fontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
-                     0, 0, 0, 1
-               );
+                "SP", config.fontname, config.fontsize, "&H00FFFFFF", "&H00FFFFFF", outlineColour, "&H1E6A5149",
+                bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, config.outline, config.shadow, 7,
+                0, 0, 0, 1);
         float msgboxOutline = config.outline * config.msgboxFontsize / config.fontsize;
         float msgboxShadow = config.shadow * config.msgboxFontsize / config.fontsize;
         fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
-                     "MSG", config.fontname, config.msgboxFontsize, "&H00FFFFFF", "&H00FFFFFF", "&H00000000", "&H1E6A5149",
-                     bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, msgboxOutline, msgboxShadow, 7,
-                     0, 0, 0, 1
-               );
-        
+                "MSG", config.fontname, config.msgboxFontsize, "&H00FFFFFF", "&H00FFFFFF", outlineColour, "&H1E6A5149",
+                bold, 0, 0, 0, 100.00, 100.00, 0.00, 0.00, 1, msgboxOutline, msgboxShadow, 7,
+                0, 0, 0, 1);
+
         if (config.statmode != 0)
         {
             fprintf(fptr, "\nStyle: %s,%s,%d,%s,%s,%s,%s,%d,%d,%d,%d,%.2f,%.2f,%.2f,%.2f,%d,%.1f,%.1f,%d,%d,%d,%d,%d",
@@ -1748,6 +1746,8 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     int msgFontSize = config.msgboxFontsize;
     const int msgDuration = GET_ASS_MS_FLT(config.msgboxDuration);  // 精度为 10 毫秒
     const int giftMinPrice = (int)(config.giftMinPrice * 1000.0f);  // 精度为 1 厘
+    const float outlineWidth = config.outline;
+    const float outlineBlur = config.outlineBlur;
 
     /* 刷新status */
     if (status != NULL)
@@ -2020,7 +2020,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             {
                 fprintf(opF, "\\fs%d", textHei);
             }
-            
+
+            if (outlineWidth > 0 && outlineBlur > 0)
+            {
+                fprintf(opF, "\\blur%g", outlineBlur);
+            }
+
             fprintf(opF, "}");
             if (showUserName == TRUE && now->user != NULL)
             {
