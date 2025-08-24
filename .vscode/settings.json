@@ -8,5 +8,8 @@
     },
     "cmake.configureOnOpen": true,
     "cmake.generator": "Ninja",
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\build\\compile_commands.json"
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\build\\compile_commands.json",
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
 }

@@ -2,6 +2,7 @@
     "recommendations": [
         "yzhang.markdown-all-in-one",
         "llvm-vs-code-extensions.vscode-clangd",
-        "sonarsource.sonarlint-vscode"
+        "sonarsource.sonarlint-vscode",
+        "esbenp.prettier-vscode",
     ]
 }
