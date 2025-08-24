@@ -2,6 +2,8 @@ name: Build & Release
 
 on:
   push:
+    branches:
+      - master
     paths:
       - "**/*.c"
       - "**/*.h"
@@ -55,19 +57,7 @@ jobs:
           submodules: "recursive"
 
       - name: Get Project Name
-        shell: bash
-        run: |
-          PROJECT_NAME=$(node -e "
-            const fs = require('fs');
-            try {
-              const content = fs.readFileSync('CMakeLists.txt', 'utf8');
-              const match = content.match(/project\s*\(\s*([^ )]+)/);
-              console.log(match ? match[1] : 'DanmakuFactory');
-            } catch (err) {
-              console.log('DanmakuFactory');
-            }
-          ")
-          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+        uses: ./.github/actions/get-project-defines
 
       - name: Build Project
         uses: threeal/cmake-action@v2.1.0
@@ -97,81 +87,25 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v5
 
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v5
-        with:
-          path: artifacts
-
       - name: Prepare Release Assets
-        shell: bash
+        uses: ./.github/actions/prepare-release-assets
+
+      - name: Update dev Tag
         run: |
-          # 创建 release-assets 目录
-          mkdir -p release-assets
-
-          # 遍历所有 package-* 目录
-          for package_dir in artifacts/package-*; do
-            # 跳过不存在的匹配
-            [ -d "$package_dir" ] || continue
-
-            # 从目录名提取平台和架构 (格式: package-<platform>-<arch>)
-            package_name=$(basename "$package_dir")
-            platform_arch="${package_name#package-}"
-
-            # 分割平台和架构 (处理可能的多段架构名，如 "macOS-Intel")
-            IFS='-' read -ra parts <<< "$platform_arch"
-            platform="${parts[0]}"
-            arch="${parts[@]:1}"  # 处理可能有多个连字符的情况
-
-            # 确定源文件路径
-            if [ "$platform" = "Windows" ]; then
-              # Windows 有额外的 Release 目录
-              src_file="$package_dir/Release/DanmakuFactory.exe"
-              extension=".exe"
-            else
-              src_file="$package_dir/DanmakuFactory"
-              extension=""
-            fi
-
-            # 检查文件是否存在（处理 Windows 的其他可能路径）
-            if [ ! -f "$src_file" ] && [ "$platform" = "Windows" ]; then
-              src_file="$package_dir/DanmakuFactory.exe"
-            fi
-
-            # 跳过不存在的文件
-            [ -f "$src_file" ] || {
-              echo "⚠️ 跳过: $package_dir (文件不存在)"
-              continue
-            }
-
-            # 构建目标文件名 (替换空格为连字符，确保文件名合法)
-            clean_arch=$(echo "$arch" | tr ' ' '-')
-            dest_file="release-assets/DanmakuFactory-dev-${platform}-${clean_arch}-CLI${extension}"
-
-            # 复制并重命名文件
-            cp "$src_file" "$dest_file"
-            echo "✅ 复制: $src_file → $dest_file"
-          done
-
-          # 验证结果
-          echo -e "\n生成的发布资产:"
-          ls -lh release-assets/
-
-      - name: Update Draft tag
-        run: |
-          git tag Draft ${{ github.sha }}
-          git push origin Draft -f
+          git tag dev ${{ github.sha }}
+          git push origin dev --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload to GitHub Release
+      - name: Release to GitHub
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: Draft
-          name: Continuous Draft Build
+          tag_name: dev
+          name: Continuous dev Build
           body: |
-            Automated Draft build from commit ${{ github.sha }}
+            Automated build from commit ${{ github.sha }}
           prerelease: true
+          preserve_order: true
           files: release-assets/*
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
