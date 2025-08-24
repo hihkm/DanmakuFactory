@@ -1,0 +1,28 @@
+name: "Prepare Release Assets"
+description: "准备需要发布的资产"
+
+inputs:
+  source-dir:
+    description: "Source directory containing build artifacts"
+    required: true
+
+  output-dir:
+    description: "Output directory for prepared assets"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v5
+      with:
+        path: ${{ inputs.source-dir }}
+
+    - name: Prepare Assets
+      run: |
+        # 获取当前 Action 的根目录
+        ACTION_DIR="${{ github.action_path }}"
+
+        # 执行 collect.sh 脚本
+        bash +x "$ACTION_DIR/collect.sh" "${{ inputs.source-dir }}" "${{ inputs.output-dir }}"
+      shell: bash
