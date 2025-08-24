@@ -49,13 +49,6 @@ cmake --build build
 
 
 
-##### macOS
-
->⚠️ 由于 Xcode 的 External Build System 不好用，这里的工程文件用的是 Command Line Tool 的模板，没有用到 makefile。
->仅供调试，实际使用请参考 Linux。
-
-打开 macOS/ 下的 DanmakuFactory.xcodeproj。
-
 ##### Python 版本(Developing)
 
 如果想使用 Python 版本，可以参考：[DanmakuConvert](https://github.com/timerring/DanmakuConvert)
