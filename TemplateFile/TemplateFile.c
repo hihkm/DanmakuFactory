@@ -1,17 +1,17 @@
 /* MIT License
- * 
+ *
  * Copyright (c) 2022 hkm
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,58 +28,57 @@
  * 参数：模板文件名/输出弹幕头/模式/错误信息文本输出容器/容器最大长度
  * 返回值：成功返回0/失败返回1
  */
-int readTemplateFile(const char *const ipFile, const char *const templateFile, 
-                     DANMAKU **danmakuHead, const char *mode, const float timeShift, 
-                     STATUS *const status, char *errMsg, int msgLen)
+int readTemplateFile(const char *const ipFile, const char *const templateFile, DANMAKU **danmakuHead, const char *mode,
+                     const float timeShift, STATUS *const status, char *errMsg, int msgLen)
 {
     FILE *tempfptr;
     DANMAKU *last = NULL;
     int cnt;
     BOOL isError = FALSE;
-    
+
     /* 刷新status */
     if (status != NULL)
     {
-        status -> function = (void *)readTemplateFile;
-        (status -> completedNum) = 0;
+        status->function = (void *)readTemplateFile;
+        (status->completedNum) = 0;
     }
-    
+
     /* 打开文件 */
-    if((tempfptr = fopen(templateFile, "r")) == NULL)
+    if ((tempfptr = fopen(templateFile, "r")) == NULL)
     {
         return 1;
     }
-    
+
     /* 判断读入方式 */
-    if(*danmakuHead == NULL || *mode == 'n')
-    {/* 新建模式 */
-//      freeList(*danmakuHead);
+    if (*danmakuHead == NULL || *mode == 'n')
+    {   /* 新建模式 */
+        //      freeList(*danmakuHead);
         *danmakuHead = NULL;
     }
-    else if(*mode == 'a')
-    {/* 追加模式 */
+    else if (*mode == 'a')
+    { /* 追加模式 */
         last = *danmakuHead;
-        while(last -> next != NULL)
+        while (last->next != NULL)
         {
-            last = last -> next;
+            last = last->next;
         }
     }
 
     errMsg[0] = '\0';
 
     /* 模板属性 */
-    float version = 0.0;  /* 版本号 */
+    float version = 0.0; /* 版本号 */
 
     FORMAT format;
     SET_TIME setTime = {
         1.0 /* 时间比例 */
     };
     SET_TYPE setType = {
-        0, /* 默认右左 */
-        0, /* 默认左右 */
-        0, /* 默认顶端固定 */
-        0, /* 默认底部固定 */
-        R2L  /* 默认弹幕类型 */
+        0,  /* 默认右左 */
+        0,  /* 默认左右 */
+        0,  /* 默认顶端固定 */
+        0,  /* 默认底部固定 */
+        R2L /* 默认弹幕类型 */
     };
     SET_COLOR setColor = {
         16777215 /* 默认颜色 */
@@ -95,7 +94,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
     char *linePtr, *tempPtr;
     int formatTableIndex = 0;
     int strTableIndex = 0;
-    
+
     /* 读取版本信息行 */
     fgets(lineStr, LINE_MAX_LEN, tempfptr);
     linePtr = lineStr;
@@ -117,12 +116,12 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
     }
     else
     {
-        strSafeCat(errMsg, msgLen, "[err]Line 1(version): You must specify the template file version on the first line.\n"
-                                 "     example: DanmakuFactory_Template_Version: 1.0\n"
-                  );
+        strSafeCat(errMsg, msgLen,
+                   "[err]Line 1(version): You must specify the template file version on the first line.\n"
+                   "     example: DanmakuFactory_Template_Version: 1.0\n");
         return -1;
     }
-    
+
     lineCnt++;
 
     while (!feof(tempfptr))
@@ -137,7 +136,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         {
             *(strchr(lineStr, '#')) = '\0';
         }
-        
+
         while (*linePtr != '\0')
         {
             /* 空白行判断 */
@@ -183,7 +182,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                 tar = TAR_FORMAT;
             }
             else
-            {/* 根据当前标签作用域读取信息 */
+            { /* 根据当前标签作用域读取信息 */
                 linePtr = startPtr;
                 switch (tar)
                 {
@@ -230,16 +229,17 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                             STR_PTR_JUMP(linePtr, "$anystring$");
                         }
                         else
-                        {/* 字符串 */
+                        { /* 字符串 */
                             *tempPtr = *linePtr;
                             tempPtr++;
                             linePtr++;
                         }
 
                         if ((verType != 0 && tempPtr != tempStr) || *linePtr == '\0')
-                        {/* 存储字符串常量 */
+                        { /* 存储字符串常量 */
                             *tempPtr = '\0';
-                            if ((format.strTable[strTableIndex] = (char *)malloc(strlen(tempStr) * sizeof(char))) == NULL)
+                            if ((format.strTable[strTableIndex] = (char *)malloc(strlen(tempStr) * sizeof(char))) ==
+                                NULL)
                             {
                                 return 2;
                             }
@@ -249,7 +249,6 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
 
                             strTableIndex++;
                             formatTableIndex++;
-
                         }
 
                         if (verType != 0)
@@ -273,7 +272,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                         strSafeCat(errMsg, msgLen, tempMsgStr);
                         return -1;
                     }
-                    
+
                     break;
                 case TAR_SET_TYPE:
                     getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', TRUE);
@@ -374,9 +373,9 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                 }
             }
         } /* 结束单行解析 */
-        
+
     } /* 文件解析结束 */
-    
+
     format.formatTableLen = formatTableIndex;
     format.strTableLen = strTableIndex;
 
@@ -415,8 +414,8 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         }
     }
 
-#ifdef DEBUG    
-    for (cnt = 0; cnt <format.formatTableLen; cnt++)
+#ifdef DEBUG
+    for (cnt = 0; cnt < format.formatTableLen; cnt++)
     {
         if (FORMAT_IS_VAR(format.formatTable[cnt]))
         {
@@ -426,7 +425,6 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         {
             printf("%s[%d]|", format.strTable[format.formatTable[cnt]], format.formatTable[cnt]);
         }
-        
     }
 #endif
 
@@ -453,16 +451,17 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         int colorDefineTimes = 0;
         int fontsizeDefineTimes = 0;
         int textDefineTimes = 0;
-        
+
         for (cnt = 1; cnt < format.formatTableLen; cnt++)
         {
             /* 检测两个变量是否连用 */
             if (FORMAT_IS_VAR(format.formatTable[cnt]))
             {
-                if (FORMAT_IS_VAR(format.formatTable[cnt-1]))
+                if (FORMAT_IS_VAR(format.formatTable[cnt - 1]))
                 {
-                    strSafeCat(errMsg, msgLen, 
-                               "[err]Line ?(Format string): The two variables must be separated by string constants.\n");
+                    strSafeCat(
+                        errMsg, msgLen,
+                        "[err]Line ?(Format string): The two variables must be separated by string constants.\n");
                     return -1;
                 }
                 switch (format.formatTable[cnt])
@@ -489,61 +488,54 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         }
 
         /* 检查结尾是不是空白变量 */
-        if (STR_IS_EMPTY(format.strTable[format.formatTable[format.formatTableLen-1]]) && 
-            (format.formatTable[format.formatTableLen-2] == FORMAT_TEXT || 
-             format.formatTable[format.formatTableLen-2] == FORMAT_ANYSTR)
-           )
+        if (STR_IS_EMPTY(format.strTable[format.formatTable[format.formatTableLen - 1]]) &&
+            (format.formatTable[format.formatTableLen - 2] == FORMAT_TEXT ||
+             format.formatTable[format.formatTableLen - 2] == FORMAT_ANYSTR))
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Format string cannot ending with variable $text$ or $anystring$.\n");
+            strSafeCat(
+                errMsg, msgLen,
+                "[err]Line ?(Format string): Format string cannot ending with variable $text$ or $anystring$.\n");
             isError = TRUE;
         }
 
         /* 检测时间定义次数 */
         if (timeDefineTimes == 0)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $time$ must be specified.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $time$ must be specified.\n");
             isError = TRUE;
         }
         else if (timeDefineTimes > 1)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $time$ is defined repeatedly.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $time$ is defined repeatedly.\n");
             isError = TRUE;
         }
         /* 检测类型定义次数 */
         if (typeDefineTimes > 1)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $type$ is defined repeatedly.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $type$ is defined repeatedly.\n");
             isError = TRUE;
         }
         /* 检查文字大小定义次数 */
         if (fontsizeDefineTimes > 1)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $fontsize$ is defined repeatedly.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $fontsize$ is defined repeatedly.\n");
             isError = TRUE;
         }
         /* 检查颜色定义次数 */
         if (colorDefineTimes > 1)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $color$ is defined repeatedly.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $color$ is defined repeatedly.\n");
             isError = TRUE;
         }
         /* 检查文本定义次数 */
         if (textDefineTimes == 0)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $text$ must be specified.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $text$ must be specified.\n");
             isError = TRUE;
         }
         else if (textDefineTimes > 1)
         {
-            strSafeCat(errMsg, msgLen, 
-                       "[err]Line ?(Format string): Variable $text$ is defined repeatedly.\n");
+            strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $text$ is defined repeatedly.\n");
             isError = TRUE;
         }
 
@@ -552,7 +544,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         {
             return -1;
         }
-    }/* 合法性检测结束 */
+    } /* 合法性检测结束 */
 
     /* 读取弹幕文件 */
     FILE *ipfptr;
@@ -575,9 +567,9 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
             {
                 fseek(ipfptr, -(long)(readBuffer + readSize - bufferPtr), SEEK_CUR);
             }
-            
+
             readSize = fread(readBuffer, 1, READ_BUFFER_SIZE, ipfptr);
-            
+
             if (readSize == 0)
             {
                 break;
@@ -593,13 +585,13 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
         if ((readDanmaku = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
         {
             /* 释放内存 */
-//          freeList(*danmakuHead);
+            //          freeList(*danmakuHead);
             return 4;
         }
-        readDanmaku -> type = HAVE_NOT_BEEN_SET;
-        readDanmaku -> fontSize = HAVE_NOT_BEEN_SET;
-        readDanmaku -> color = HAVE_NOT_BEEN_SET;
-        readDanmaku -> text = NULL;
+        readDanmaku->type = HAVE_NOT_BEEN_SET;
+        readDanmaku->fontSize = HAVE_NOT_BEEN_SET;
+        readDanmaku->color = HAVE_NOT_BEEN_SET;
+        readDanmaku->text = NULL;
 
         for (cnt = 0; cnt < format.formatTableLen; cnt++)
         {
@@ -619,7 +611,8 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                 }
                 *tempPtr = '\0';
                 float tempTime = atof(tempStr) / setTime.ratioToSeconds + timeShift;
-                if (tempTime < EPS) {
+                if (tempTime < EPS)
+                {
                     tempTime = 0.0f;
                 }
                 readDanmaku->time = GET_MS_FLT(tempTime);
@@ -639,29 +632,28 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     }
                 }
                 *tempPtr = '\0';
-                
+
                 int typeNum = atoi(tempStr);
                 if (typeNum == setType.rightToLeft)
                 {
-                    readDanmaku -> type = R2L;
+                    readDanmaku->type = R2L;
                 }
                 else if (typeNum == setType.leftToRight)
                 {
-                    readDanmaku -> type = L2R;
+                    readDanmaku->type = L2R;
                 }
                 else if (typeNum == setType.topFix)
                 {
-                    readDanmaku -> type = TOP;
+                    readDanmaku->type = TOP;
                 }
                 else if (typeNum == setType.bottomFix)
                 {
-                    readDanmaku -> type = BOTTOM;
+                    readDanmaku->type = BOTTOM;
                 }
                 else
                 {
-                    readDanmaku -> type = setType.defaultType;
+                    readDanmaku->type = setType.defaultType;
                 }
-                
             }
             else if (format.formatTable[cnt] == FORMAT_COLOR)
             {
@@ -678,7 +670,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     }
                 }
                 *tempPtr = '\0';
-                readDanmaku -> color = atoi(tempStr);
+                readDanmaku->color = atoi(tempStr);
             }
             else if (format.formatTable[cnt] == FORMAT_FONTSIZE)
             {
@@ -695,12 +687,12 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     }
                 }
                 *tempPtr = '\0';
-                readDanmaku -> fontSize = atoi(tempStr);
+                readDanmaku->fontSize = atoi(tempStr);
             }
             else if (format.formatTable[cnt] == FORMAT_TEXT)
             {
                 tempPtr = tempStr;
-                char *formatStr = format.strTable[format.formatTable[cnt+1]];
+                char *formatStr = format.strTable[format.formatTable[cnt + 1]];
                 while (!isStartWith(bufferPtr, formatStr))
                 {
                     *tempPtr = *bufferPtr;
@@ -713,18 +705,18 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                     }
                 }
                 *tempPtr = '\0';
-                if ((readDanmaku -> text = (char *)malloc((strlen(tempStr) + 1) * sizeof(char))) == NULL)
+                if ((readDanmaku->text = (char *)malloc((strlen(tempStr) + 1) * sizeof(char))) == NULL)
                 {
                     /* TODO: 释放内存 */
-                    if (readDanmaku -> text != NULL)
+                    if (readDanmaku->text != NULL)
                     {
                         free(readDanmaku->text);
                     }
                     free(readDanmaku);
-//                  freeList(*danmakuHead);
+                    //                  freeList(*danmakuHead);
                     return 5;
                 }
-                strcpy(readDanmaku -> text, tempStr);
+                strcpy(readDanmaku->text, tempStr);
             }
             else if (format.formatTable[cnt] == FORMAT_ANYNUM)
             {
@@ -740,7 +732,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
             }
             else if (format.formatTable[cnt] == FORMAT_ANYSTR)
             {
-                char *formatStr = format.strTable[format.formatTable[cnt+1]];
+                char *formatStr = format.strTable[format.formatTable[cnt + 1]];
                 while (!isStartWith(bufferPtr, formatStr))
                 {
                     bufferPtr++;
@@ -771,7 +763,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
                 else
                 {
                     if (!isStartWith(bufferPtr, formatStr))
-                    {/* 匹配失败 放弃整条已读取内容 */
+                    { /* 匹配失败 放弃整条已读取内容 */
                         bufferPtr = startPtr + 1;
                         isSuccess = FALSE;
                         goto LINE_END;
@@ -805,15 +797,15 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
             }
             else
             {
-                last -> next = readDanmaku;
+                last->next = readDanmaku;
             }
             last = readDanmaku;
-            last -> next = NULL;
-            status -> totalNum++;
+            last->next = NULL;
+            status->totalNum++;
         }
         else
         {
-            if (readDanmaku -> text != NULL)
+            if (readDanmaku->text != NULL)
             {
                 free(readDanmaku->text);
             }
@@ -828,6 +820,6 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile,
     }
 
     fclose(ipfptr);
-    status -> isDone = TRUE;
+    status->isDone = TRUE;
     return 0;
 }

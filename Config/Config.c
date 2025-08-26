@@ -1,17 +1,17 @@
 /* MIT License
- * 
+ *
  * Copyright (c) 2022 hkm
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,36 +21,38 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
+#include "Config.h"
+#include "../String/DanmakuFactoryString.h"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../String/DanmakuFactoryString.h"
-#include "Config.h"
 
 static COORDIN jsonGetCoord(const char *const jsonStr);
 
-/* 
+/*
  * 从文件读配置文件
  * 参数:配置文件名/默认配置
  * 返回值:配置结构体
-  */
+ */
 CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
 {
     int cnt;
     char ch;
     char buf[SIZE_OF_BUF], *bufPtr, *bufCopyPtr;
     CONFIG configOnfile = defaultConfig;
-    
+
     FILE *fptr = fopen(configFileName, "r");
     if (fptr == NULL)
     {
         return configOnfile;
     }
-    
+
     /* 找到可读区域 */
-    while (fgetc(fptr) != '{' && !feof(fptr)){}
-    
+    while (fgetc(fptr) != '{' && !feof(fptr))
+    {
+    }
+
     /* 读取 */
     cnt = 0;
     while ((ch = fgetc(fptr)) != '}' && !feof(fptr) && cnt < SIZE_OF_BUF - 1)
@@ -60,7 +62,7 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
     }
     buf[cnt] = '\0';
     fclose(fptr);
-    
+
     /* 解析 */
     bufPtr = buf;
     char key[KEY_LEN];
@@ -70,13 +72,13 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
     {
         /* 解析key */
         if (*bufPtr == ',')
-        {/* 跳过逗号 */
+        { /* 跳过逗号 */
             bufPtr++;
         }
         strGetLeftPart(key, &bufPtr, ':', KEY_LEN);
         deQuotMarks(key);
         toLower(NULL, key);
-        
+
         /* 解析value */
         valuePtr = value;
         bufCopyPtr = bufPtr;
@@ -92,10 +94,10 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
                     bufPtr++;
                 }
             }
-            
+
             *valuePtr = *bufPtr;
             valuePtr++;
-            
+
             if (*bufPtr != '\0')
             {
                 bufPtr++;
@@ -112,20 +114,20 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
             strGetLeftPart(NULL, &valuePtr, '[', VALUE_LEN);
             while (*valuePtr != '\0')
             {
-                /* 拆分中括号内用逗号分割的多个值 */ 
+                /* 拆分中括号内用逗号分割的多个值 */
                 if (strchr(valuePtr, ',') != NULL)
-                {/* 后半段有逗号 */ 
+                { /* 后半段有逗号 */
                     strGetLeftPart(typeName, &valuePtr, ',', TYPENAME_LEN);
                 }
                 else
-                {/* 后半段无逗号 */ 
+                { /* 后半段无逗号 */
                     strGetLeftPart(typeName, &valuePtr, ']', TYPENAME_LEN);
-                    valuePtr += strlen(typeName);/* 将指针移到字串末尾以下一个循环跳出 */ 
+                    valuePtr += strlen(typeName); /* 将指针移到字串末尾以下一个循环跳出 */
                 }
-                
+
                 deQuotMarks(typeName);
                 toLower(NULL, typeName);
-                
+
                 if (strcmp("r2l", typeName) == 0)
                 {
                     blockmode += BLK_R2L;
@@ -147,12 +149,12 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
                     blockmode += BLK_SPECIAL;
                 }
                 else if (strcmp("color", typeName) == 0 || strcmp("colour", typeName) == 0)
-                {/* 兼容英式拼写的color */ 
+                { /* 兼容英式拼写的color */
                     blockmode += BLK_COLOR;
                 }
                 else if (strcmp("repeat", typeName) == 0)
                 {
-                    blockmode += BLK_REPEAT; 
+                    blockmode += BLK_REPEAT;
                 }
             }
             configOnfile.blockmode = blockmode;
@@ -164,19 +166,19 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
             strGetLeftPart(NULL, &valuePtr, '[', VALUE_LEN);
             while (*valuePtr != '\0')
             {
-                /* 解析中括号内用逗号分割的多个值 */ 
+                /* 解析中括号内用逗号分割的多个值 */
                 if (strchr(valuePtr, ',') != NULL)
-                {/* 后半段有逗号 */ 
+                { /* 后半段有逗号 */
                     strGetLeftPart(typeName, &valuePtr, ',', TYPENAME_LEN);
                 }
                 else
-                {/* 后半段无逗号 */ 
+                { /* 后半段无逗号 */
                     strGetLeftPart(typeName, &valuePtr, ']', TYPENAME_LEN);
-                    valuePtr += strlen(typeName);/* 将指针移到字串末尾以下一个循环跳出 */ 
+                    valuePtr += strlen(typeName); /* 将指针移到字串末尾以下一个循环跳出 */
                 }
                 deQuotMarks(typeName);
                 toLower(NULL, typeName);
-                
+
                 if (strcmp("table", typeName) == 0)
                 {
                     statmode += TABLE;
@@ -281,27 +283,26 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
             configOnfile.msgBoxPos = jsonGetCoord(value);
         }
     }
-    
+
     return configOnfile;
 }
 
-
-/* 
+/*
  * 写配置文件
  * 参数：配置文件名/配置信息
  * 返回值：布尔值 是否成功
-  */
+ */
 BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
 {
     FILE *fptr = fopen(configFileName, "w");
-    
+
     char tempStr[MAX_TEXT_LENGTH];
     CONFIG newConfigCopy = newConfig;
     if (fptr == NULL)
     {
         return FALSE;
     }
-    
+
     fprintf(fptr,
             "{\n"
             "    \"resolution\": [%d, %d],\n"
@@ -317,24 +318,13 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"opacity\": %d,\n"
             "    \"outline\": %.1f,\n"
             "    \"shadow\": %.1f,\n"
-            "    \"bold\": %s,\n"
-            ,
-            newConfigCopy.resolution.x, newConfigCopy.resolution.y,
-            newConfigCopy.displayarea,
-            newConfigCopy.scrollarea,
-            newConfigCopy.scrolltime,
-            newConfigCopy.fixtime,
+            "    \"bold\": %s,\n",
+            newConfigCopy.resolution.x, newConfigCopy.resolution.y, newConfigCopy.displayarea, newConfigCopy.scrollarea,
+            newConfigCopy.scrolltime, newConfigCopy.fixtime,
 
-            newConfigCopy.density,
-            newConfigCopy.lineSpacing,
-            newConfigCopy.fontsize,
-            newConfigCopy.fontname,
-            newConfigCopy.opacity,
-            newConfigCopy.outline,
-            newConfigCopy.shadow,
-            boolToStr(tempStr, newConfigCopy.bold)
-    );
-    
+            newConfigCopy.density, newConfigCopy.lineSpacing, newConfigCopy.fontsize, newConfigCopy.fontname,
+            newConfigCopy.opacity, newConfigCopy.outline, newConfigCopy.shadow, boolToStr(tempStr, newConfigCopy.bold));
+
     /* 写是否保存屏蔽部分 */
     if (newConfigCopy.saveBlockedPart == FALSE)
     {
@@ -343,7 +333,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
 
     // 为防止一次性写入相同的值，此处分开对同一变量赋值输出。
     fprintf(fptr, "    \"showUsernames\": %s,\n", boolToStr(tempStr, newConfigCopy.showUserNames));
-    
+
     fprintf(fptr,
             "    \"showMsgbox\": %s,\n"
 
@@ -351,17 +341,13 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             "    \"msgboxPos\": [%d, %d],\n"
             "    \"msgboxFontsize\": %d,\n"
             "    \"msgboxDuration\": %.2f,\n"
-            "    \"giftMinPrice\": %.2f,\n"
-            ,
+            "    \"giftMinPrice\": %.2f,\n",
             boolToStr(tempStr, newConfigCopy.showMsgBox),
 
-            newConfigCopy.msgBoxSize.x, newConfigCopy.msgBoxSize.y,
-            newConfigCopy.msgBoxPos.x, newConfigCopy.msgBoxPos.y,
-            newConfigCopy.msgboxFontsize,
-            newConfigCopy.msgboxDuration,
-            newConfigCopy.giftMinPrice
-    );
-    
+            newConfigCopy.msgBoxSize.x, newConfigCopy.msgBoxSize.y, newConfigCopy.msgBoxPos.x,
+            newConfigCopy.msgBoxPos.y, newConfigCopy.msgboxFontsize, newConfigCopy.msgboxDuration,
+            newConfigCopy.giftMinPrice);
+
     /* 写屏蔽模式 */
     {
         /* L2R, R2L, TOP, BOTTOM, SPECIAL, COLOR, REPEAT */
@@ -436,13 +422,13 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
                 fprintf(fptr, ", ");
             }
         }
-        
+
         fprintf(fptr, "],\n");
     }
-    
+
     /* 写统计模式 */
     {
-        /* TABLE, HISTOGRAM */ 
+        /* TABLE, HISTOGRAM */
         fprintf(fptr, "    \"statmode\": [");
         if (newConfigCopy.statmode & TABLE)
         {
@@ -453,7 +439,6 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             {
                 fprintf(fptr, ", ");
             }
-            
         }
         if (newConfigCopy.statmode & HISTOGRAM)
         {
@@ -465,20 +450,20 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
                 fprintf(fptr, ", ");
             }
         }
-        
+
         fprintf(fptr, "]\n");
     }
-    
+
     fprintf(fptr, "}");
-    
+
     if (ferror(fptr))
     {
         fclose(fptr);
-        return FALSE; 
+        return FALSE;
     }
-    
+
     fclose(fptr);
-    
+
     return TRUE;
 }
 
@@ -487,22 +472,22 @@ void printConfig(CONFIG config)
 {
     printf("\n"
            "Configuration:\n"
-           "Resolution: %dx%d", config.resolution.x, config.resolution.y);
+           "Resolution: %dx%d",
+           config.resolution.x, config.resolution.y);
 
     printf(" | DisplayArea: %.3f", config.displayarea);
     if (fabs(config.displayarea - 1) < EPS)
     {
         printf("(full)");
     }
-    
+
     printf(" | ScrollArea: %.3f", config.scrollarea);
     if (fabs(config.scrollarea - 1) < EPS)
     {
         printf("(full)");
     }
-    
-    printf(" | ScrollTime: %.3f sec | FixTime: %.3f sec",
-           config.scrolltime, config.fixtime);
+
+    printf(" | ScrollTime: %.3f sec | FixTime: %.3f sec", config.scrolltime, config.fixtime);
 
     printf("\nDensity: %d", config.density);
     if (config.density == -1)
@@ -513,14 +498,14 @@ void printConfig(CONFIG config)
     {
         printf("(unlimit)");
     }
-    
-    printf(" | LineSpacing: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f",
-           config.lineSpacing, config.fontsize, config.fontname, config.opacity, config.outline);
+
+    printf(" | LineSpacing: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f", config.lineSpacing,
+           config.fontsize, config.fontname, config.opacity, config.outline);
     if (fabs(config.outline) < EPS)
     {
         printf("(disable)");
     }
-    
+
     printf(" | Shadow: %.1f", config.shadow);
     if (fabs(config.shadow) < EPS)
     {
@@ -567,16 +552,20 @@ void printConfig(CONFIG config)
         printf("true");
     }
 
-    printf("\nMessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f", 
-           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize, config.msgboxDuration);
-    if (config.msgboxDuration < EPS) {
+    printf("\nMessageBoxSize: %dx%d | MessageBoxPosition: (%d, %d) | MessageBoxFontsize: %d | MessageBoxDuration: %.2f",
+           config.msgBoxSize.x, config.msgBoxSize.y, config.msgBoxPos.x, config.msgBoxPos.y, config.msgboxFontsize,
+           config.msgboxDuration);
+    if (config.msgboxDuration < EPS)
+    {
         printf("(default)");
-    } else {
+    }
+    else
+    {
         printf(" sec");
     }
 
     printf(" | GiftMinPrice: CNY %.2f", config.giftMinPrice);
-    
+
     printf("\nBlockMode: ");
     if (config.blockmode == 0)
     {
@@ -613,7 +602,7 @@ void printConfig(CONFIG config)
             printf("repeat ");
         }
     }
-    
+
     printf("\nStatMode:  ");
     if (config.statmode == 0)
     {
@@ -630,7 +619,7 @@ void printConfig(CONFIG config)
             printf("histogram ");
         }
     }
-    
+
     printf("\n");
     return;
 }

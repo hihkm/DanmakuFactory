@@ -1,17 +1,17 @@
 /* MIT License
- * 
+ *
  * Copyright (c) 2022 hkm
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,15 +25,16 @@
 #define __TEMPLATE_FILE_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "../Define/DanmakuDef.h"
 #include "../Define/Status.h"
 #include "../String/DanmakuFactoryString.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define LINE_MAX_LEN 4096
 #define FORMAT_TABLE_MAX_LEN 256
@@ -59,50 +60,51 @@ extern "C" {
 
 #define FORMAT_IS_VAR(tableValue) (tableValue < 0)
 
-struct formatOfDanmaku
-{
-    char *strTable[STR_TABLE_MAX_LEN];    /* 字串表 */
-    int formatTable[FORMAT_TABLE_MAX_LEN];/* 格式表 */
-    int strTableLen;
-    int formatTableLen;
-    /* 
-     * 格式表表示方法： 按顺序用整形存储每一个部分，宏定义 FORMAT_XXX 表示读取某类型值，正整数表示字串表下标，对于某一字符串
-     */
-};
+    struct formatOfDanmaku
+    {
+        char *strTable[STR_TABLE_MAX_LEN];     /* 字串表 */
+        int formatTable[FORMAT_TABLE_MAX_LEN]; /* 格式表 */
+        int strTableLen;
+        int formatTableLen;
+        /*
+         * 格式表表示方法： 按顺序用整形存储每一个部分，宏定义 FORMAT_XXX
+         * 表示读取某类型值，正整数表示字串表下标，对于某一字符串
+         */
+    };
 
-struct timeDefineSetting
-{
-    float ratioToSeconds;
-};
+    struct timeDefineSetting
+    {
+        float ratioToSeconds;
+    };
 
-struct typeDefineSetting
-{
-    int rightToLeft;
-    int leftToRight;
-    int topFix;
-    int bottomFix;
-    int defaultType;
-};
+    struct typeDefineSetting
+    {
+        int rightToLeft;
+        int leftToRight;
+        int topFix;
+        int bottomFix;
+        int defaultType;
+    };
 
-struct colorDefineSetting
-{
-    int defaultColor;
-};
+    struct colorDefineSetting
+    {
+        int defaultColor;
+    };
 
-struct fontsizeDefineSetting
-{
-    int defaultFontsize;
-};
+    struct fontsizeDefineSetting
+    {
+        int defaultFontsize;
+    };
 
-typedef struct formatOfDanmaku FORMAT;
-typedef struct timeDefineSetting SET_TIME;
-typedef struct typeDefineSetting SET_TYPE;
-typedef struct colorDefineSetting SET_COLOR;
-typedef struct fontsizeDefineSetting SET_FONTSIZE;
+    typedef struct formatOfDanmaku FORMAT;
+    typedef struct timeDefineSetting SET_TIME;
+    typedef struct typeDefineSetting SET_TYPE;
+    typedef struct colorDefineSetting SET_COLOR;
+    typedef struct fontsizeDefineSetting SET_FONTSIZE;
 
-extern int readTemplateFile(const char *const ipFile, const char *const templateFile, 
-                     DANMAKU **danmakuHead, const char *mode, const float timeShift, 
-                     STATUS *const status, char *errMsg, int msgLen);
+    extern int readTemplateFile(const char *const ipFile, const char *const templateFile, DANMAKU **danmakuHead,
+                                const char *mode, const float timeShift, STATUS *const status, char *errMsg,
+                                int msgLen);
 
 #ifdef __cplusplus
 }

@@ -1,17 +1,17 @@
 /* MIT License
- * 
+ *
  * Copyright (c) 2022 hkm
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,41 +23,39 @@
 
 #include "AssStringProcessing.h"
 
-const struct AssEscapeListNode assEscapeList[] = 
-{ /* 源字符串 转义后字符串 */
-    // {"\\n", "\\{}n"},
-    // {"\\N", "\\{}N"},
-    // {"\\h", "\\{}h"},
-    {"\\n", "\\\xe2\x80\x8bn"},
-    {"\\N", "\\\xe2\x80\x8bN"},
-    {"\\h", "\\​h"},
-    {"{", "\\{"},   // compatible with libass
-    {"}", "\\}"},   // compatible with libass
-    {" ", "\\h"},
-    {"\n", "\\N"},
-    {"&lt;", "<"},
-    {"&gt;", ">"},
-    {"&amp;", "&"},
-    {"&apos;", "\'"},
-    {"&quot;", "\""},
-    {"&#", ""}, // emoji Unicode 码位占位符
-    {NULL, NULL}
-};
+const struct AssEscapeListNode assEscapeList[] = {/* 源字符串 转义后字符串 */
+                                                  // {"\\n", "\\{}n"},
+                                                  // {"\\N", "\\{}N"},
+                                                  // {"\\h", "\\{}h"},
+                                                  {"\\n", "\\\xe2\x80\x8bn"},
+                                                  {"\\N", "\\\xe2\x80\x8bN"},
+                                                  {"\\h", "\\​h"},
+                                                  {"{", "\\{"}, // compatible with libass
+                                                  {"}", "\\}"}, // compatible with libass
+                                                  {" ", "\\h"},
+                                                  {"\n", "\\N"},
+                                                  {"&lt;", "<"},
+                                                  {"&gt;", ">"},
+                                                  {"&amp;", "&"},
+                                                  {"&apos;", "\'"},
+                                                  {"&quot;", "\""},
+                                                  {"&#", ""}, // emoji Unicode 码位占位符
+                                                  {NULL, NULL}};
 
-/* 
+/*
  * 转换十进制rgb颜色为十六进制颜色
  * 参数：
- * 十进制颜色/记录十六进制的数组（7个字节以上） 
+ * 十进制颜色/记录十六进制的数组（7个字节以上）
  * 返回值：
  * 十六进制数组的地址
- */ 
+ */
 char *toHexColor(int decColor, char *hexColor)
-{/* 先转换为16进制再两个为一对倒序排列 */
+{ /* 先转换为16进制再两个为一对倒序排列 */
     int i, j;
-    /* 使用两个for实现位置交叉 */ 
-    for(i = 0; i < 3; i++)
+    /* 使用两个for实现位置交叉 */
+    for (i = 0; i < 3; i++)
     {
-        for(j = 1; j >= 0; j--)
+        for (j = 1; j >= 0; j--)
         {
             if (decColor % 16 < 10)
             {
@@ -70,17 +68,17 @@ char *toHexColor(int decColor, char *hexColor)
             decColor /= 16;
         }
     }
-    hexColor[6] = '\0'; 
+    hexColor[6] = '\0';
     return hexColor;
 }
 
-/* 
- * 十进制透明度转十六进制透明度（0-255） 
+/*
+ * 十进制透明度转十六进制透明度（0-255）
  */
 char *toHexOpacity(int decOpacity, char *hexOpacity)
 {
     int cnt;
-    for(cnt = 1; cnt >=0; cnt--)
+    for (cnt = 1; cnt >= 0; cnt--)
     {
         if (decOpacity % 16 < 10)
         {
@@ -96,36 +94,36 @@ char *toHexOpacity(int decOpacity, char *hexOpacity)
     return hexOpacity;
 }
 
-/* 
+/*
  * 转换十六进制rgb颜色为十进制颜色
- */ 
+ */
 int toDecColor(char *hexColor)
 {
     int i, j;
     int color = 0;
-    
+
     for (i = 2; i >= 0; i--)
     {
         for (j = 0; j < 2; j++)
         {
-            if (hexColor[2*i + j] >= '0' && hexColor[2*i + j] <= '9')
+            if (hexColor[2 * i + j] >= '0' && hexColor[2 * i + j] <= '9')
             {
                 color *= 16;
-                color += hexColor[2*i + j] - '0';
+                color += hexColor[2 * i + j] - '0';
             }
-            else if (hexColor[2*i + j] >= 'a' && hexColor[2*i + j] <= 'f')
+            else if (hexColor[2 * i + j] >= 'a' && hexColor[2 * i + j] <= 'f')
             {
                 color *= 16;
-                color += hexColor[2*i + j] - 'a' + 10;
+                color += hexColor[2 * i + j] - 'a' + 10;
             }
-            else if (hexColor[2*i + j] >= 'A' && hexColor[2*i + j] <= 'F')
+            else if (hexColor[2 * i + j] >= 'A' && hexColor[2 * i + j] <= 'F')
             {
                 color *= 16;
-                color += hexColor[2*i + j] - 'A' + 10;
+                color += hexColor[2 * i + j] - 'A' + 10;
             }
         }
     }
-    
+
     return color;
 }
 
@@ -142,29 +140,29 @@ char *deStyleNamePrefix(char *str)
     {
         return NULL;
     }
-    
+
     char *leftPtr, *rightPtr;
     leftPtr = str;
-    rightPtr = str + 21;/* 从22个字节开始寻找字符 '_' 下划线 */
-    
-    while (*rightPtr != '\0' && *(rightPtr-1) != '_')
-    {/* 寻找下划线 */
+    rightPtr = str + 21; /* 从22个字节开始寻找字符 '_' 下划线 */
+
+    while (*rightPtr != '\0' && *(rightPtr - 1) != '_')
+    { /* 寻找下划线 */
         rightPtr++;
     }
-    
-    while (*(rightPtr-1) != '\0')
-    {/* 内容拷贝 */
+
+    while (*(rightPtr - 1) != '\0')
+    { /* 内容拷贝 */
         *leftPtr = *rightPtr;
         leftPtr++;
         rightPtr++;
     }
-    
+
     return str;
 }
 
-/* 
+/*
   以ass标准读取时间
-  输出单位：毫秒 
+  输出单位：毫秒
  */
 int timeToInt(const char *ipStr)
 {
@@ -172,7 +170,7 @@ int timeToInt(const char *ipStr)
     int num = 0;
     int time = 0;
     char *ptr = (char *)ipStr;
-    
+
     /* 小时部分 */
     while (*ptr != ':' && *ptr != '.' && *ptr != '\0')
     {
@@ -188,7 +186,7 @@ int timeToInt(const char *ipStr)
     time = num * 3600;
     num = 0;
     ptr++;
-    
+
     /* 分钟部分 */
     while (*ptr != ':' && *ptr != '.' && *ptr != '\0')
     {
@@ -204,7 +202,7 @@ int timeToInt(const char *ipStr)
     time += num * 60;
     num = 0;
     ptr++;
-    
+
     /* 秒部分 */
     while (*ptr != '.' && *ptr != ':' && *ptr != '\0')
     {
@@ -220,16 +218,20 @@ int timeToInt(const char *ipStr)
     time += num;
     num = 0;
     ptr++;
-    
+
     /* 毫秒部分 */
-    while (*ptr != '.' && *ptr != ':' && *ptr != '\0') {
-        if (*ptr == ' ') {
+    while (*ptr != '.' && *ptr != ':' && *ptr != '\0')
+    {
+        if (*ptr == ' ')
+        {
             ptr++;
             continue;
         }
-        if (++num > 3) {    // 最多 3 位有效数字
-            if ((*ptr - '0') >= 5) {
-                time++;     // 四舍五入
+        if (++num > 3)
+        { // 最多 3 位有效数字
+            if ((*ptr - '0') >= 5)
+            {
+                time++; // 四舍五入
             }
             break;
         }
@@ -237,24 +239,25 @@ int timeToInt(const char *ipStr)
         time += *ptr - '0';
         ptr++;
     }
-    for (int i = 0; i < 3 - num; i++) {
+    for (int i = 0; i < 3 - num; i++)
+    {
         time *= 10;
     }
-    
+
     return time;
 }
 
-/* 
- * 数组清空 
- * 参数： 
- * 数组首地址/要初始化成的值/成员数量/ 
+/*
+ * 数组清空
+ * 参数：
+ * 数组首地址/要初始化成的值/成员数量/
  * 返回值：
- * ferror函数的返回值 
-  */
+ * ferror函数的返回值
+ */
 void arrset(int *array, const int value, const int numberOfMember)
 {
     int cnt;
-    for(cnt = 0; cnt < numberOfMember; cnt++)
+    for (cnt = 0; cnt < numberOfMember; cnt++)
     {
         *(array + cnt) = value;
     }
@@ -283,10 +286,10 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
     srcPtr = srcStr;
     dstPtr = dstStr;
 
-    while (*srcPtr != '\0' && lenCnt < dstStrLen-1)
+    while (*srcPtr != '\0' && lenCnt < dstStrLen - 1)
     {
         int listCnt = 0;
-        while (lenCnt < dstStrLen-1)
+        while (lenCnt < dstStrLen - 1)
         {
             if (mode == ASS_ESCAPE)
             {
@@ -300,13 +303,13 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
             }
 
             if (originalTextPtr == NULL || assEscapedTextPtr == NULL || *originalTextPtr == '\0')
-            { /* 匹配全部失败，直接拷贝文本 */ 
+            { /* 匹配全部失败，直接拷贝文本 */
                 *dstPtr = *srcPtr;
                 dstPtr++;
                 lenCnt++;
                 break;
             }
-            
+
             char *srcCmpPtr = srcPtr;
             char *originalTextCmpPtr = originalTextPtr;
             while (*originalTextCmpPtr != '\0' && *srcCmpPtr != '\0')
@@ -321,7 +324,8 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
 
             if (*originalTextCmpPtr == '\0')
             {
-                if (strcmp(originalTextPtr, "&#") == 0) {
+                if (strcmp(originalTextPtr, "&#") == 0)
+                {
                     char emojiUnicodeText[8];
                     strGetLeftPart(emojiUnicodeText, &srcCmpPtr, ';', 8);
                     unicode_to_utf8(atoi(emojiUnicodeText), utf8Hex);
@@ -332,18 +336,18 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
                 /* 拷贝转义后字串 */
                 while (*assEscapedTextPtr != '\0')
                 {
-                    if (lenCnt >= dstStrLen-1)
-                    {/* 目标容器超长 */
+                    if (lenCnt >= dstStrLen - 1)
+                    { /* 目标容器超长 */
                         break;
                     }
-                    
+
                     *dstPtr = *assEscapedTextPtr;
                     dstPtr++;
                     assEscapedTextPtr++;
                     lenCnt++;
                 }
-                
-                srcPtr += strlen(originalTextPtr) - 1;  // "- 1" is for "srcPtr++" later.
+
+                srcPtr += strlen(originalTextPtr) - 1; // "- 1" is for "srcPtr++" later.
                 break;
             }
 
@@ -352,7 +356,7 @@ char *assEscape(char *dstStr, char *srcStr, int dstStrLen, int mode)
 
         srcPtr++;
     }
-    
+
     *dstPtr = '\0';
 
     return dstStr;
