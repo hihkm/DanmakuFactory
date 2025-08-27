@@ -30,6 +30,7 @@ extern "C"
 #endif
 
 #include "../Define/DanmakuDef.h"
+#include <stddef.h>
 
 #define CHAR_IS_BLANK(ch) (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')
 #define STR_IS_EMPTY(str) (str[0] == '\0')
