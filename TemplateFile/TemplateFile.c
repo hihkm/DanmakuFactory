@@ -51,7 +51,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
 
     /* 判断读入方式 */
     if (*danmakuHead == NULL || *mode == 'n')
-    {   /* 新建模式 */
+    { /* 新建模式 */
         //      freeList(*danmakuHead);
         *danmakuHead = NULL;
     }
