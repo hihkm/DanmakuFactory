@@ -1,25 +1,26 @@
-// .github/scripts/update-version.js
 import { readFileSync, writeFileSync } from "fs";
 
 function updateVersionHeader(sha) {
   const headerPath = "Define/CLIDef.h";
-  const shortSha = sha.substring(0, 7);
+  const shortShaVersion = `${sha.substring(0, 7)}-dev`;
 
   try {
     let content = readFileSync(headerPath, "utf8");
 
     // 匹配 #define VERSION "..."
-    const versionRegex = /(^\s*#\s*define\s+VERSION\s+["'])([^"']+)["']/m;
+    const versionRegex = /(^\s*#define\s+VERSION\s+["'])([^"']+)["']/m;
 
     if (!versionRegex.test(content)) {
       console.error(`❌ 未在 ${headerPath} 中找到 VERSION 定义`);
       process.exit(1);
     }
 
-    const newContent = content.replace(versionRegex, `$1${shortSha}"`);
+    const newContent = content.replace(versionRegex, `$1${shortShaVersion}"`);
     writeFileSync(headerPath, newContent, "utf8");
 
-    console.log(`✅ 成功更新 ${headerPath} 中的 VERSION 为 "${shortSha}"`);
+    console.log(
+      `✅ 成功更新 ${headerPath} 中的 VERSION 为 "${shortShaVersion}"`
+    );
   } catch (err) {
     if (err.code === "ENOENT") {
       console.error(`❌ 文件未找到: ${headerPath}`);

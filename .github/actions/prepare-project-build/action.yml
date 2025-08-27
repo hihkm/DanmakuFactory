@@ -4,8 +4,8 @@ description: "进行编译所需的准备"
 runs:
   using: "composite"
   steps:
-    - name: Set PROJECT_NAME via Node.js
-      run: node "${{ github.action_path }}/set-project-name-env.js"
+    - name: Set Project Defines
+      run: node "${{ github.action_path }}/set-project-defines.js"
       shell: bash
 
     - name: Update VERSION with Commit SHA

@@ -1,5 +1,7 @@
 ## DanmukuFactory
 
+[![Build & Release](https://github.com/hihkm/DanmakuFactory/actions/workflows/build-release.yml/badge.svg)](https://github.com/hihkm/DanmakuFactory/actions/workflows/build-release.yml)
+
 DanmakuFactory是一款弹幕文件转换工具，支持弹幕姬的礼物读取，支持特殊弹幕，支持多格式互转，支持自定义输入模板，~~甚至可以原地tp~~
 
 <img src="images/01.png" alt="pic01" style="zoom: 38%;" />
