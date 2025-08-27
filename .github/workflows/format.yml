@@ -46,7 +46,7 @@ jobs:
         if: steps.check_changes.outputs.changed != 0
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: "style(format): AUTO format code [skip ci]"
+          commit_message: "style(format): AUTO format code"
           branch: ${{ github.ref_name }}
           commit_options: "--no-verify --signoff"
           file_pattern: "*.h *.c"
