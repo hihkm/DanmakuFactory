@@ -8,8 +8,9 @@ runs:
       run: node "${{ github.action_path }}/set-project-defines.js"
       shell: bash
 
-    - name: Update VERSION with Commit SHA
-      run: node "${{ github.action_path }}/update-version.js"
-      shell: bash
-      env:
-        GITHUB_SHA: ${{ github.sha }}
+    #  TODO: Add Build version to library & CLI
+    # - name: Update Version
+    #   run: node "${{ github.action_path }}/update-version.js"
+    #   shell: bash
+    #   env:
+    #     GITHUB_SHA: ${{ github.sha }}

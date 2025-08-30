@@ -2,14 +2,13 @@ name: "Format Code"
 
 on:
   workflow_run:
-    workflows: ["Build & Release"]
-    types:
-      - completed
+    workflows: ["Release Artifacts"]
+    types: ["completed"]
     branches: [master]
   workflow_dispatch:
 
 concurrency:
-  group: "formatter"
+  group: "format"
   cancel-in-progress: false
 
 jobs:

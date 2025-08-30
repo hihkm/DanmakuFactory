@@ -1,8 +1,7 @@
 import { readFileSync, appendFileSync } from "fs";
 
-const defaultProjectName = "DanmakuFactory";
-
 function getProjectName() {
+  const defaultProjectName = "DanmakuFactory";
   try {
     const cmakeContent = readFileSync("CMakeLists.txt", "utf8");
     const match = cmakeContent.match(/project\s*\(\s*([^ )]+)/);
