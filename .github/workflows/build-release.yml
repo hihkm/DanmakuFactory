@@ -1,0 +1,172 @@
+name: "Build & Release"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**/*.c"
+      - "**/*.h"
+      - "**/CMakeLists.txt"
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "**/*.c"
+      - "**/*.h"
+      - "**/CMakeLists.txt"
+  workflow_dispatch:
+
+concurrency:
+  group: "build-release"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build on ${{ matrix.platform }} (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    env:
+      PROJECT_NAME: ${{ github.event.repository.name }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: Linux
+            arch: x64
+
+          - os: ubuntu-24.04-arm
+            platform: Linux
+            arch: arm64
+
+          - os: macos-13
+            platform: macOS
+            arch: Intel
+
+          - os: macos-latest
+            platform: macOS
+            arch: arm64
+
+          - os: windows-latest
+            platform: Windows
+            arch: x64
+
+          - os: windows-11-arm
+            platform: Windows
+            arch: arm64
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          submodules: "recursive"
+
+      - name: Prepare Project Build
+        uses: ./.github/actions/prepare-project-build
+
+      - name: Build Project
+        uses: threeal/cmake-action@v2.1.0
+        with:
+          options: CMAKE_BUILD_TYPE=Release
+          build-args: --config Release --target ${{ env.PROJECT_NAME }}
+
+      - name: Upload Artifact
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            build/**/${{ env.PROJECT_NAME }}
+            build/**/${{ env.PROJECT_NAME }}.exe
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 9
+
+  release:
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    name: Upload to GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      SOURCE_DIR: "artifacts"
+      OUTPUT_DIR: "release-assets"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Prepare Release Assets
+        id: prep_assets
+        uses: ./.github/actions/prepare-release-assets
+        with:
+          source-dir: ${{ env.SOURCE_DIR }}
+          output-dir: ${{ env.OUTPUT_DIR }}
+
+      - name: Update dev Tag
+        run: |
+          git tag dev ${{ github.sha }}
+          git push origin "refs/tags/dev" --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release to GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev
+          name: Continuous dev Build
+          body: Automated build from commit ${{ github.sha }}
+          prerelease: true
+          preserve_order: true
+          files: ${{ env.OUTPUT_DIR }}/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  format:
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    name: Auto Format Code
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Clang-Format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+
+      - name: Format C/C++ files
+        run: find . -name '*.c' -o -name '*.h' | xargs clang-format -i -style=file
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=0" >> $GITHUB_OUTPUT
+          else
+            echo "changed=1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto commit and push changes
+        if: steps.check_changes.outputs.changed != 0
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "style(format): AUTO format code"
+          branch: ${{ github.ref_name }}
+          commit_options: "--no-verify --signoff"
+          file_pattern: "*.h *.c"
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          status_options: "--untracked-files=no"
+          add_options: "-u"
+          disable_globbing: true
