@@ -63,14 +63,23 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           submodules: "recursive"
 
-      - name: Prepare Project Build
-        uses: ./.github/actions/prepare-project-build
+      # - name: Prepare Project Build
+      #   uses: ./.github/actions/prepare-project-build
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+          build-cache: true
+          build-cache-key: "${{ matrix.platform }}-${{ matrix.arch }}-CI"
+          build-cache-path: 'build/.build_cache'
+          package-cache: true
+          package-cache-key: "${{ matrix.platform }}-${{ matrix.arch }}-CI"
+          project-path: ${{ env.PROJECT_NAME }}
 
       - name: Build Project
-        uses: threeal/cmake-action@v2.1.0
-        with:
-          options: CMAKE_BUILD_TYPE=Release
-          build-args: --config Release --target ${{ env.PROJECT_NAME }}
+        run: |
+          xmake build -y -v
 
       - name: Upload Artifact
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}

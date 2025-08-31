@@ -1,3 +1,10 @@
+# Xmake cache
+.xmake/
+build/
+
+# MacOS Cache
+.DS_Store
+
 # Visual Studio
 .vs/
 obj/
@@ -6,10 +13,6 @@ CMakeSettings.json
 # Docs
 *.docx
 *.ini
-
-# CMake
-build/
-bin/
 
 # Clangd
 .cache/
