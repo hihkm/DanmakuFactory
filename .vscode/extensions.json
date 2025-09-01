@@ -1,8 +1,8 @@
 {
     "recommendations": [
-        "yzhang.markdown-all-in-one",
         "llvm-vs-code-extensions.vscode-clangd",
         "sonarsource.sonarlint-vscode",
         "esbenp.prettier-vscode",
+        "tboox.xmake-vscode",
     ]
 }

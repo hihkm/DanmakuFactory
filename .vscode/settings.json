@@ -1,11 +1,4 @@
 {
-    "files.associations": {
-        "cdanmakufactory.h": "c",
-        "danmakufactorylist.h": "c",
-        "assfile.h": "c",
-        "templatefile.h": "c",
-        "assstringprocessing.h": "c"
-    },
     "cmake.configureOnOpen": true,
     "cmake.generator": "Ninja",
     "sonarlint.pathToCompileCommands": "${workspaceFolder}\\.vscode\\compile_commands.json",
