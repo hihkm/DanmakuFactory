@@ -65,7 +65,6 @@ jobs:
         with:
           xmake-version: ~3
           actions-cache-folder: ".xmake-cache"
-          actions-cache-key: "${{ matrix.platform }}_${{ matrix.arch }}"
           build-cache-key: "${{ matrix.platform }}_${{ matrix.arch }}"
           build-cache: true
           package-cache: true

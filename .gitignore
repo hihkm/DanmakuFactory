@@ -21,6 +21,7 @@ CMakeSettings.json
 .cache/
 
 # Others
+bin/
 DanmakuFactory
 
 #

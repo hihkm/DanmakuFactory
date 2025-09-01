@@ -4,5 +4,6 @@
         "sonarsource.sonarlint-vscode",
         "esbenp.prettier-vscode",
         "tboox.xmake-vscode",
-    ]
+        "yinfei.luahelper",
+    ],
 }
