@@ -117,7 +117,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: dev
-          name: Continuous dev Build
+          name: Continuous Build
           body: Automated build from commit ${{ github.sha }}
           prerelease: true
           preserve_order: true
