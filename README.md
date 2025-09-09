@@ -35,7 +35,13 @@ cd DanmakuFactory
 3. 编译，可执行文件为 DanmakuFactory
 
 ```shell
-xmake build -y -v
+xmake build -v
+```
+
+4. 生成 CMakeLists.txt
+
+```shell
+xmake project -k cmake
 ```
 
 ### Python 版本(Developing)
@@ -100,3 +106,7 @@ xmake build -y -v
 图形界面部分用的是 VB.NET 编写
 
 <img src="images/05.png" alt="图形界面展示" style="zoom:90%;" />
+
+## 更新日志
+
+见 [CHANGELOG.md](./CHANGELOG.md)

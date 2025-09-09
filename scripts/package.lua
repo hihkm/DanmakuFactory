@@ -21,6 +21,7 @@ function package_release(target)
     os.mkdir(package_dir)
 
     -- 生成压缩包名称
+    -- TODO: 这里的版本号需要从分支名称中获取
     local package_name = ("%s-dev-%s-%s-CLI"):format(target:basename(), os.host(), os.arch())
     local package_path = path.join(package_dir, package_name)
 
@@ -28,13 +29,13 @@ function package_release(target)
     print("Packaging %s...", package_name)
     if is_plat("windows") then
         package_path = package_path .. ".zip"
-        os.execv("powershell", {"-Command",
-                                string.format(
-            "Compress-Archive -Path '%s\\*' -DestinationPath '%s' -Force -CompressionLevel Optimal", tmp_dir,
-            package_path)})
+        os.execv("powershell",
+            { "-Command", string.format(
+                "Compress-Archive -Path '%s\\*' -DestinationPath '%s' -Force -CompressionLevel Optimal",
+                tmp_dir, package_path) })
     else
         package_path = package_path .. ".tar.gz"
-        os.execv("tar", {"--use-compress-program", "gzip -9", "-cvf", package_path, "-C", tmp_dir, "."})
+        os.execv("tar", { "--use-compress-program", "gzip -9", "-cvf", package_path, "-C", tmp_dir, "." })
     end
 
     -- 清理临时目录

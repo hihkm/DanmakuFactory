@@ -1,25 +1,27 @@
 # Xmake
 .xmake/
 build/
+
+# CMake
 CMakeLists.txt
+CMakeSettings.json
 
-# MacOS Cache
-.DS_Store
-
-# VSCode
-.vscode/compile_commands.json
+# Clangd
+.cache
+compile_commands.json
 
 # Visual Studio
 .vs/
 obj/
-CMakeSettings.json
+
+# VSCode
+
+# MacOS Cache
+.DS_Store
 
 # Docs
 *.docx
 *.ini
-
-# Clangd
-.cache/
 
 # Others
 bin/

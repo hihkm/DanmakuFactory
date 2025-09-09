@@ -24,6 +24,8 @@
 #ifndef __CLIDEF_H__
 #define __CLIDEF_H__
 
+#include <stdbool.h>
+
 #define GUI_SUPPORT // 给GUI版本提供一些特殊的功能支持
 
 #define VERSION "1.70"
@@ -40,7 +42,7 @@ struct fileInfo
     char fileName[FILENAME_LEN];
     char template[FILENAME_LEN];
     float timeShift; // 秒
-    BOOL isSet;
+    bool isSet;
 };
 
 typedef struct fileInfo FINFO;

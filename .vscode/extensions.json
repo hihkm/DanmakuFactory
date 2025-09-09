@@ -1,9 +1,9 @@
 {
-    "recommendations": [
-        "llvm-vs-code-extensions.vscode-clangd",
-        "sonarsource.sonarlint-vscode",
-        "esbenp.prettier-vscode",
-        "vadimcn.vscode-lldb",
-        "tboox.xmake-vscode",
-    ],
+  "recommendations": [
+    "llvm-vs-code-extensions.vscode-clangd",
+    "sonarsource.sonarlint-vscode",
+    "esbenp.prettier-vscode",
+    "vadimcn.vscode-lldb",
+    "tboox.xmake-vscode",
+  ],
 }

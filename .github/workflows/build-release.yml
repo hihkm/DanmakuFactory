@@ -6,7 +6,7 @@ on:
     paths:
       - "src/**/*.c"
       - "src/**/*.h"
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, reopened, ready_for_review]
   push:
     branches: [master]
     paths:
@@ -118,7 +118,7 @@ jobs:
         with:
           tag_name: dev
           name: Continuous Build
-          body: Automated build from commit ${{ github.sha }}
+          body: Automated build from commit ${{ github.sha }} at ${{ github.event.head_commit.timestamp }}
           prerelease: true
           preserve_order: true
           files: |

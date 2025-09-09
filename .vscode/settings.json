@@ -1,23 +1,17 @@
 {
-    "cmake.configureOnOpen": true,
-    "cmake.generator": "Ninja",
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\.vscode\\compile_commands.json",
-    "[yaml]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-    },
-    "[markdown]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.unicodeHighlight.ambiguousCharacters": false,
-        "editor.unicodeHighlight.invisibleCharacters": false,
-        "diffEditor.ignoreTrimWhitespace": false,
-        "editor.wordWrap": "on",
-        "editor.quickSuggestions": {
-            "comments": "off",
-            "strings": "off",
-            "other": "off"
-        }
-    },
+  "[javascript,markdown,yaml,yml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[json,jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+  },
+  "clangd.arguments": [
+    "--compile-commands-dir=${workspaceFolder}/.vscode",
+  ],
+  "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
+  "Lua.runtime.version": "LuaJIT",
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.workspace.library": [
+    "${addons}/xmake/module/library",
+  ],
 }

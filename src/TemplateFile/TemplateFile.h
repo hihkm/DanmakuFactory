@@ -24,17 +24,13 @@
 #ifndef __TEMPLATE_FILE_H__
 #define __TEMPLATE_FILE_H__
 
+#include "Define/DanmakuDef.h"
+#include "Define/Status.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include "../Define/DanmakuDef.h"
-#include "../Define/Status.h"
-#include "../String/DanmakuFactoryString.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define LINE_MAX_LEN 4096
 #define FORMAT_TABLE_MAX_LEN 256

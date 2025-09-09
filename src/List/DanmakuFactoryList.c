@@ -20,12 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define PCRE2_CODE_UNIT_WIDTH 8
+
 #include "DanmakuFactoryList.h"
-#include "../Config/Config.h"
-#include "../Define/DanmakuDef.h"
-#include <pcre2.h>
+
 #include <stdio.h>
+#include <string.h>
+
+#include <pcre2.h>
+
+#include "Config/Config.h"
+#include "Define/DanmakuDef.h"
 
 /*
  * 排序整个链表（桶排序）
@@ -42,19 +46,19 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     {
         status->function = (void *)&sortList;
         (status->completedNum) = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     if (*listHead == NULL)
     {
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
         printf("\n[X] 弹幕池为空");
 #endif
         return 1;
     }
 
     DANMAKU *now = (*listHead)->next;
-    BOOL isSorted = TRUE;
+    bool isSorted = true;
 
     /* 统计弹幕数量并找出最大最小值 */
     int danmakuNum = 1; // 弹幕条数
@@ -71,14 +75,14 @@ int sortList(DANMAKU **listHead, STATUS *const status)
             min = now->time;
         }
 
-        if (isSorted == TRUE && now->next != NULL && now->time > now->next->time)
+        if (isSorted == true && now->next != NULL && now->time > now->next->time)
         {
-            isSorted = FALSE;
+            isSorted = false;
         }
     }
 
     /* 如果本来就排序好了直接退出 */
-    if (isSorted == TRUE)
+    if (isSorted == true)
     {
         return 0;
     }
@@ -88,7 +92,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     DANMAKU **bucket = NULL;
     if ((bucket = (DANMAKU **)malloc(sizeof(DANMAKU *) * bucketNum)) == NULL)
     {
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
         printf("\n[X] 申请内存空间失败");
 #endif
         return 2;
@@ -165,7 +169,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
     return 0;
 }
@@ -182,7 +186,7 @@ int sortList(DANMAKU **listHead, STATUS *const status)
  * BLK_SPECIAL     屏蔽特殊弹幕
  * BLK_COLOR       屏蔽非白色弹幕
  */
-void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, BOOL blocklistRegexEnabled)
+void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, bool blocklistRegexEnabled)
 {
     if (mode == 0 && keyStrings == NULL)
     {
@@ -373,7 +377,7 @@ void freeList(DANMAKU *listHead)
 
 void normFontSize(DANMAKU *const danmakuHead, const CONFIG config)
 {
-    BOOL doNormalize = FALSE;
+    bool doNormalize = false;
 
     if (config.fontSizeNorm)
     {
@@ -386,7 +390,7 @@ void normFontSize(DANMAKU *const danmakuHead, const CONFIG config)
 
             if (ptr->fontSize <= 0 || ptr->fontSize >= config.resolution.y)
             {
-                doNormalize = TRUE;
+                doNormalize = true;
                 break;
             }
         }

@@ -24,13 +24,15 @@
 #ifndef __DANMAKUFACTORY_STRING_H__
 #define __DANMAKUFACTORY_STRING_H__
 
+#include <stdbool.h>
+#include <stddef.h>
+
+#include "Define/DanmakuDef.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include "../Define/DanmakuDef.h"
-#include <stddef.h>
 
 #define CHAR_IS_BLANK(ch) (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')
 #define STR_IS_EMPTY(str) (str[0] == '\0')
@@ -55,19 +57,19 @@ extern "C"
     extern char *deQuotMarks(char *const str);
     extern char *toLower(char *output, char *input);
     extern int lastChr(const char *const str, const char chr);
-    extern BOOL isDesignatedChar(char ch, const char *designatedChar);
-    extern BOOL isDesignatedStr(char *str, char *designatedChar);
-    extern BOOL isUtf8(char const *const str);
+    extern bool isDesignatedChar(char ch, const char *designatedChar);
+    extern bool isDesignatedStr(char *str, char *designatedChar);
+    extern bool isUtf8(char const *const str);
     extern char *strSafeCopy(char *destination, const char *const source, size_t count);
     extern int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf);
     extern int match(char *mainStr, char *patternStr);
     extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
-    extern BOOL isStartWith(const char *const mainStr, const char *const prefixStr);
-    extern char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMovePtr);
+    extern bool isStartWith(const char *const mainStr, const char *const prefixStr);
+    extern char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, bool isMovePtr);
     extern char *filenameGetFormat(char *format, const char *const fileName, int maxLen);
     extern char *filenameGetPath(char *path, const char *const fileName, int maxLen);
-    extern BOOL strToBool(const char *const str);
-    extern char *boolToStr(char *opStr, BOOL boolValue);
+    extern bool strToBool(const char *const str);
+    extern char *boolToStr(char *opStr, bool boolValue);
     extern void unicode_to_utf8(unsigned int codepoint, char *utf8_buffer);
 
 #ifdef __cplusplus

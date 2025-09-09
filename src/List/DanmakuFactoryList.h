@@ -24,21 +24,20 @@
 #ifndef __DANMAKUFACTORY_LIST_H__
 #define __DANMAKUFACTORY_LIST_H__
 
+#include <math.h>
+#include <stddef.h>
+
+#include "Config/Config.h"
+#include "Define/DanmakuDef.h"
+#include "Define/Status.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include "../Config/Config.h"
-#include "../Define/DanmakuDef.h"
-#include "../Define/Status.h"
-#include <math.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-
     extern int sortList(DANMAKU **listHead, STATUS *const status);
-    extern void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, BOOL blocklistRegexEnabled);
+    extern void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, bool blocklistRegexEnabled);
     extern void freeList(DANMAKU *listHead);
     extern void normFontSize(DANMAKU *const danmakuHead, const CONFIG config);
 

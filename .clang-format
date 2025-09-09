@@ -2,3 +2,5 @@
 ---
 Language: Cpp
 BasedOnStyle: Microsoft
+AlignConsecutiveMacros: Consecutive
+IndentExternBlock: NoIndent

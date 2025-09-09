@@ -36,7 +36,13 @@
 /* | B站特殊弹幕 |    5    | */
 /* +-------------+---------+ */
 
-#include "CDanmakuFactory.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "List/DanmakuFactoryList.h"
+#include "String/DanmakuFactoryString.h"
 
 static void JSErrorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 
@@ -68,7 +74,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
     /* 打开文件 */
     if ((ipF = fopen(ipFile, "r")) == NULL)
     {
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
         printf("\n[X] 文件打开失败");
 #endif
         return 1;
@@ -113,7 +119,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
             if (ferror(ipF))
             {
                 JSErrorExit(ipF, *head, last);
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
                 printf("\n[X] 读文件发生错误");
 #endif
                 return 2;
@@ -134,7 +140,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
             if (ferror(ipF))
             {
                 JSErrorExit(ipF, *head, last);
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
                 printf("\n[X] 读文件发生错误");
 #endif
                 return 3;
@@ -153,7 +159,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
             if (ferror(ipF))
             {
                 JSErrorExit(ipF, *head, last);
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
                 printf("\n[X] 读文件发生错误");
 #endif
                 return 4;
@@ -167,7 +173,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
         if ((now = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
         {
             JSErrorExit(ipF, *head, last);
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
             printf("\n[X] 申请内存空间失败");
 #endif
             return 5;
@@ -176,7 +182,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
         if ((now->text = (char *)malloc(strlen(t_text) + 1)) == NULL)
         {
             JSErrorExit(ipF, *head, now);
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
             printf("\n[X] 申请内存空间失败");
 #endif
             return 6;
@@ -250,7 +256,7 @@ ENDREAD:
     }
     else
     {
-#if PRINT_ERR == TRUE
+#if PRINT_ERR == true
         printf("\n[X] 文件不能按正确格式读入");
 #endif
         return 7;
@@ -260,7 +266,7 @@ ENDREAD:
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
     return 0;
 }
@@ -358,7 +364,7 @@ int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const st
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
     return 0;
 }

@@ -24,13 +24,15 @@
 #ifndef __ASSFILE_H__
 #define __ASSFILE_H__
 
+#include <stdio.h>
+
+#include "Config/Config.h"
+#include "Define/Status.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include "../CDanmakuFactory.h"
-#include "AssStringProcessing.h"
 
 #define ASS_MAX_LINE_LEN 4096
 #define ASS_TITLE_LEN 128
@@ -138,8 +140,8 @@ extern "C"
         struct ComboList *comboListHead;
         struct ComboList *comboListTail;
 
-        BOOL isShown;
-        BOOL isUpMoved; // 该消息是否已完成向上滚动
+        bool isShown;
+        bool isUpMoved; // 该消息是否已完成向上滚动
         int height;
         // int width;
         int posY;

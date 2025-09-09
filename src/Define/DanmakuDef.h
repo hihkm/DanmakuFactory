@@ -38,11 +38,9 @@ extern "C"
 #define MEDAL_NAME_LEN 32
 #define GIFT_NAME_LEN 64
 
-#define TRUE 1
-#define FALSE 0
 #define BOOL_UNDETERMINED -1
 
-#define PRINT_ERR FALSE
+#define PRINT_ERR false
 
 #define UNKNOW_TYPE_DANMAKU 0
 
@@ -136,7 +134,6 @@ extern "C"
         char fontName[FONTNAME_LEN]; /* 字体名 */
     };
 
-    typedef int BOOL;
     typedef struct SingleDanmaku DANMAKU;
     typedef struct SpecialDanmakuPart SPPART;
     typedef struct UserPart USERPART;

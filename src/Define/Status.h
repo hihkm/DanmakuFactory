@@ -24,12 +24,12 @@
 #ifndef __STATUS_H__
 #define __STATUS_H__
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include "DanmakuDef.h"
 
     struct SingleTaskStatus
     {
@@ -37,7 +37,7 @@ extern "C"
         int totalNum;
         int completedNum;
 
-        BOOL isDone;
+        bool isDone;
     };
 
     typedef struct SingleTaskStatus STATUS;
