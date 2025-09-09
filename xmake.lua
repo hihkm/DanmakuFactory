@@ -44,8 +44,8 @@ task("format")
         if not tool then
             raise("clang-format not found!")
         end
-        
-        local files = option.get("files") or {"src/**/*.cpp", "src/**/*.h"}
+
+        local files = option.get("files") or {"src/**", "include/**"}
         for _, pattern in ipairs(files) do
             local filelist = os.files(pattern)
             for _, file in ipairs(filelist) do

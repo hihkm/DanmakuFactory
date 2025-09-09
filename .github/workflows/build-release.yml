@@ -118,7 +118,9 @@ jobs:
         with:
           tag_name: dev
           name: Continuous Build
-          body: Automated build from commit ${{ github.sha }} at ${{ github.event.head_commit.timestamp }}
+          body: |
+            Automated build from commit ${{ github.sha }}
+            Build time: `${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}`
           prerelease: true
           preserve_order: true
           files: |
@@ -168,7 +170,6 @@ jobs:
           commit_message: "style(format): AUTO format code"
           branch: ${{ github.ref_name }}
           commit_options: "--no-verify --no-signoff"
-          file_pattern: "*.h *.c"
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           status_options: "--untracked-files=no"
           add_options: "-u"
