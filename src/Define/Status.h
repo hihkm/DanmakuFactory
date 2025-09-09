@@ -24,23 +24,23 @@
 #ifndef __STATUS_H__
 #define __STATUS_H__
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include "DanmakuDef.h"
+struct SingleTaskStatus
+{
+    void *function;
+    int totalNum;
+    int completedNum;
 
-    struct SingleTaskStatus
-    {
-        void *function;
-        int totalNum;
-        int completedNum;
+    bool isDone;
+};
 
-        BOOL isDone;
-    };
-
-    typedef struct SingleTaskStatus STATUS;
+typedef struct SingleTaskStatus STATUS;
 
 #ifdef __cplusplus
 }

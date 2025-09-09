@@ -24,15 +24,17 @@
 #ifndef __CLIDEF_H__
 #define __CLIDEF_H__
 
+#include <stdbool.h>
+
 #define GUI_SUPPORT // 给GUI版本提供一些特殊的功能支持
 
-#define VERSION "1.70"
-#define EDITION "CLI Release"
+#define VERSION          "1.70"
+#define EDITION          "CLI Release"
 #define CONFIG_FILE_NAME "DanmakuFactoryConfig.json"
-#define FILENAME_LEN 1024
-#define FORMAT_LEN 16
+#define FILENAME_LEN     1024
+#define FORMAT_LEN       16
 
-#define ISFORMAT(str) (!strcmp("ass", str) || !strcmp("xml", str) || !strcmp("json", str))
+#define ISFORMAT(str)   (!strcmp("ass", str) || !strcmp("xml", str) || !strcmp("json", str))
 #define ISNUMBERIC(str) (isDesignatedStr(str, "\"\'-.0123456789"))
 
 struct fileInfo
@@ -40,7 +42,7 @@ struct fileInfo
     char fileName[FILENAME_LEN];
     char template[FILENAME_LEN];
     float timeShift; // 秒
-    BOOL isSet;
+    bool isSet;
 };
 
 typedef struct fileInfo FINFO;

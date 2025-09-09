@@ -22,6 +22,7 @@
  */
 
 #include "DanmakuFactoryString.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -62,7 +63,7 @@ int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSiz
     }
 
     /* 判断字符串编码 */
-    if (isUtf8(str) == TRUE)
+    if (isUtf8(str) == true)
     {
         /*
          * 目前仅支持utf-8
@@ -409,19 +410,19 @@ int lastChr(const char *const str, const char chr)
  * 参数：输入字符/包含指定字符的字符串
  * 返回值：是否是指定字符之一
  */
-BOOL isDesignatedChar(char ch, const char *designatedChar)
+bool isDesignatedChar(char ch, const char *designatedChar)
 {
     char *ptr = (char *)designatedChar;
     while (*ptr != '\0')
     {
         if (*ptr == ch)
         {
-            return TRUE;
+            return true;
         }
         ptr++;
     }
 
-    return FALSE;
+    return false;
 }
 
 /*
@@ -429,7 +430,7 @@ BOOL isDesignatedChar(char ch, const char *designatedChar)
  * 参数：输入字符串/包含指定字符的字符串
  * 返回值：是否是指定字符串
  */
-BOOL isDesignatedStr(char *str, char *designatedChar)
+bool isDesignatedStr(char *str, char *designatedChar)
 {
     int cnt = 0;
     int i, j;
@@ -446,11 +447,11 @@ BOOL isDesignatedStr(char *str, char *designatedChar)
 
     if (cnt == (int)strlen(str))
     {
-        return TRUE;
+        return true;
     }
     else
     {
-        return FALSE;
+        return false;
     }
 }
 
@@ -459,12 +460,12 @@ BOOL isDesignatedStr(char *str, char *designatedChar)
  * 参数:要检测的字符串
  * 返回值:是否是utf-8编码
  */
-BOOL isUtf8(char const *const str)
+bool isUtf8(char const *const str)
 {
     /* 非法检查 */
     if (str == NULL)
     {
-        return FALSE;
+        return false;
     }
 
     int i, len;
@@ -498,7 +499,7 @@ BOOL isUtf8(char const *const str)
         }
         else
         {
-            return FALSE;
+            return false;
         }
 
         for (i = 0; i < len; i++)
@@ -506,13 +507,13 @@ BOOL isUtf8(char const *const str)
             ptr++;
             if (*ptr == '\0' || ((*ptr) & 0xC0) != 0x80)
             {
-                return FALSE;
+                return false;
             }
         }
         ptr++;
     }
 
-    return TRUE;
+    return true;
 }
 
 /*
@@ -699,25 +700,25 @@ char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffS
  * 参数：待判断字符串/指定字符串
  * 返回值：布尔值
  */
-BOOL isStartWith(const char *const mainStr, const char *const prefixStr)
+bool isStartWith(const char *const mainStr, const char *const prefixStr)
 {
     int index = 0;
     while (mainStr[index] != '\0' && prefixStr[index] != '\0')
     {
         if (mainStr[index] != prefixStr[index])
         {
-            return FALSE;
+            return false;
         }
         index++;
     }
 
     if (prefixStr[index] == '\0')
     {
-        return TRUE;
+        return true;
     }
     else
     {
-        return FALSE;
+        return false;
     }
 }
 
@@ -729,7 +730,7 @@ BOOL isStartWith(const char *const mainStr, const char *const prefixStr)
  * 即便是指定了结束字符，遇到空白字符仍然会结束
  * buf 为 NULL 时，仅移动指针
  */
-char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMovePtr)
+char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, bool isMovePtr)
 {
     int cnt = 1;
     char *ipPtr = *ptr, *opPtr = buf;
@@ -776,7 +777,7 @@ char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, BOOL isMove
     }
 
     /* 是否移动指针 */
-    if (isMovePtr == TRUE)
+    if (isMovePtr == true)
     {
         *ptr = ipPtr;
     }
@@ -850,23 +851,23 @@ char *filenameGetPath(char *path, const char *const fileName, int maxLen)
 }
 
 /* 字符串转布尔类型 */
-BOOL strToBool(const char *const str)
+bool strToBool(const char *const str)
 {
     char tempStr[MAX_TEXT_LENGTH];
     toLower(tempStr, (char *)str);
     trim(tempStr);
     if (strcmp("false", tempStr) == 0)
     {
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* 布尔类型转字符串 */
-char *boolToStr(char *opStr, BOOL boolValue)
+char *boolToStr(char *opStr, bool boolValue)
 {
-    if (boolValue == TRUE)
+    if (boolValue == true)
     {
         strcpy(opStr, "true");
     }

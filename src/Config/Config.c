@@ -22,11 +22,14 @@
  */
 
 #include "Config.h"
-#include "../String/DanmakuFactoryString.h"
+
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "String/DanmakuFactoryString.h"
 
 static COORDIN jsonGetCoord(const char *const jsonStr);
 
@@ -292,7 +295,7 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
  * 参数：配置文件名/配置信息
  * 返回值：布尔值 是否成功
  */
-BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
+bool writeConfig(const char *const configFileName, const CONFIG newConfig)
 {
     FILE *fptr = fopen(configFileName, "w");
 
@@ -300,7 +303,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
     CONFIG newConfigCopy = newConfig;
     if (fptr == NULL)
     {
-        return FALSE;
+        return false;
     }
 
     fprintf(fptr,
@@ -326,7 +329,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.opacity, newConfigCopy.outline, newConfigCopy.shadow, boolToStr(tempStr, newConfigCopy.bold));
 
     /* 写是否保存屏蔽部分 */
-    if (newConfigCopy.saveBlockedPart == FALSE)
+    if (newConfigCopy.saveBlockedPart == false)
     {
         fprintf(fptr, "    \"saveblocked\": false, \n");
     }
@@ -459,12 +462,12 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
     if (ferror(fptr))
     {
         fclose(fptr);
-        return FALSE;
+        return false;
     }
 
     fclose(fptr);
 
-    return TRUE;
+    return true;
 }
 
 /* 打印配置信息 */
@@ -513,7 +516,7 @@ void printConfig(CONFIG config)
     }
 
     printf(" | Bold: ");
-    if (config.bold == FALSE)
+    if (config.bold == false)
     {
         printf("false");
     }
@@ -523,7 +526,7 @@ void printConfig(CONFIG config)
     }
 
     printf("\nSaveBlocked: ");
-    if (config.saveBlockedPart == FALSE)
+    if (config.saveBlockedPart == false)
     {
         printf("false");
     }
@@ -533,7 +536,7 @@ void printConfig(CONFIG config)
     }
 
     printf(" | ShowUsernames: ");
-    if (config.showUserNames == FALSE)
+    if (config.showUserNames == false)
     {
         printf("false");
     }
@@ -543,7 +546,7 @@ void printConfig(CONFIG config)
     }
 
     printf(" | ShowMessageBox: ");
-    if (config.showMsgBox == FALSE)
+    if (config.showMsgBox == false)
     {
         printf("false");
     }

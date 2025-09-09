@@ -21,7 +21,13 @@
  * SOFTWARE.
  */
 
-#include "CDanmakuFactory.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "List/DanmakuFactoryList.h"
+#include "String/DanmakuFactoryString.h"
 
 #define LABEL_LEN 10240
 
@@ -48,26 +54,26 @@ static void errorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 ** 参数：
 ** 文件指针/存储字符串的指针/字符串长度
 ** 返回值：
-** TRUE 包含
-** FALSE 读取失败/不包含
+** true 包含
+** false 读取失败/不包含
 */
-BOOL findSubstr(FILE *file, const char *substr, int maxlen)
+bool findSubstr(FILE *file, const char *substr, int maxlen)
 {
     // 保存当前文件指针位置
     long currentPos = ftell(file);
     if (currentPos == -1)
     {
-        return FALSE; // 获取文件指针位置失败
+        return false; // 获取文件指针位置失败
     }
 
     char buffer[1024];
-    BOOL isFound = FALSE;
+    bool isFound = false;
     while (maxlen - 1 > 0 &&
            fgets(buffer, maxlen < SIZE_NUM(char, buffer) ? maxlen : SIZE_NUM(char, buffer), file) != NULL)
     {
         if (strstr(buffer, substr) != NULL)
         {
-            isFound = TRUE;
+            isFound = true;
             break;
         }
         maxlen -= (int)strlen(buffer);
@@ -101,7 +107,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     {
         status->function = (void *)readXml;
         status->completedNum = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     /* 打开文件 */
@@ -111,7 +117,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     }
 
     // 检查文件是否为录播姬生成的文件
-    BOOL isBililiveRecorder = findSubstr(ipF, "<BililiveRecorder", 1024);
+    bool isBililiveRecorder = findSubstr(ipF, "<BililiveRecorder", 1024);
 
     /* 判断读入方式 */
     if (*head == NULL || *mode == 'n')
@@ -152,16 +158,16 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     USERPART user;
     GIFTPART gift;
 
-    BOOL isDanmaku;
-    BOOL hasUserInfo;
-    BOOL hasGiftInfo;
+    bool isDanmaku;
+    bool hasUserInfo;
+    bool hasGiftInfo;
 
     while (!feof(ipF))
     {
         type = 0;
-        isDanmaku = FALSE;
-        hasUserInfo = FALSE;
-        hasGiftInfo = FALSE;
+        isDanmaku = false;
+        hasUserInfo = false;
+        hasGiftInfo = false;
 
         text = NULL;
 
@@ -212,7 +218,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
 
         /* 解析标签内容 */
         labelPtr = label;
-        getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+        getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
         if (strcmp(tempText, "d") == 0)
         { /* 普通弹幕 */
             messageType = UNKNOW_TYPE_DANMAKU;
@@ -220,17 +226,17 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         else if (strcmp(tempText, "gift") == 0)
         { /* 录播姬 - 普通礼物 */
             messageType = MSG_GIFT;
-            hasGiftInfo = TRUE;
+            hasGiftInfo = true;
         }
         else if (strcmp(tempText, "sc") == 0)
         { /* 录播姬 - SuperChat */
             messageType = MSG_SUPER_CHAT;
-            hasGiftInfo = TRUE;
+            hasGiftInfo = true;
         }
         else if (strcmp(tempText, "guard") == 0)
         { /* 录播姬 - 舰长 */
             messageType = MSG_GUARD;
-            hasGiftInfo = TRUE;
+            hasGiftInfo = true;
         }
         else
         { /* 无效标签 */
@@ -259,33 +265,33 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             else if (strcmp(key, "ts") == 0)
             {
-                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
                 time = atof(deQuotMarks(tempText));
             }
             else if (strcmp(key, "user") == 0)
             {
-                getNextWord(&labelPtr, user.name, USER_NAME_LEN, ' ', TRUE);
+                getNextWord(&labelPtr, user.name, USER_NAME_LEN, ' ', true);
                 deQuotMarks(user.name);
-                hasUserInfo = TRUE;
+                hasUserInfo = true;
             }
             else if (strcmp(key, "uid") == 0)
             {
-                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
                 user.uid = strtoull(deQuotMarks(tempText), NULL, 10);
             }
             else if (strcmp(key, "giftname") == 0)
             {
-                getNextWord(&labelPtr, gift.name, GIFT_NAME_LEN, ' ', TRUE);
+                getNextWord(&labelPtr, gift.name, GIFT_NAME_LEN, ' ', true);
                 deQuotMarks(gift.name);
             }
             else if (strcmp(key, "giftcount") == 0 || strcmp(key, "count") == 0)
             {
-                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
                 gift.count = atoi(deQuotMarks(tempText));
             }
             else if (strcmp(key, "price") == 0)
             {
-                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
                 // 如果是录播姬的 SC 金额，需要乘以 1000
                 if (isBililiveRecorder && messageType == MSG_SUPER_CHAT)
                 {
@@ -299,12 +305,12 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "time") == 0)
             {
                 // sc node
-                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
                 gift.duration = GET_MS_FLT(atof(deQuotMarks(tempText)));
             }
             else if (strcmp(key, "level") == 0)
             {
-                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, tempText, MAX_TEXT_LENGTH, ' ', true);
                 switch (atoi(deQuotMarks(tempText)))
                 {
                 case 1:
@@ -328,7 +334,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             // BililiveRecorder，开启记录raw
             else if (strcmp(key, "raw") == 0)
             {
-                if (hasGiftInfo == TRUE)
+                if (hasGiftInfo == true)
                 {
                     strGetLeftPart(NULL, &labelPtr, '\"', LABEL_LEN);
                     strGetLeftPart(raw, &labelPtr, '\"', LABEL_LEN);
@@ -390,7 +396,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             else if (strcmp(key, "cointype") == 0)
             {
                 char coinTypeValue[VALUE_LEN];
-                getNextWord(&labelPtr, coinTypeValue, GIFT_NAME_LEN, ' ', TRUE);
+                getNextWord(&labelPtr, coinTypeValue, GIFT_NAME_LEN, ' ', true);
                 deQuotMarks(coinTypeValue);
                 // 银瓜子 —— 免费礼物
                 if (strcmp(coinTypeValue, "\xe9\x93\xb6\xe7\x93\x9c\xe5\xad\x90") == 0)
@@ -400,7 +406,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             else
             {
-                getNextWord(&labelPtr, NULL, MAX_TEXT_LENGTH, ' ', TRUE);
+                getNextWord(&labelPtr, NULL, MAX_TEXT_LENGTH, ' ', true);
             }
         }
 
@@ -507,7 +513,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
 
         /* 申请用户信息部分空间 */
-        if (hasUserInfo == TRUE)
+        if (hasUserInfo == true)
         {
             if ((userNode = (USERPART *)malloc(sizeof(USERPART))) == NULL)
             {
@@ -521,7 +527,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
         }
 
         /* 申请礼物信息部分空间 */
-        if (hasGiftInfo == TRUE)
+        if (hasGiftInfo == true)
         {
             if ((giftNode = (GIFTPART *)malloc(sizeof(GIFTPART))) == NULL)
             {
@@ -610,7 +616,7 @@ ENDREAD:
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
 
     return 0;
@@ -632,7 +638,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
     {
         status->function = (void *)writeXml;
         (status->completedNum) = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     if (danmakuHead == NULL)
@@ -704,7 +710,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
         fprintf(opF, "\n    <d p=\"%s,%d,%d,%d,0,0,NULL,0\">", intTimeToStr(tempText, ptr->time, 3), typeInXml,
                 ptr->fontSize, ptr->color);
 
-        if (IS_SPECIAL(ptr) == FALSE)
+        if (IS_SPECIAL(ptr) == false)
         {
             fprintf(opF, "%s", ptr->text);
         }
@@ -746,7 +752,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
     return 0;
 }

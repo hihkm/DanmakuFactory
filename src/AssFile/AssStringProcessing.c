@@ -23,24 +23,31 @@
 
 #include "AssStringProcessing.h"
 
-const struct AssEscapeListNode assEscapeList[] = {/* 源字符串 转义后字符串 */
-                                                  // {"\\n", "\\{}n"},
-                                                  // {"\\N", "\\{}N"},
-                                                  // {"\\h", "\\{}h"},
-                                                  {"\\n", "\\\xe2\x80\x8bn"},
-                                                  {"\\N", "\\\xe2\x80\x8bN"},
-                                                  {"\\h", "\\​h"},
-                                                  {"{", "\\{"}, // compatible with libass
-                                                  {"}", "\\}"}, // compatible with libass
-                                                  {" ", "\\h"},
-                                                  {"\n", "\\N"},
-                                                  {"&lt;", "<"},
-                                                  {"&gt;", ">"},
-                                                  {"&amp;", "&"},
-                                                  {"&apos;", "\'"},
-                                                  {"&quot;", "\""},
-                                                  {"&#", ""}, // emoji Unicode 码位占位符
-                                                  {NULL, NULL}};
+#include <stdlib.h>
+#include <string.h>
+
+#include "String/DanmakuFactoryString.h"
+
+const struct AssEscapeListNode assEscapeList[] = {
+    /* 源字符串 转义后字符串 */
+    {"\\n", "\\\xe2\x80\x8bn"},
+    {"\\N", "\\\xe2\x80\x8bN"},
+    {"\\h", "\\\u200bh"},
+    {"\\n", "\\{}n"}, // compatible with libass
+    {"\\N", "\\{}N"}, // compatible with libass
+    {"\\h", "\\{}h"}, // compatible with libass
+    {"{", "\\{"},     // compatible with libass
+    {"}", "\\}"},     // compatible with libass
+    {" ", "\\h"},
+    {"\n", "\\N"},
+    {"&lt;", "<"},
+    {"&gt;", ">"},
+    {"&amp;", "&"},
+    {"&apos;", "\'"},
+    {"&quot;", "\""},
+    {"&#", ""}, // emoji Unicode 码位占位符
+    {NULL, NULL},
+};
 
 /*
  * 转换十进制rgb颜色为十六进制颜色

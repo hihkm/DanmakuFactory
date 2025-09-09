@@ -22,8 +22,14 @@
  */
 
 #include "AssFile.h"
-#include "../Define/CLIDef.h"
+
+#include <stdlib.h>
+#include <string.h>
+
 #include "AssStringProcessing.h"
+#include "Define/CLIDef.h"
+#include "List/DanmakuFactoryList.h"
+#include "String/DanmakuFactoryString.h"
 
 static int printStatDataStr(FILE *filePtr, const int startTime, const int endTime, const int posX, const int posY,
                             const char *effect, const char *str);
@@ -53,7 +59,7 @@ int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode,
     {
         status->function = (void *)&readAss;
         status->completedNum = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     int returnValue = 0;
@@ -374,7 +380,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
     {
         status->function = (void *)assFileToDanmaku;
         status->completedNum = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     if (mode[0] == 'n')
@@ -618,7 +624,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                     cnt = 0;
                     while (*codePartPtr != ')' && *codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 127)
                     {
-                        if (isDesignatedChar(*codePartPtr, ",-.0123456789") == TRUE)
+                        if (isDesignatedChar(*codePartPtr, ",-.0123456789") == true)
                         {
                             *singleCodePtr = *codePartPtr;
                             singleCodePtr++;
@@ -653,7 +659,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                     cnt = 0;
                     while (*codePartPtr != ')' && *codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 127)
                     {
-                        if (isDesignatedChar(*codePartPtr, ",-.0123456789") == TRUE)
+                        if (isDesignatedChar(*codePartPtr, ",-.0123456789") == true)
                         {
                             *singleCodePtr = *codePartPtr;
                             singleCodePtr++;
@@ -691,7 +697,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                 cnt = 0;
                 while (*codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 127)
                 {
-                    if (isDesignatedChar(*codePartPtr, "0123456789") == TRUE)
+                    if (isDesignatedChar(*codePartPtr, "0123456789") == true)
                     {
                         *singleCodePtr = *codePartPtr;
                         singleCodePtr++;
@@ -729,7 +735,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                 cnt = 0;
                 while (*codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 6)
                 {
-                    if (isDesignatedChar(*codePartPtr, "0123456789abcdefABCDEF") == TRUE)
+                    if (isDesignatedChar(*codePartPtr, "0123456789abcdefABCDEF") == true)
                     {
                         *singleCodePtr = *codePartPtr;
                         singleCodePtr++;
@@ -764,7 +770,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                 cnt = 0;
                 while (*codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 127)
                 {
-                    if (isDesignatedChar(*codePartPtr, "-0123456789") == TRUE)
+                    if (isDesignatedChar(*codePartPtr, "-0123456789") == true)
                     {
                         *singleCodePtr = *codePartPtr;
                         singleCodePtr++;
@@ -788,7 +794,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                 cnt = 0;
                 while (*codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 127)
                 {
-                    if (isDesignatedChar(*codePartPtr, "-0123456789") == TRUE)
+                    if (isDesignatedChar(*codePartPtr, "-0123456789") == true)
                     {
                         *singleCodePtr = *codePartPtr;
                         singleCodePtr++;
@@ -821,7 +827,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
                     cnt = 0;
                     while (*codePartPtr != ')' && *codePartPtr != '\\' && *codePartPtr != '\0' && cnt < 127)
                     {
-                        if (isDesignatedChar(*codePartPtr, ",-0123456789") == TRUE)
+                        if (isDesignatedChar(*codePartPtr, ",-0123456789") == true)
                         {
                             *singleCodePtr = *codePartPtr;
                             singleCodePtr++;
@@ -921,7 +927,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
             }
 
 // 第三方弹幕正确率测试
-#if FALSE
+#if false
             {
                 static int debug_cnt = 0;
                 static int debug_total = 0;
@@ -1053,7 +1059,7 @@ int assFileToDanmaku(ASSFILE *inputSub, DANMAKU **danmakuHead, const char *mode,
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
 
     return 0;
@@ -1120,7 +1126,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead, const CONFIG conf
     {
         status->function = (void *)writeAss;
         status->completedNum = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     if (fptr == NULL)
@@ -1165,7 +1171,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead, const CONFIG conf
         sprintf(primaryColour, "&H%sFFFFFF", hexOpacity);
         sprintf(outlineColour, "&H%s000000", hexOutlineOpacity);
 
-        if (config.bold == TRUE)
+        if (config.bold == true)
         {
             bold = 1;
         }
@@ -1225,7 +1231,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead, const CONFIG conf
     {
         status->function = (void *)writeAssStatPart;
         status->completedNum = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     returnValue *= 10;
@@ -1392,11 +1398,11 @@ static inline void amendMessage(MSGLIST *msgListPtr, const int msgAnimationTime,
             dlgListPtr = dlgListNextPtr;
         }
     }
-    BOOL isMerged;
+    bool isMerged;
     // 绝大多数情况下只合并一轮，少许情况下要合并两轮
     do
     {
-        isMerged = FALSE;
+        isMerged = false;
         // 合并`前动后动`的情形
         for (dlgListPtr = msgListPtr->dlgListHead, dlgListNextPtr = dlgListPtr->nextNode; dlgListNextPtr != NULL;
              dlgListNextPtr = dlgListPtr->nextNode)
@@ -1407,7 +1413,7 @@ static inline void amendMessage(MSGLIST *msgListPtr, const int msgAnimationTime,
                 dlgListPtr->startPosY != dlgListPtr->endPosY && dlgListNextPtr->startPosY != dlgListNextPtr->endPosY &&
                 dlgListPtr->endTime == dlgListNextPtr->startTime)
             {
-                isMerged = TRUE;
+                isMerged = true;
                 dlgListPtr->endPosX = dlgListNextPtr->endPosX;
                 dlgListPtr->endPosY = dlgListNextPtr->endPosY;
                 dlgListPtr->endTime = dlgListNextPtr->endTime;
@@ -1427,7 +1433,7 @@ static inline void amendMessage(MSGLIST *msgListPtr, const int msgAnimationTime,
                 dlgListPtr->startPosY == dlgListNextPtr->startPosY && dlgListPtr->endPosX == dlgListNextPtr->endPosX &&
                 dlgListPtr->endPosY == dlgListNextPtr->endPosY && dlgListPtr->endTime == dlgListNextPtr->startTime)
             {
-                isMerged = TRUE;
+                isMerged = true;
                 dlgListPtr->endTime = dlgListNextPtr->endTime;
                 dlgListPtr->nextNode = dlgListNextPtr->nextNode;
                 free(dlgListNextPtr);
@@ -1447,7 +1453,7 @@ static inline void amendMessage(MSGLIST *msgListPtr, const int msgAnimationTime,
                 dlgListNextPtr->startPosY == dlgListNextPtr->endPosY &&
                 dlgListPtr->endTime == dlgListNextPtr->startTime)
             { // \_ -> ╲
-                isMerged = TRUE;
+                isMerged = true;
                 if (thisMsgDeltaTime + nextMsgDeltaTime <= msgAnimationTime)
                 {
                     dlgListPtr->endTime = dlgListNextPtr->endTime;
@@ -1465,7 +1471,7 @@ static inline void amendMessage(MSGLIST *msgListPtr, const int msgAnimationTime,
                      dlgListNextPtr->startPosY > dlgListNextPtr->endPosY &&
                      dlgListPtr->endTime == dlgListNextPtr->startTime)
             { // _/ -> ╱
-                isMerged = TRUE;
+                isMerged = true;
                 if (thisMsgDeltaTime + nextMsgDeltaTime <= msgAnimationTime)
                 {
                     dlgListPtr->endPosX = dlgListNextPtr->endPosX;
@@ -1483,7 +1489,7 @@ static inline void amendMessage(MSGLIST *msgListPtr, const int msgAnimationTime,
                 }
             }
         }
-    } while (isMerged == TRUE);
+    } while (isMerged == true);
     // 进行动画裁剪
     if (msgListPtr->dlgListHead->startPosY < msgBoxPos->y || msgListPtr->dlgListHead->endPosY < msgBoxPos->y)
     {
@@ -1593,7 +1599,7 @@ static inline void appendMessage(const int startPosX, const int startPosY, const
 static inline void appendEndMessage(const int msgStartTime, const int startTime, const int endTime,
                                     const int totalUpHeight, MSGLIST *msgListPtr, COORDIN *msgBoxPos)
 {
-    if (endTime <= msgStartTime || msgListPtr->isUpMoved == TRUE)
+    if (endTime <= msgStartTime || msgListPtr->isUpMoved == true)
     {
         appendMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY, startTime, endTime, msgListPtr);
     }
@@ -1603,7 +1609,7 @@ static inline void appendEndMessage(const int msgStartTime, const int startTime,
         appendMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY, startTime, msgStartTime,
                       msgListPtr);
         msgListPtr->posY -= totalUpHeight;
-        msgListPtr->isUpMoved = TRUE;
+        msgListPtr->isUpMoved = true;
         appendMessage(msgBoxPos->x, msgListPtr->posY, msgBoxPos->x, msgListPtr->posY, msgStartTime, endTime,
                       msgListPtr);
     }
@@ -1618,13 +1624,13 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
     int totalHeight, totalUpHeight, totalDownHeight;
     // Gift Combo
     DANMAKU *prev, *now;
-    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == FALSE; msgListPtr = msgListNextPtr)
+    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == false; msgListPtr = msgListNextPtr)
     {
         msgListNextPtr = msgListPtr->nextNode;
         now = msgListPtr->comboListHead->message;
         if (!IS_MSG_GIFT(now) || now->gift == NULL)
             continue;
-        for (msgListLastPtr = *msgListTail; msgListLastPtr != NULL && msgListLastPtr->isShown == TRUE;
+        for (msgListLastPtr = *msgListTail; msgListLastPtr != NULL && msgListLastPtr->isShown == true;
              msgListLastPtr = msgListLastPtr->lastNode)
         {
             prev = msgListLastPtr->comboListTail->message;
@@ -1666,7 +1672,7 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
     MSGPTRLIST msgPtrListHead, *msgPtrListPtr, *newMsgPtrListPtr;
     msgPtrListHead.thisMsgEndTime = 0;
     msgPtrListHead.nextNode = NULL;
-    for (msgListPtr = *msgListTail; msgListPtr != NULL && msgListPtr->isShown == TRUE;
+    for (msgListPtr = *msgListTail; msgListPtr != NULL && msgListPtr->isShown == true;
          msgListPtr = msgListPtr->lastNode)
     {
         newMsgPtrListPtr = (MSGPTRLIST *)malloc(sizeof(MSGPTRLIST));
@@ -1690,7 +1696,7 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
     }
     /* 计算需显示消息总高度 */
     totalUpHeight = 0;
-    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == FALSE;
+    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == false;
          msgListPtr = msgListPtr->nextNode)
     {
         totalUpHeight += msgListPtr->height;
@@ -1732,8 +1738,8 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
                     msgPtrPosYListPtr->nextNode = newMsgPtrListPtr;
                 }
                 // 保持为所有被删节点的前节点
-                if ((msgListPtr->lastNode == NULL || msgListPtr->lastNode->isShown == FALSE) ||
-                    (msgListLastPtr != NULL && msgListLastPtr->isShown == TRUE &&
+                if ((msgListPtr->lastNode == NULL || msgListPtr->lastNode->isShown == false) ||
+                    (msgListLastPtr != NULL && msgListLastPtr->isShown == true &&
                      msgListLastPtr->posY < msgListPtr->lastNode->posY))
                 {
                     msgListLastPtr = msgListPtr->lastNode;
@@ -1769,7 +1775,7 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
             }
             totalDownHeight = 0;
             msgPtrPosYListPtr = msgPtrPosYListHead.nextNode;
-            for (msgListPtr = msgListNextPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE;
+            for (msgListPtr = msgListNextPtr; msgListPtr != NULL && msgListPtr->isShown == true;
                  msgListPtr = msgListPtr->nextNode)
             {
                 appendEndMessage(msgStartTime, lastMsgEndTime, thisMsgEndTime, totalUpHeight, msgListPtr, msgBoxPos);
@@ -1788,7 +1794,7 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
                 free(msgPtrPosYListPtr);
             }
             // 其余消息常驻显示
-            for (msgListPtr = msgListLastPtr; msgListPtr != NULL && msgListPtr->isShown == TRUE;
+            for (msgListPtr = msgListLastPtr; msgListPtr != NULL && msgListPtr->isShown == true;
                  msgListPtr = msgListPtr->lastNode)
             {
                 appendEndMessage(msgStartTime, lastMsgEndTime, thisMsgEndTime, totalUpHeight, msgListPtr, msgBoxPos);
@@ -1800,7 +1806,7 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
             // 较长消息承接上方的 lastMsgEndTime 常驻显示
             msgListPtr = msgPtrListPtr->msgListPtr;
             appendEndMessage(msgStartTime, lastMsgEndTime, msgEndTime, totalUpHeight, msgListPtr, msgBoxPos);
-            msgListPtr->isUpMoved = FALSE;
+            msgListPtr->isUpMoved = false;
         }
     }
     for (msgPtrListPtr = msgPtrListHead.nextNode; msgPtrListPtr != NULL; msgPtrListPtr = msgPtrListNextPtr)
@@ -1810,10 +1816,10 @@ static void writeAliveMessage(FILE *opF, COORDIN *resolution, COORDIN *msgBoxPos
     }
     /* 新消息进场 */
     totalHeight = msgBoxPos->y + msgBoxSize->y;
-    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == FALSE;
+    for (msgListPtr = *msgListHead; msgListPtr != NULL && msgListPtr->isShown == false;
          msgListPtr = msgListPtr->nextNode)
     {
-        msgListPtr->isShown = TRUE;
+        msgListPtr->isShown = true;
         totalHeight -= msgListPtr->height;
         msgListPtr->posY = totalHeight;
 
@@ -1845,9 +1851,9 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     const int density = config.density;
     const int lineSpacing = config.lineSpacing;
     const int blockMode = config.blockmode;
-    const BOOL saveBlockedPart = config.saveBlockedPart;
-    const BOOL showMsgBox = config.showMsgBox;
-    const BOOL showUserName = config.showUserNames;
+    const bool saveBlockedPart = config.saveBlockedPart;
+    const bool showMsgBox = config.showMsgBox;
+    const bool showUserName = config.showUserNames;
     COORDIN msgBoxSize = config.msgBoxSize;
     COORDIN msgBoxPos = config.msgBoxPos;
     int msgFontSize = config.msgboxFontsize;
@@ -1861,7 +1867,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     {
         status->function = (void *)&writeAssDanmakuPart;
         (status->completedNum) = 0;
-        status->isDone = FALSE;
+        status->isDone = false;
     }
 
     if (head == NULL || opF == NULL)
@@ -1976,7 +1982,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         // 四舍五入为 ASS 的时间精度(10 毫秒)
         now->time = GET_ASS_MS_INT(now->time);
     }
-    if (showMsgBox == TRUE)
+    if (showMsgBox == true)
     {
         // 合并相同时间的礼物
         mergeGiftDanmaku(head);
@@ -2015,7 +2021,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                         {
                             now->type *= -1;
                         }
-                        if (saveBlockedPart == FALSE)
+                        if (saveBlockedPart == false)
                         {
                             goto NEXTNODE;
                         }
@@ -2034,7 +2040,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 {
                     now->type *= -1;
                 }
-                if (saveBlockedPart == FALSE)
+                if (saveBlockedPart == false)
                 {
                     goto NEXTNODE;
                 }
@@ -2045,7 +2051,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         int textLen = 0, textHei = 0;
 
         /* 计算用户ID长度 */
-        if (showUserName == TRUE && now->user != NULL)
+        if (showUserName == true && now->user != NULL)
         {
             textLen = getStrLen((unsigned char *)(now->user->name), fontSize, now->fontSize, fontName);
         }
@@ -2110,7 +2116,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 if (density == -1)
                 {
                     now->type = -1;
-                    if (saveBlockedPart == FALSE)
+                    if (saveBlockedPart == false)
                     {
                         goto NEXTNODE;
                     }
@@ -2149,12 +2155,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
 
             fprintf(opF, "}");
-            if (showUserName == TRUE && now->user != NULL)
+            if (showUserName == true && now->user != NULL)
             {
                 fprintf(opF, "{\\c&HBCACF7}%s:\\h", now->user->name);
             }
 
-            if (now->color != 0xFFFFFF || showUserName == TRUE)
+            if (now->color != 0xFFFFFF || showUserName == true)
             {
                 char hexColor[7];
                 fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
@@ -2188,7 +2194,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 if (density == -1)
                 {
                     now->type = -2;
-                    if (saveBlockedPart == FALSE)
+                    if (saveBlockedPart == false)
                     {
                         goto NEXTNODE;
                     }
@@ -2223,12 +2229,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
 
             fprintf(opF, "}");
-            if (showUserName == TRUE && now->user != NULL)
+            if (showUserName == true && now->user != NULL)
             {
                 fprintf(opF, "{\\c&HBCACF7}%s:", now->user->name);
             }
 
-            if (now->color != 0xFFFFFF || showUserName == TRUE)
+            if (now->color != 0xFFFFFF || showUserName == true)
             {
                 char hexColor[7];
                 fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
@@ -2259,7 +2265,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 if (density == -1)
                 {
                     now->type = -3;
-                    if (saveBlockedPart == FALSE)
+                    if (saveBlockedPart == false)
                     {
                         goto NEXTNODE;
                     }
@@ -2290,12 +2296,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
 
             fprintf(opF, "}");
-            if (showUserName == TRUE && now->user != NULL)
+            if (showUserName == true && now->user != NULL)
             {
                 fprintf(opF, "{\\c&HBCACF7}%s:", now->user->name);
             }
 
-            if (now->color != 0xFFFFFF || showUserName == TRUE)
+            if (now->color != 0xFFFFFF || showUserName == true)
             {
                 char hexColor[7];
                 fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
@@ -2326,7 +2332,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
                 if (density == -1)
                 {
                     now->type = -4;
-                    if (saveBlockedPart == FALSE)
+                    if (saveBlockedPart == false)
                     {
                         goto NEXTNODE;
                     }
@@ -2357,12 +2363,12 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             }
 
             fprintf(opF, "}");
-            if (showUserName == TRUE && now->user != NULL)
+            if (showUserName == true && now->user != NULL)
             {
                 fprintf(opF, "{\\c&HBCACF7}%s:", now->user->name);
             }
 
-            if (now->color != 0xFFFFFF || showUserName == TRUE)
+            if (now->color != 0xFFFFFF || showUserName == true)
             {
                 char hexColor[7];
                 fprintf(opF, "{\\c&H%s}", toHexColor(now->color, hexColor));
@@ -2372,7 +2378,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
         }
         else if (IS_SPECIAL(now)) /* 特殊弹幕 */
         {
-            if (saveBlockedPart == FALSE)
+            if (saveBlockedPart == false)
             {
                 goto NEXTNODE;
             }
@@ -2517,8 +2523,8 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
             newMsgNode->comboListTail = newMsgNode->comboListHead = (COMBOLIST *)malloc(sizeof(COMBOLIST));
             newMsgNode->comboListHead->message = now;
             newMsgNode->comboListHead->nextNode = NULL;
-            newMsgNode->isShown = FALSE;
-            newMsgNode->isUpMoved = FALSE;
+            newMsgNode->isShown = false;
+            newMsgNode->isUpMoved = false;
             newMsgNode->height = getMsgBoxHeight(now, msgFontSize, msgBoxSize.x) + msgMarginV;
             newMsgNode->dlgListHead = NULL;
             newMsgNode->dlgListTail = NULL;
@@ -2611,7 +2617,7 @@ BYE:
     /* 刷新status */
     if (status != NULL)
     {
-        status->isDone = TRUE;
+        status->isDone = true;
     }
     return ret_code;
 }
@@ -2668,7 +2674,7 @@ int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, con
         int chartMaxHeight = 0; /* 图表最高点的高度 */
         int allCnt[212] = {0}, blockCnt[212] = {0};
 
-        BOOL drawBlockChart = FALSE;
+        bool drawBlockChart = false;
 
         /* 计算各类弹幕总数 */
         now = head;
@@ -2755,7 +2761,7 @@ int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, con
                 if (now->type < 0)
                 {
                     blockCnt[cnt]++;
-                    drawBlockChart = TRUE;
+                    drawBlockChart = true;
                 }
             }
             now = now->next;
@@ -2813,7 +2819,7 @@ int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, con
         fprintf(opF, " l 20 385{\\p0}");
 
         /* 画屏蔽弹幕分布图 */
-        if (drawBlockChart == TRUE)
+        if (drawBlockChart == true)
         {
             mPointX = 21;
             fprintf(opF, "\nDialogue: 8,0:00:00.00,");
@@ -3060,7 +3066,7 @@ int writeAssStatPart(FILE *opF, DANMAKU *head, int mode, const int rollTime, con
                 int minTimeType = 0;             /* 最小时间对应的弹幕类型 */
                 int debugTempTime, debugMinTime; // 毫秒
                 startTime = endTime = now->time;
-                while (TRUE)
+                while (true)
                 {
                     /* 在同屏弹幕中不断寻找结束时间的最小值，在这个时间点需要更新一条同屏弹幕-1的数据 */
                     scanPtr = signPtr;

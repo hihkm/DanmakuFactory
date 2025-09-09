@@ -21,8 +21,18 @@
  * SOFTWARE.
  */
 
-#include "Define/DanmakuDef.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include "AssFile/AssFile.h"
+#include "Config/Config.h"
+#include "Define/CLIDef.h"
+#include "Define/DanmakuDef.h"
+#include "List/DanmakuFactoryList.h"
+#include "String/DanmakuFactoryString.h"
+#include "TemplateFile/TemplateFile.h"
+
 #ifdef _WIN32
 /* windows下 */
 #include <io.h>
@@ -37,17 +47,24 @@
 
 #endif
 
-#include "CDanmakuFactory.h"
-#include "Define/CLIDef.h"
+/* xml */
+extern int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift,
+                   STATUS *const status);
+extern int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const status);
+
+/* json */
+extern int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const float timeShift,
+                    STATUS *const status);
+extern int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const status);
 
 void printHelpInfo();
 int getArgNum(int argc, char **argv, const int optionIndex);
 double getArgValDouble(int argc, char **argv, const int optIndex, const char *const optName,
                        const double errorReturnValue);
-BOOL getArgValBool(int argc, char **argv, const int optIndex, const char *const optName);
+int getArgValBool(int argc, char **argv, const int optIndex, const char *const optName);
 COORDIN getArgValCoodr(int argc, char **argv, const int optIndex, const char *const optName, int *argNum);
-void toPause(BOOL skip);
-BOOL isContinue(BOOL skip);
+void toPause(bool skip);
+bool isContinue(bool skip);
 
 static CONFIG defaultConfig = {
     {1920, 1080}, /* 分辨率 */
@@ -59,8 +76,8 @@ static CONFIG defaultConfig = {
     0,     /* 弹幕密度 */
     0,     /* 行间距 */
     38,    /* 字号 */
-    FALSE, /* 是否严格保持指定的字号大小 */
-    FALSE, /* 是否修正字号 */
+    false, /* 是否严格保持指定的字号大小 */
+    false, /* 是否修正字号 */
            /* 字体 */
     "Microsoft YaHei",
     180,   /* 不透明度 */
@@ -68,11 +85,11 @@ static CONFIG defaultConfig = {
     0,     /* 描边模糊半径 */
     255,   /* 描边不透明度 */
     1,     /* 阴影 */
-    FALSE, /* 是否加粗 */
+    false, /* 是否加粗 */
 
-    TRUE,  /* 是否保存屏蔽部分 */
-    FALSE, /* 是否显示用户名 */
-    TRUE,  /* 是否显示消息框 */
+    true,  /* 是否保存屏蔽部分 */
+    false, /* 是否显示用户名 */
+    true,  /* 是否显示消息框 */
 
     {500, 1080}, /* 消息框大小 */
     {20, 0},     /* 消息框位置 */
@@ -83,7 +100,7 @@ static CONFIG defaultConfig = {
     0,     /* 屏蔽模式 */
     0,     /* 统计模式 */
     NULL,  /* 弹幕黑名单 */
-    FALSE, /* 弹幕黑名单是否启用正则表达式匹配 */
+    false, /* 弹幕黑名单是否启用正则表达式匹配 */
 };
 
 int main(int argc, char **argv)
@@ -94,15 +111,15 @@ int main(int argc, char **argv)
     int argCnt = 1;
     int arg_config_num = 0;
     int cnt;
-    BOOL showConfig = FALSE;
-    BOOL saveConfig = FALSE;
-    BOOL configFileErr = FALSE;
-    BOOL ignoreWarnings = FALSE;
+    bool showConfig = false;
+    bool saveConfig = false;
+    bool configFileErr = false;
+    bool ignoreWarnings = false;
     CONFIG config;
     char tempStr[MAX_TEXT_LENGTH], *tempPtr;
     char programPath[MAX_TEXT_LENGTH];
     char configFilePath[MAX_TEXT_LENGTH];
-    outfile.isSet = FALSE;
+    outfile.isSet = false;
 
     /* 打印程序版本信息 */
     printf("\nDanmakuFactory " VERSION " " EDITION " by hkm (hkm@tikm.org)"
@@ -128,7 +145,7 @@ int main(int argc, char **argv)
         printf("\nNOTE"
                "\nFail to get config file path, because the path is too long.\n");
 
-        configFileErr = TRUE;
+        configFileErr = true;
         toPause(ignoreWarnings);
     }
 
@@ -167,13 +184,13 @@ int main(int argc, char **argv)
             }
             else if (!strcmp("-c", argv[argCnt]) || !strcmp("--config", argv[argCnt]))
             { // 读取配置文件
-                showConfig = TRUE;
+                showConfig = true;
                 argCnt += arg_config_num + 1;
             }
             else if (!strcmp("--save", argv[argCnt]))
             {
-                saveConfig = TRUE;
-                showConfig = TRUE;
+                saveConfig = true;
+                showConfig = true;
                 argCnt += 1;
             }
             else if (!strcmp("-o", argv[argCnt]) || !strcmp("--output", argv[argCnt]))
@@ -203,7 +220,7 @@ int main(int argc, char **argv)
 
                 deQuotMarks(outfile.fileName);
                 deQuotMarks(outfile.template);
-                outfile.isSet = TRUE;
+                outfile.isSet = true;
 
                 /* 合法性检查 */
                 if (!ISFORMAT(outfile.template))
@@ -373,13 +390,13 @@ int main(int argc, char **argv)
             }
             else if (!strcmp("--font-size-strict", argv[argCnt]))
             { /* 是否严格保持指定的字号大小 */
-                config.fontSizeStrict = TRUE;
+                config.fontSizeStrict = true;
 
                 argCnt += 1;
             }
             else if (!strcmp("--font-size-norm", argv[argCnt]))
             { /* 是否修正字号 */
-                config.fontSizeNorm = TRUE;
+                config.fontSizeNorm = true;
 
                 argCnt += 1;
             }
@@ -464,7 +481,7 @@ int main(int argc, char **argv)
             }
             else if (!strcmp("-B", argv[argCnt]) || !strcmp("--bold", argv[argCnt]))
             { /* 是否加粗 */
-                BOOL returnValue = getArgValBool(argc, argv, argCnt, "Bold");
+                int returnValue = getArgValBool(argc, argv, argCnt, "Bold");
                 if (returnValue == BOOL_UNDETERMINED)
                 {
                     return 0;
@@ -686,7 +703,7 @@ int main(int argc, char **argv)
             }
             else if (!strcmp("--blacklist-regex", argv[argCnt]))
             { /* 弹幕黑名单是否启用正则表达式匹配 */
-                BOOL returnValue = getArgValBool(argc, argv, argCnt, "BlacklistRegexEnabled");
+                int returnValue = getArgValBool(argc, argv, argCnt, "BlacklistRegexEnabled");
                 if (returnValue == BOOL_UNDETERMINED)
                 {
                     return 0;
@@ -705,7 +722,7 @@ int main(int argc, char **argv)
             }
             else if (!strcmp("--saveblocked", argv[argCnt]))
             { /* 是否保存屏蔽部分 */
-                BOOL returnValue = getArgValBool(argc, argv, argCnt, "SaveBlocked");
+                int returnValue = getArgValBool(argc, argv, argCnt, "SaveBlocked");
                 if (returnValue == BOOL_UNDETERMINED)
                 {
                     return 0;
@@ -716,7 +733,7 @@ int main(int argc, char **argv)
             }
             else if (!(strcmp("--showusernames", argv[argCnt])))
             { /* 是否显示用户名 */
-                BOOL returnValue = getArgValBool(argc, argv, argCnt, "showUsernames");
+                int returnValue = getArgValBool(argc, argv, argCnt, "showUsernames");
                 if (returnValue == BOOL_UNDETERMINED)
                 {
                     return 0;
@@ -727,7 +744,7 @@ int main(int argc, char **argv)
             }
             else if (!(strcmp("--showmsgbox", argv[argCnt])))
             { /* 是否显示消息框 */
-                BOOL returnValue = getArgValBool(argc, argv, argCnt, "ShowMsgbox");
+                int returnValue = getArgValBool(argc, argv, argCnt, "ShowMsgbox");
                 if (returnValue == BOOL_UNDETERMINED)
                 {
                     return 0;
@@ -790,7 +807,7 @@ int main(int argc, char **argv)
 
             else if (!(strcmp("--ignore-warnings", argv[argCnt])))
             { /* 跳过全部警告*/
-                ignoreWarnings = TRUE;
+                ignoreWarnings = true;
                 argCnt++;
             }
             else if (!(strcmp("--check-version-" VERSION, argv[argCnt])))
@@ -852,7 +869,7 @@ int main(int argc, char **argv)
     }
 
     /* 显示配置信息 */
-    if (showConfig == TRUE)
+    if (showConfig == true)
     {
         printConfig(config);
     }
@@ -985,9 +1002,9 @@ int main(int argc, char **argv)
     }
 
     /* 保存配置文件 */
-    if (saveConfig == TRUE && configFileErr == FALSE)
+    if (saveConfig == true && configFileErr == false)
     {
-        if (writeConfig(configFilePath, config) == TRUE)
+        if (writeConfig(configFilePath, config) == true)
         {
             printf("\nConfiguration file had been saved successfully!\n");
         }
@@ -1001,7 +1018,7 @@ int main(int argc, char **argv)
     }
 
     /* 显示文件信息 */
-    if (outfile.isSet == FALSE)
+    if (outfile.isSet == false)
     {
         fprintf(stderr, "\nERROR"
                         "\nOutput file must be specified.");
@@ -1101,7 +1118,7 @@ int main(int argc, char **argv)
                 printf("\nNOTE"
                        "\nCould not load file \"%s\" as a xml file.\n",
                        infile[cnt].fileName);
-                if (isContinue(ignoreWarnings) == FALSE)
+                if (isContinue(ignoreWarnings) == false)
                 {
                     return 0;
                 }
@@ -1154,7 +1171,7 @@ int main(int argc, char **argv)
                 printf("\nNOTE"
                        "\nCould not load file \"%s\" as a json file.\n",
                        infile[cnt].fileName);
-                if (isContinue(ignoreWarnings) == FALSE)
+                if (isContinue(ignoreWarnings) == false)
                 {
                     return 0;
                 }
@@ -1326,7 +1343,7 @@ int main(int argc, char **argv)
         printf("\nWARNING"
                "\nFile \"%s\" already exists, it will be overwritten when continue.\n",
                outfile.fileName);
-        if (isContinue(ignoreWarnings) == FALSE)
+        if (isContinue(ignoreWarnings) == false)
         {
             return 0;
         }
@@ -1497,15 +1514,15 @@ void printHelpInfo()
            "\n                    Available value: 0-255 (default: 255)"
            "\n-D, --shadow        Specify the depth of shadow for each danmaku(range: 0-4)."
            "\n-B, --bold          Specify whether the font should be boldface."
-           "\n                    Available value: TRUE, FALSE (default)"
+           "\n                    Available value: true, false (default)"
            "\n"
            "\n--saveblocked       Specify whether remain the blocked message or not."
-           "\n                    If FALSE, the masked message will not remain in the ASS output file."
-           "\n                    Available value: TRUE (default), FALSE"
+           "\n                    If false, the masked message will not remain in the ASS output file."
+           "\n                    Available value: true (default), false"
            "\n--showusernames     Specify whether show usernames or not."
-           "\n                    Available value: TRUE, FALSE (default)"
+           "\n                    Available value: true, false (default)"
            "\n--showmsgbox        Specify whether show message box or not."
-           "\n                    Available value: TRUE (default), FALSE"
+           "\n                    Available value: true (default), false"
            "\n"
            "\n--msgboxsize        Specify the size of message box."
            "\n                    Use any character to connect width and height, like \"400x1000\"."
@@ -1530,7 +1547,7 @@ void printHelpInfo()
            "\n                    For example: `black.txt`."
            "\n"
            "\n--blacklist-regex   Specify whether lines in the blacklist file should be treated as regular expressions."
-           "\n                    Available value: TRUE, FALSE (default)"
+           "\n                    Available value: true, false (default)"
            "\n"
            "\nOther options:"
            "\n-h, --help          Display this help and version information than exit."
@@ -1611,7 +1628,7 @@ double getArgValDouble(int argc, char **argv, const int optIndex, const char *co
 }
 
 /* 获取一个布尔参数 */
-BOOL getArgValBool(int argc, char **argv, const int optIndex, const char *const optName)
+int getArgValBool(int argc, char **argv, const int optIndex, const char *const optName)
 {
     char argValue[MAX_TEXT_LENGTH];
     switch (getArgNum(argc, argv, optIndex))
@@ -1639,11 +1656,11 @@ BOOL getArgValBool(int argc, char **argv, const int optIndex, const char *const 
     toLower(NULL, argValue);
     if (!strcmp("true", argValue))
     {
-        return TRUE;
+        return true;
     }
     else if (!strcmp("false", argValue))
     {
-        return FALSE;
+        return false;
     }
 
     fprintf(stderr,
@@ -1677,7 +1694,7 @@ COORDIN getArgValCoodr(int argc, char **argv, const int optIndex, const char *co
     {
         strSafeCopy(argStr, argv[optIndex + 1], MAX_TEXT_LENGTH);
         numXStrPtr = argStrPtr = argStr;
-        while (TRUE)
+        while (true)
         {
             if (!isDesignatedChar(*argStrPtr, "-.0123456789"))
             {
@@ -1734,7 +1751,7 @@ COORDIN getArgValCoodr(int argc, char **argv, const int optIndex, const char *co
 }
 
 /* 暂停 按回车继续 */
-void toPause(BOOL skip)
+void toPause(bool skip)
 {
     if (skip)
     {
@@ -1747,12 +1764,12 @@ void toPause(BOOL skip)
 }
 
 /* 是否继续 */
-BOOL isContinue(BOOL skip)
+bool isContinue(bool skip)
 {
     if (skip)
     {
         printf("\nSkip!\n");
-        return TRUE;
+        return true;
     }
     printf("\nPress 'Y' or 'y' to continue, any other key to exit.\n");
     printf("> ");
@@ -1760,8 +1777,8 @@ BOOL isContinue(BOOL skip)
     char ch = getchar();
     if (ch == 'Y' || ch == 'y')
     {
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }

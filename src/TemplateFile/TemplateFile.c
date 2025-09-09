@@ -23,6 +23,13 @@
 
 #include "TemplateFile.h"
 
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "String/DanmakuFactoryString.h"
+
 /*
  * 读取用户自定义模板文件
  * 参数：模板文件名/输出弹幕头/模式/错误信息文本输出容器/容器最大长度
@@ -34,7 +41,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
     FILE *tempfptr;
     DANMAKU *last = NULL;
     int cnt;
-    BOOL isError = FALSE;
+    bool isError = false;
 
     /* 刷新status */
     if (status != NULL)
@@ -98,11 +105,11 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
     /* 读取版本信息行 */
     fgets(lineStr, LINE_MAX_LEN, tempfptr);
     linePtr = lineStr;
-    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, ':', TRUE);
+    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, ':', true);
     if (!strcmp(tempStr, "DanmakuFactory_Template_Version"))
     {
         strGetLeftPart(NULL, &linePtr, ':', LINE_MAX_LEN);
-        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\n', TRUE);
+        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\n', true);
         version = atof(tempStr);
         if (version != 1.0)
         {
@@ -146,12 +153,12 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
             }
 
             char *startPtr = linePtr;
-            getNextWord(&linePtr, tempStr, LINE_MAX_LEN, ':', TRUE);
+            getNextWord(&linePtr, tempStr, LINE_MAX_LEN, ':', true);
 
             /* 解析标签 */
             if (!strcmp(tempStr, "set"))
             {
-                getNextWord(&linePtr, tempStr, LINE_MAX_LEN, ':', TRUE);
+                getNextWord(&linePtr, tempStr, LINE_MAX_LEN, ':', true);
                 if (!strcmp(tempStr, "$time$"))
                 {
                     tar = TAR_SET_TIME;
@@ -259,11 +266,11 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     }
                     break;
                 case TAR_SET_TIME:
-                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', TRUE);
+                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', true);
                     if (!strcmp(tempStr, "Ratio_to_seconds"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setTime.ratioToSeconds = atof(tempStr);
                     }
                     else
@@ -275,35 +282,35 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
 
                     break;
                 case TAR_SET_TYPE:
-                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', TRUE);
+                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', true);
                     if (!strcmp(tempStr, "right_to_left"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setType.rightToLeft = atoi(tempStr);
                     }
                     else if (!strcmp(tempStr, "left_to_right"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setType.leftToRight = atoi(tempStr);
                     }
                     else if (!strcmp(tempStr, "top_fix"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setType.topFix = atoi(tempStr);
                     }
                     else if (!strcmp(tempStr, "bottom_fix"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setType.bottomFix = atoi(tempStr);
                     }
                     else if (!strcmp(tempStr, "default_type"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         /* 解析默认类型 */
                         if (!strcmp(tempStr, "right_to_left"))
                         {
@@ -336,11 +343,11 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     }
                     break;
                 case TAR_SET_COLOR:
-                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', TRUE);
+                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', true);
                     if (!strcmp(tempStr, "default_color"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setColor.defaultColor = atoi(tempStr);
                     }
                     else
@@ -351,11 +358,11 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     }
                     break;
                 case TAR_SET_FONTSIZE:
-                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', TRUE);
+                    getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '=', true);
                     if (!strcmp(tempStr, "default_fontsize"))
                     {
                         strGetLeftPart(NULL, &linePtr, '=', LINE_MAX_LEN);
-                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', TRUE);
+                        getNextWord(&linePtr, tempStr, LINE_MAX_LEN, '\0', true);
                         setFontsize.defaultFontsize = atoi(tempStr);
                     }
                     else
@@ -495,52 +502,52 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
             strSafeCat(
                 errMsg, msgLen,
                 "[err]Line ?(Format string): Format string cannot ending with variable $text$ or $anystring$.\n");
-            isError = TRUE;
+            isError = true;
         }
 
         /* 检测时间定义次数 */
         if (timeDefineTimes == 0)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $time$ must be specified.\n");
-            isError = TRUE;
+            isError = true;
         }
         else if (timeDefineTimes > 1)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $time$ is defined repeatedly.\n");
-            isError = TRUE;
+            isError = true;
         }
         /* 检测类型定义次数 */
         if (typeDefineTimes > 1)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $type$ is defined repeatedly.\n");
-            isError = TRUE;
+            isError = true;
         }
         /* 检查文字大小定义次数 */
         if (fontsizeDefineTimes > 1)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $fontsize$ is defined repeatedly.\n");
-            isError = TRUE;
+            isError = true;
         }
         /* 检查颜色定义次数 */
         if (colorDefineTimes > 1)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $color$ is defined repeatedly.\n");
-            isError = TRUE;
+            isError = true;
         }
         /* 检查文本定义次数 */
         if (textDefineTimes == 0)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $text$ must be specified.\n");
-            isError = TRUE;
+            isError = true;
         }
         else if (textDefineTimes > 1)
         {
             strSafeCat(errMsg, msgLen, "[err]Line ?(Format string): Variable $text$ is defined repeatedly.\n");
-            isError = TRUE;
+            isError = true;
         }
 
         /* 报错并返回 */
-        if (isError == TRUE)
+        if (isError == true)
         {
             return -1;
         }
@@ -558,7 +565,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
         return 3;
     }
 
-    while (TRUE)
+    while (true)
     {
         /* 按块读取文件 */
         if (((bufferPtr - readBuffer) > READ_BUFFER_SIZE / 2) || (bufferPtr - readBuffer) == readSize)
@@ -580,7 +587,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
         /* 读取一条 */
         startPtr = bufferPtr;
         DANMAKU *readDanmaku;
-        BOOL isSuccess = TRUE;
+        bool isSuccess = true;
 
         if ((readDanmaku = (DANMAKU *)malloc(sizeof(DANMAKU))) == NULL)
         {
@@ -605,7 +612,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -627,7 +634,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -665,7 +672,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -682,7 +689,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -700,7 +707,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -725,7 +732,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -738,7 +745,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     bufferPtr++;
                     if ((size_t)(bufferPtr - readBuffer) >= readSize)
                     {
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -755,7 +762,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                         bufferPtr++;
                         if ((size_t)(bufferPtr - readBuffer) >= readSize)
                         {
-                            isSuccess = FALSE;
+                            isSuccess = false;
                             goto LINE_END;
                         }
                     }
@@ -765,7 +772,7 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
                     if (!isStartWith(bufferPtr, formatStr))
                     { /* 匹配失败 放弃整条已读取内容 */
                         bufferPtr = startPtr + 1;
-                        isSuccess = FALSE;
+                        isSuccess = false;
                         goto LINE_END;
                     }
                 }
@@ -820,6 +827,6 @@ int readTemplateFile(const char *const ipFile, const char *const templateFile, D
     }
 
     fclose(ipfptr);
-    status->isDone = TRUE;
+    status->isDone = true;
     return 0;
 }
