@@ -36,10 +36,10 @@ extern "C"
 {
 #endif
 
-    extern int sortList(DANMAKU **listHead, STATUS *const status);
-    extern void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, bool blocklistRegexEnabled);
-    extern void freeList(DANMAKU *listHead);
-    extern void normFontSize(DANMAKU *const danmakuHead, const CONFIG config);
+extern int sortList(DANMAKU **listHead, STATUS *const status);
+extern void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, bool blocklistRegexEnabled);
+extern void freeList(DANMAKU *listHead);
+extern void normFontSize(DANMAKU *const danmakuHead, const CONFIG config);
 
 #ifdef __cplusplus
 }

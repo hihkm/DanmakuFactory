@@ -31,16 +31,16 @@ extern "C"
 {
 #endif
 
-    struct SingleTaskStatus
-    {
-        void *function;
-        int totalNum;
-        int completedNum;
+struct SingleTaskStatus
+{
+    void *function;
+    int totalNum;
+    int completedNum;
 
-        bool isDone;
-    };
+    bool isDone;
+};
 
-    typedef struct SingleTaskStatus STATUS;
+typedef struct SingleTaskStatus STATUS;
 
 #ifdef __cplusplus
 }

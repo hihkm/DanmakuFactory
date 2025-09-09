@@ -34,10 +34,10 @@ extern "C"
 {
 #endif
 
-#define CHAR_IS_BLANK(ch) (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')
-#define STR_IS_EMPTY(str) (str[0] == '\0')
-#define STR_IS_BLANK(str) (isDesignatedStr(str, " \n\t\r"))
-#define TO_STR_END(ptr) (ptr += strlen(ptr))
+#define CHAR_IS_BLANK(ch)                    (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r')
+#define STR_IS_EMPTY(str)                    (str[0] == '\0')
+#define STR_IS_BLANK(str)                    (isDesignatedStr(str, " \n\t\r"))
+#define TO_STR_END(ptr)                      (ptr += strlen(ptr))
 #define FLOAT_IS_EQUAL(floatNum1, floatNum2) (fabs(floatNum1 - floatNum2) < EPS)
 
 /*移动字符指针向后跳到距离为字符串prefix的长度的位置*/
@@ -46,31 +46,29 @@ extern "C"
         strPtr += strlen(prefix) * sizeof(char);                                                                       \
     }
 
-    extern int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile,
-                         const char *fontName);
-    extern int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile,
-                         const char *fontName);
-    extern char *intTimeToStr(char *const outputStr, const int input, const int accuracy);
-    extern char *floatToStr(char *const outputStr, const double input, const int accuracy);
-    extern char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, const int maxLen);
-    extern char *trim(char *const str);
-    extern char *deQuotMarks(char *const str);
-    extern char *toLower(char *output, char *input);
-    extern int lastChr(const char *const str, const char chr);
-    extern bool isDesignatedChar(char ch, const char *designatedChar);
-    extern bool isDesignatedStr(char *str, char *designatedChar);
-    extern bool isUtf8(char const *const str);
-    extern char *strSafeCopy(char *destination, const char *const source, size_t count);
-    extern int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf);
-    extern int match(char *mainStr, char *patternStr);
-    extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
-    extern bool isStartWith(const char *const mainStr, const char *const prefixStr);
-    extern char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, bool isMovePtr);
-    extern char *filenameGetFormat(char *format, const char *const fileName, int maxLen);
-    extern char *filenameGetPath(char *path, const char *const fileName, int maxLen);
-    extern bool strToBool(const char *const str);
-    extern char *boolToStr(char *opStr, bool boolValue);
-    extern void unicode_to_utf8(unsigned int codepoint, char *utf8_buffer);
+extern int getStrHei(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName);
+extern int getStrLen(const unsigned char *str, const int fontSizeSet, const int fontSizeInFile, const char *fontName);
+extern char *intTimeToStr(char *const outputStr, const int input, const int accuracy);
+extern char *floatToStr(char *const outputStr, const double input, const int accuracy);
+extern char *strGetLeftPart(char *const opStr, char **const ipStr, const char cutCh, const int maxLen);
+extern char *trim(char *const str);
+extern char *deQuotMarks(char *const str);
+extern char *toLower(char *output, char *input);
+extern int lastChr(const char *const str, const char chr);
+extern bool isDesignatedChar(char ch, const char *designatedChar);
+extern bool isDesignatedStr(char *str, char *designatedChar);
+extern bool isUtf8(char const *const str);
+extern char *strSafeCopy(char *destination, const char *const source, size_t count);
+extern int strSafeCat(char *dstBuf, int dstSize, const char *srcBuf);
+extern int match(char *mainStr, char *patternStr);
+extern char *strrpl(char *inStr, char *outStr, char *srcStr, char *dstStr, int outBuffSize);
+extern bool isStartWith(const char *const mainStr, const char *const prefixStr);
+extern char *getNextWord(char **ptr, char *buf, int maxLen, char endBefore, bool isMovePtr);
+extern char *filenameGetFormat(char *format, const char *const fileName, int maxLen);
+extern char *filenameGetPath(char *path, const char *const fileName, int maxLen);
+extern bool strToBool(const char *const str);
+extern char *boolToStr(char *opStr, bool boolValue);
+extern void unicode_to_utf8(unsigned int codepoint, char *utf8_buffer);
 
 #ifdef __cplusplus
 }

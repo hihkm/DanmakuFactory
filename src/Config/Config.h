@@ -33,60 +33,60 @@ extern "C"
 {
 #endif
 
-#define SIZE_OF_BUF 4096
-#define KEY_LEN 128
-#define VALUE_LEN 512
+#define SIZE_OF_BUF  4096
+#define KEY_LEN      128
+#define VALUE_LEN    512
 #define TYPENAME_LEN 64
 
-    struct Coordinate
-    {
-        int x;
-        int y;
-    };
+struct Coordinate
+{
+    int x;
+    int y;
+};
 
-    struct Configurations
-    {
-        struct Coordinate resolution; /* 分辨率 */
-        float displayarea;            /* 显示区域 */
-        float scrollarea;             /* 滚动区域 */
-        float scrolltime;             /* 滚动时间 */
-        float fixtime;                /* 固定时间 */
+struct Configurations
+{
+    struct Coordinate resolution; /* 分辨率 */
+    float displayarea;            /* 显示区域 */
+    float scrollarea;             /* 滚动区域 */
+    float scrolltime;             /* 滚动时间 */
+    float fixtime;                /* 固定时间 */
 
-        int density;                 /* 密度 */
-        int lineSpacing;             /* 行间距(像素) */
-        int fontsize;                /* 字号 */
-        bool fontSizeStrict;         /* 是否严格保持指定的字号大小 */
-        bool fontSizeNorm;           /* 是否修正字号 */
-        char fontname[FONTNAME_LEN]; /* 字体 */
-        int opacity;                 /* 不透明度 */
-        float outline;               /* 描边 */
-        float outlineBlur;           /* 描边模糊半径 */
-        int outlineOpacity;          /* 描边不透明度 */
-        float shadow;                /* 阴影 */
-        bool bold;                   /* 是否加粗 */
+    int density;                 /* 密度 */
+    int lineSpacing;             /* 行间距(像素) */
+    int fontsize;                /* 字号 */
+    bool fontSizeStrict;         /* 是否严格保持指定的字号大小 */
+    bool fontSizeNorm;           /* 是否修正字号 */
+    char fontname[FONTNAME_LEN]; /* 字体 */
+    int opacity;                 /* 不透明度 */
+    float outline;               /* 描边 */
+    float outlineBlur;           /* 描边模糊半径 */
+    int outlineOpacity;          /* 描边不透明度 */
+    float shadow;                /* 阴影 */
+    bool bold;                   /* 是否加粗 */
 
-        bool saveBlockedPart; /* 是否保存屏蔽部分 */
-        bool showUserNames;   /* 是否显示用户名 */
-        bool showMsgBox;      /* 是否显示消息框 */
+    bool saveBlockedPart; /* 是否保存屏蔽部分 */
+    bool showUserNames;   /* 是否显示用户名 */
+    bool showMsgBox;      /* 是否显示消息框 */
 
-        struct Coordinate msgBoxSize; /* 消息框大小 */
-        struct Coordinate msgBoxPos;  /* 消息框位置 */
-        int msgboxFontsize;           /* 消息框内文字大小 */
-        float msgboxDuration;         /* 消息框持续时长(秒数) */
-        float giftMinPrice;           /* 消息框礼物最低价格限制(元) */
+    struct Coordinate msgBoxSize; /* 消息框大小 */
+    struct Coordinate msgBoxPos;  /* 消息框位置 */
+    int msgboxFontsize;           /* 消息框内文字大小 */
+    float msgboxDuration;         /* 消息框持续时长(秒数) */
+    float giftMinPrice;           /* 消息框礼物最低价格限制(元) */
 
-        int blockmode;              /* 屏蔽模式 */
-        int statmode;               /* 统计模式 */
-        char **blocklist;           /* 弹幕黑名单文件，文件内以换行分隔 */
-        bool blocklistRegexEnabled; /* 黑名单是否启用正则表达式匹配 */
-    };
+    int blockmode;              /* 屏蔽模式 */
+    int statmode;               /* 统计模式 */
+    char **blocklist;           /* 弹幕黑名单文件，文件内以换行分隔 */
+    bool blocklistRegexEnabled; /* 黑名单是否启用正则表达式匹配 */
+};
 
-    typedef struct Coordinate COORDIN;
-    typedef struct Configurations CONFIG;
+typedef struct Coordinate COORDIN;
+typedef struct Configurations CONFIG;
 
-    extern CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig);
-    extern bool writeConfig(const char *const configFileName, const CONFIG newConfig);
-    extern void printConfig(CONFIG config);
+extern CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig);
+extern bool writeConfig(const char *const configFileName, const CONFIG newConfig);
+extern void printConfig(CONFIG config);
 
 #ifdef __cplusplus
 }
