@@ -12,8 +12,8 @@ target("cli")
     set_languages("c11")
     set_version("2.0.0", {build = "%Y%m%d%H%M"})
 
-    add_files("src/*.c", "src/**/*.c")
     add_packages("pcre2")
+    add_files("src/*.c", "src/**/*.c")
 
     on_package(function (target)
         if is_mode("release") then
