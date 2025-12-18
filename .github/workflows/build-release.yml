@@ -1,0 +1,175 @@
+name: "Build & Release"
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "src/**/*.c"
+      - "src/**/*.h"
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [master]
+    paths:
+      - "src/**/*.c"
+      - "src/**/*.h"
+  workflow_dispatch:
+
+concurrency:
+  group: "build-release"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build on ${{ matrix.platform }} (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    env:
+      PROJECT_NAME: ${{ github.event.repository.name }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: Linux
+            arch: x64
+
+          - os: ubuntu-24.04-arm
+            platform: Linux
+            arch: arm64
+
+          - os: macos-13
+            platform: macOS
+            arch: Intel
+
+          - os: macos-latest
+            platform: macOS
+            arch: arm64
+
+          - os: windows-latest
+            platform: Windows
+            arch: x64
+
+          - os: windows-11-arm
+            platform: Windows
+            arch: arm64
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: ~3
+          actions-cache-folder: ".xmake-cache"
+          build-cache-key: "${{ matrix.platform }}_${{ matrix.arch }}"
+          build-cache: true
+          package-cache: true
+
+      - name: Build & Package Project
+        run: xmake package --yes --verbose
+
+      - name: Upload Artifact
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            build/packages/*.zip
+            build/packages/*.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 9
+
+  release:
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    name: Upload to GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    permissions:
+      contents: write
+
+    env:
+      RELEASE_DIR: "artifacts"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: ${{ env.RELEASE_DIR }}
+
+      - name: Update dev Tag
+        run: |
+          git tag dev ${{ github.sha }}
+          git push origin "refs/tags/dev" --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release to GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev
+          name: Continuous dev Build
+          body: Automated build from commit ${{ github.sha }}
+          prerelease: true
+          preserve_order: true
+          files: |
+            ${{ env.RELEASE_DIR }}/**/*.zip
+            ${{ env.RELEASE_DIR }}/**/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  format:
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    name: Auto Format Code
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: ~3
+          actions-cache-folder: ".xmake-cache"
+
+      - name: Format C/C++ files
+        run: xmake format
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=0" >> $GITHUB_OUTPUT
+          else
+            echo "changed=1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto commit and push changes
+        if: steps.check_changes.outputs.changed != 0
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "style(format): AUTO format code"
+          branch: ${{ github.ref_name }}
+          commit_options: "--no-verify --no-signoff"
+          file_pattern: "*.h *.c"
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          status_options: "--untracked-files=no"
+          add_options: "-u"
+          disable_globbing: true

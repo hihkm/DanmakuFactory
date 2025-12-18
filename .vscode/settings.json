@@ -1,12 +1,23 @@
 {
-    "files.associations": {
-        "cdanmakufactory.h": "c",
-        "danmakufactorylist.h": "c",
-        "assfile.h": "c",
-        "templatefile.h": "c",
-        "assstringprocessing.h": "c"
-    },
     "cmake.configureOnOpen": true,
     "cmake.generator": "Ninja",
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\build\\compile_commands.json"
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\.vscode\\compile_commands.json",
+    "[yaml]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.unicodeHighlight.ambiguousCharacters": false,
+        "editor.unicodeHighlight.invisibleCharacters": false,
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+        }
+    },
 }

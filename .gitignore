@@ -1,3 +1,13 @@
+# Xmake cache
+.xmake/
+build/
+
+# MacOS Cache
+.DS_Store
+
+# VSCode
+.vscode/compile_commands.json
+
 # Visual Studio
 .vs/
 obj/
@@ -7,14 +17,11 @@ CMakeSettings.json
 *.docx
 *.ini
 
-# CMake
-build/
-bin/
-
 # Clangd
 .cache/
 
 # Others
+bin/
 DanmakuFactory
 
 #
