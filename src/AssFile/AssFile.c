@@ -1845,6 +1845,7 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
     const int density = config.density;
     const int lineSpacing = config.lineSpacing;
     const int topMargin = config.topMargin;
+    const int bottomMargin = config.bottomMargin;
     const int blockMode = config.blockmode;
     const BOOL saveBlockedPart = config.saveBlockedPart;
     const BOOL showMsgBox = config.showMsgBox;
@@ -2350,7 +2351,8 @@ int writeAssDanmakuPart(FILE *opF, DANMAKU *head, CONFIG config, STATUS *const s
 
             printTime(opF, now->time, ",");
             printTime(opF, now->time + holdTime, ",");
-            fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)", resolution.x / 2, PositionY - holdLineHeight);
+            fprintf(opF, "BTM,,0000,0000,0000,,{\\pos(%d,%d)", resolution.x / 2,
+                    PositionY - holdLineHeight - bottomMargin);
 
             if (textHei != fontSize)
             {
