@@ -1052,7 +1052,7 @@ int main(int argc, char **argv)
     {
         printf("Loading file \"%s\"\n", infile[cnt].fileName);
         /* 检查文件是否存在 */
-        if (access(infile[cnt].fileName, F_OK) != 0)
+        if (utf8_access(infile[cnt].fileName, F_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nNo such file.\n");
@@ -1060,7 +1060,7 @@ int main(int argc, char **argv)
         }
 
         /* 权限检查 */
-        if (access(infile[cnt].fileName, R_OK) != 0)
+        if (utf8_access(infile[cnt].fileName, R_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nPermission denied.\n");
@@ -1327,7 +1327,7 @@ int main(int argc, char **argv)
 
     /* 写文件 */
     printf("\nWritting file \"%s\"...\n", outfile.fileName);
-    if (access(outfile.fileName, F_OK) == 0)
+    if (utf8_access(outfile.fileName, F_OK) == 0)
     { /* 检查文件是否存在 */
         printf("\nWARNING"
                "\nFile \"%s\" already exists, it will be overwritten when continue.\n",
@@ -1338,7 +1338,7 @@ int main(int argc, char **argv)
         }
 
         /* 权限检查 */
-        if (access(outfile.fileName, W_OK) != 0)
+        if (utf8_access(outfile.fileName, W_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nPermission denied.\n");

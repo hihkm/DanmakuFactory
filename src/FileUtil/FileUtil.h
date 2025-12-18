@@ -9,6 +9,7 @@ extern "C"
 #endif
 
     FILE *utf8_fopen(const char *filename, const char *mode);
+    int utf8_access(const char *path, int mode);
 
 #ifdef _WIN32
     void GetCommandLineUTF8(int *argc, char ***argv);

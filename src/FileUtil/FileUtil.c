@@ -5,6 +5,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
+#include <io.h>
 
 FILE *utf8_fopen(const char *filename, const char *mode)
 {
@@ -40,6 +41,31 @@ FILE *utf8_fopen(const char *filename, const char *mode)
     free(wmode);
 
     return f;
+}
+
+int utf8_access(const char *path, int mode)
+{
+    int ret = -1;
+    int len;
+    wchar_t *wpath;
+
+    if (!path)
+        return -1;
+
+    len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+    if (len == 0)
+        return -1;
+
+    wpath = (wchar_t *)malloc(len * sizeof(wchar_t));
+    if (!wpath)
+        return -1;
+
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, len);
+
+    ret = _waccess(wpath, mode);
+
+    free(wpath);
+    return ret;
 }
 
 void GetCommandLineUTF8(int *argc, char ***argv)
@@ -87,9 +113,16 @@ void FreeCommandLineUTF8(int argc, char **argv)
 
 #else
 
+#include <unistd.h>
+
 FILE *utf8_fopen(const char *filename, const char *mode)
 {
     return fopen(filename, mode);
+}
+
+int utf8_access(const char *path, int mode)
+{
+    return access(path, mode);
 }
 
 #endif
