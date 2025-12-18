@@ -39,6 +39,7 @@
 
 #include "CDanmakuFactory.h"
 #include "Define/CLIDef.h"
+#include "FileUtil/FileUtil.h"
 
 void printHelpInfo();
 int getArgNum(int argc, char **argv, const int optionIndex);
@@ -88,6 +89,9 @@ static CONFIG defaultConfig = {
 
 int main(int argc, char **argv)
 {
+#ifdef _WIN32
+    GetCommandLineUTF8(&argc, &argv);
+#endif
     FINFO outfile;
     FINFO *infile = NULL;
     int infileNum = 0;
@@ -108,7 +112,9 @@ int main(int argc, char **argv)
     printf("\nDanmakuFactory " VERSION " " EDITION " by hkm (hkm@tikm.org)"
            "\nhttps://github.com/hihkm/DanmakuFactory\n");
 
-    /* 获取程序运行目录 */
+    wchar_t wTempStr[MAX_TEXT_LENGTH];
+    GetModuleFileNameW(NULL, wTempStr, MAX_TEXT_LENGTH);
+    WideCharToMultiByte(CP_UTF8, 0, wTempStr, -1, tempStr, MAX_TEXT_LENGTH, NULL, NULL);
     tempStr[0] = '\0';
 #ifdef _WIN32
     GetModuleFileName(0, tempStr, MAX_TEXT_LENGTH);
@@ -654,7 +660,7 @@ int main(int argc, char **argv)
                 // 读取黑名单文件
                 char *filename = argv[argCnt + 1];
 
-                FILE *fp = fopen(filename, "r");
+                FILE *fp = utf8_fopen(filename, "r");
                 if (fp == NULL)
                 {
                     fprintf(stderr,

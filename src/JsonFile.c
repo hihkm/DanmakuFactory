@@ -37,6 +37,7 @@
 /* +-------------+---------+ */
 
 #include "CDanmakuFactory.h"
+#include "FileUtil/FileUtil.h"
 
 static void JSErrorExit(FILE *ipF, DANMAKU *head, DANMAKU *ptr);
 
@@ -66,7 +67,7 @@ int readJson(const char *const ipFile, DANMAKU **head, const char *mode, const f
     }
 
     /* 打开文件 */
-    if ((ipF = fopen(ipFile, "r")) == NULL)
+    if ((ipF = utf8_fopen(ipFile, "r")) == NULL)
     {
 #if PRINT_ERR == TRUE
         printf("\n[X] 文件打开失败");
@@ -289,7 +290,7 @@ int writeJson(const char *const fileName, DANMAKU *danmakuHead, STATUS *const st
     }
 
     FILE *opF;
-    if ((opF = fopen(fileName, "w")) == NULL)
+    if ((opF = utf8_fopen(fileName, "w")) == NULL)
     {
         return 2;
     }

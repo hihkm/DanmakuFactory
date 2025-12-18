@@ -22,6 +22,7 @@
  */
 
 #include "CDanmakuFactory.h"
+#include "FileUtil/FileUtil.h"
 
 #define LABEL_LEN 10240
 
@@ -105,7 +106,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
     }
 
     /* 打开文件 */
-    if ((ipF = fopen(ipFile, "r")) == NULL)
+    if ((ipF = utf8_fopen(ipFile, "r")) == NULL)
     {
         return 1; /* 文件打开失败 */
     }
@@ -646,7 +647,7 @@ int writeXml(char const *const fileName, DANMAKU *danmakuHead, STATUS *const sta
     char tempText[64];
     int typeInXml;
 
-    if ((opF = fopen(fileName, "w")) == NULL)
+    if ((opF = utf8_fopen(fileName, "w")) == NULL)
     {
         return 2;
     }

@@ -22,6 +22,7 @@
  */
 
 #include "Config.h"
+#include "../FileUtil/FileUtil.h"
 #include "../String/DanmakuFactoryString.h"
 #include <math.h>
 #include <stdio.h>
@@ -42,7 +43,7 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
     char buf[SIZE_OF_BUF], *bufPtr, *bufCopyPtr;
     CONFIG configOnfile = defaultConfig;
 
-    FILE *fptr = fopen(configFileName, "r");
+    FILE *fptr = utf8_fopen(configFileName, "r");
     if (fptr == NULL)
     {
         return configOnfile;
@@ -294,7 +295,7 @@ CONFIG readConfig(const char *const configFileName, const CONFIG defaultConfig)
  */
 BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
 {
-    FILE *fptr = fopen(configFileName, "w");
+    FILE *fptr = utf8_fopen(configFileName, "w");
 
     char tempStr[MAX_TEXT_LENGTH];
     CONFIG newConfigCopy = newConfig;

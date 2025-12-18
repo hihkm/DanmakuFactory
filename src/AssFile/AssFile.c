@@ -22,6 +22,7 @@
  */
 
 #include "AssFile.h"
+#include "../FileUtil/FileUtil.h"
 #include "../Define/CLIDef.h"
 #include "AssStringProcessing.h"
 
@@ -77,7 +78,7 @@ int readAss(const char *const fileName, DANMAKU **danmakuHead, const char *mode,
 int readAssFile(ASSFILE *assFile, const char *const fileName)
 {
     FILE *fptr;
-    if ((fptr = fopen(fileName, "r")) == NULL)
+    if ((fptr = utf8_fopen(fileName, "r")) == NULL)
     {
         return 1;
     }
@@ -1111,7 +1112,7 @@ int writeAss(const char *const fileName, DANMAKU *danmakuHead, const CONFIG conf
              STATUS *const status)
 {
 
-    FILE *fptr = fopen(fileName, "w");
+    FILE *fptr = utf8_fopen(fileName, "w");
 
     int returnValue = 0;
 
