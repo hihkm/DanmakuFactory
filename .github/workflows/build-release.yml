@@ -57,8 +57,6 @@ jobs:
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
       - name: Setup Xmake
         uses: xmake-io/github-action-setup-xmake@v1
