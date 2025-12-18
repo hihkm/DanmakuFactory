@@ -264,8 +264,8 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             }
             else if (strcmp(key, "user") == 0)
             {
-                getNextWord(&labelPtr, user.name, USER_NAME_LEN, ' ', TRUE);
-                deQuotMarks(user.name);
+                strGetLeftPart(NULL, &labelPtr, '\"', MAX_TEXT_LENGTH);
+                strGetLeftPart(user.name, &labelPtr, '\"', USER_NAME_LEN);
                 hasUserInfo = TRUE;
             }
             else if (strcmp(key, "uid") == 0)
