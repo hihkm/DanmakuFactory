@@ -98,6 +98,7 @@ int main(int argc, char **argv)
     BOOL saveConfig = FALSE;
     BOOL configFileErr = FALSE;
     BOOL ignoreWarnings = FALSE;
+    BOOL forceOverwrite = FALSE;
     CONFIG config;
     char tempStr[MAX_TEXT_LENGTH], *tempPtr;
     char programPath[MAX_TEXT_LENGTH];
@@ -793,6 +794,11 @@ int main(int argc, char **argv)
                 ignoreWarnings = TRUE;
                 argCnt++;
             }
+            else if (!(strcmp("--force", argv[argCnt])))
+            { /* 强制覆盖输出文件 */
+                forceOverwrite = TRUE;
+                argCnt++;
+            }
             else if (!(strcmp("--check-version-" VERSION, argv[argCnt])))
             { /* 为GUI提供程序版本确认 如果是错误的版本将会报非法参数错误 */
                 argCnt++;
@@ -1323,12 +1329,15 @@ int main(int argc, char **argv)
     printf("\nWritting file \"%s\"...\n", outfile.fileName);
     if (access(outfile.fileName, F_OK) == 0)
     { /* 检查文件是否存在 */
-        printf("\nWARNING"
-               "\nFile \"%s\" already exists, it will be overwritten when continue.\n",
-               outfile.fileName);
-        if (isContinue(ignoreWarnings) == FALSE)
+        if (forceOverwrite == FALSE)
         {
-            return 0;
+            printf("\nWARNING"
+                   "\nFile \"%s\" already exists, it will be overwritten when continue.\n",
+                   outfile.fileName);
+            if (isContinue(ignoreWarnings) == FALSE)
+            {
+                return 0;
+            }
         }
 
         /* 权限检查 */
@@ -1540,6 +1549,7 @@ void printHelpInfo()
            "\n                    *Note*: Arguments read from command line are superior."
            "\n--save              Save configuration as current command settings."
            "\n--ignore-warnings   Ignore all warnings, like `-y, --yes`."
+           "\n--force             Force overwrite output file without confirmation."
            "\n"
            "\nExample:"
            "\nDanmakuFactory -o ass \"outfile.ass\" -i xml \"infile1.xml\""
