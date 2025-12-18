@@ -313,6 +313,7 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
 
             "    \"density\": %d,\n"
             "    \"lineSpacing\": %d,\n"
+            "    \"topMargin\": %d,\n"
             "    \"fontsize\": %d,\n"
             "    \"fontname\": \"%s\",\n"
             "    \"opacity\": %d,\n"
@@ -322,8 +323,9 @@ BOOL writeConfig(const char *const configFileName, const CONFIG newConfig)
             newConfigCopy.resolution.x, newConfigCopy.resolution.y, newConfigCopy.displayarea, newConfigCopy.scrollarea,
             newConfigCopy.scrolltime, newConfigCopy.fixtime,
 
-            newConfigCopy.density, newConfigCopy.lineSpacing, newConfigCopy.fontsize, newConfigCopy.fontname,
-            newConfigCopy.opacity, newConfigCopy.outline, newConfigCopy.shadow, boolToStr(tempStr, newConfigCopy.bold));
+            newConfigCopy.density, newConfigCopy.lineSpacing, newConfigCopy.topMargin, newConfigCopy.fontsize,
+            newConfigCopy.fontname, newConfigCopy.opacity, newConfigCopy.outline, newConfigCopy.shadow,
+            boolToStr(tempStr, newConfigCopy.bold));
 
     /* 写是否保存屏蔽部分 */
     if (newConfigCopy.saveBlockedPart == FALSE)
@@ -499,8 +501,8 @@ void printConfig(CONFIG config)
         printf("(unlimit)");
     }
 
-    printf(" | LineSpacing: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f", config.lineSpacing,
-           config.fontsize, config.fontname, config.opacity, config.outline);
+    printf(" | LineSpacing: %d | TopMargin: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f",
+           config.lineSpacing, config.topMargin, config.fontsize, config.fontname, config.opacity, config.outline);
     if (fabs(config.outline) < EPS)
     {
         printf("(disable)");
