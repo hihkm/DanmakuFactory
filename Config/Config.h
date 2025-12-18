@@ -57,6 +57,8 @@ struct Configurations
     char fontname[FONTNAME_LEN]; /* 字体 */
     int opacity;       /* 不透明度 */
     float outline;       /* 描边 */
+    float outlineBlur;   /* 描边模糊半径 */
+    int outlineOpacity; /* 描边不透明度 */
     float shadow;        /* 阴影 */
     BOOL bold;         /* 是否加粗 */
 
@@ -73,6 +75,7 @@ struct Configurations
     int blockmode;     /* 屏蔽模式 */
     int statmode;      /* 统计模式 */
     char** blocklist;     /* 弹幕黑名单文件，文件内以换行分隔 */
+    BOOL blocklistRegexEnabled;   /* 黑名单是否启用正则表达式匹配 */
 };
 
 typedef struct Coordinate COORDIN;

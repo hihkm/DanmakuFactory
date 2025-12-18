@@ -2,12 +2,10 @@ name: Build
 
 on:
   push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
-  release:
+  build:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     env:
@@ -15,50 +13,35 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest, ubuntu-24.04-arm]
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-      - name: build for linux
-        if: startsWith(matrix.os, 'ubuntu')
-        run: make
+        with:
+          submodules: 'recursive'
 
-      - name: build for windows
+      - name: Build Project
+        uses: threeal/cmake-action@v2.1.0
+        with:
+          options: CMAKE_BUILD_TYPE=Release
+          build-args: --config Release --target DanmakuFactory
+
+      - run: ls build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         if: startsWith(matrix.os, 'windows')
-        run: mingw32-make
-
-      - run: ls
-
-      - name: Upload win artifact
-        uses: actions/upload-artifact@v4
         with:
-          name: package-${{ runner.os }}
-          path: |
-            DanmakuFactory
-            DanmakuFactory.exe
+          name: package-${{ runner.os }}-${{ runner.arch }}
+          path: build/Release/DanmakuFactory.exe
 
-  prebuild-linux-arm:
-    strategy:
-      matrix:
-        arch:
-          - arm64
-    name: Prebuild on Linux (${{ matrix.arch }})
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-      - run: |
-          docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} ubuntu:latest -c "\
-          apt-get update && \
-          apt-get install -y make gcc && \
-          cd /tmp/project && \
-          make"
-      - name: Upload arm64 artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
+        if: ${{ startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos') }}
         with:
-          name: package-linux-${{ matrix.arch }}
-          path: DanmakuFactory
+          name: package-${{ runner.os }}-${{ runner.arch }}
+          path: build/DanmakuFactory
 
 permissions:
   contents: write

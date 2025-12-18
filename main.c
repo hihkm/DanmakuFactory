@@ -22,6 +22,7 @@
  */
 
 #include "Define/DanmakuDef.h"
+#include <string.h>
 #ifdef _WIN32
 /* windows下 */
 #include <windows.h>
@@ -64,6 +65,8 @@ static CONFIG defaultConfig =
     "Microsoft YaHei", 
     180,            /* 不透明度 */ 
     0,              /* 描边 */ 
+    0,              /* 描边模糊半径 */ 
+    255,            /* 描边不透明度 */
     1,              /* 阴影 */
     FALSE,          /* 是否加粗 */ 
 
@@ -80,6 +83,7 @@ static CONFIG defaultConfig =
     0,              /* 屏蔽模式 */
     0,              /* 统计模式 */
     NULL,           /* 弹幕黑名单 */
+    FALSE,          /* 弹幕黑名单是否启用正则表达式匹配 */
 };
 
 int main(int argc, char **argv)
@@ -420,6 +424,28 @@ int main(int argc, char **argv)
                 
                 argCnt += 2; 
             }
+            else if (!strcmp("--outline-blur", argv[argCnt]))
+            { /* 描边模糊半径 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "OutlineBlur", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.outlineBlur = returnValue;
+
+                argCnt += 2;
+            }
+            else if (!strcmp("--outline-opacity", argv[argCnt]))
+            { /* 描边不透明度 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "OutlineOpacity", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.outlineOpacity = (int)returnValue;
+
+                argCnt += 2;
+            }
             else if (!strcmp("-D", argv[argCnt]) || !strcmp("--shadow", argv[argCnt]))
             { /* 阴影 */
                 double returnValue = getArgValDouble(argc, argv, argCnt, "Shadow", -256.00);
@@ -639,6 +665,17 @@ int main(int argc, char **argv)
 
                 argCnt += 2;
             }
+            else if (!strcmp("--blacklist-regex", argv[argCnt]))
+            { /* 弹幕黑名单是否启用正则表达式匹配 */
+                BOOL returnValue = getArgValBool(argc, argv, argCnt, "BlacklistRegexEnabled");
+                if (returnValue == BOOL_UNDETERMINED)
+                {
+                    return 0;
+                }
+                config.blocklistRegexEnabled = returnValue;
+
+                argCnt += 2;
+            }
             else if (!strcmp("-t", argv[argCnt]) || !strcmp("--timeshift", argv[argCnt]))
             { /* 时轴偏移 因不确定文件数量，故先跳过，最后解析 */
                 argCnt++;
@@ -846,6 +883,26 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "\nERROR"
                             "\n\"Outline\" must be an float greater than or equal to 0 and less than or equal to 4.\n");
+            return 0;
+        }
+        /* 描边模糊半径 */
+        if (config.outlineBlur < 0.0)
+        {
+            fprintf(stderr, "\nERROR"
+                            "\n\"OutlineBlur\" must be an float greater than or equal to 0.\n");
+            return 0;
+        }
+        if (config.outline == 0.0 && config.outlineBlur > 0.0)
+        {
+            fprintf(stderr, "\nWARNING"
+                            "\n\"OutlineBlur\" is ignored since \"Outline\" is set to 0.\n");
+            toPause(ignoreWarnings);
+        }
+        /* 描边不透明度 */
+        if (config.outlineOpacity < 0 || config.outlineOpacity > 255)
+        {
+            fprintf(stderr, "\nERROR"
+                            "\n\"OutlineOpacity\" must be an integer greater than or equal to 0 and less than or equal to 255.\n");
             return 0;
         }
         /* 阴影 */
@@ -1199,7 +1256,7 @@ int main(int argc, char **argv)
     }
 
     /* 屏蔽 */
-    blockByType(danmakuPool, config.blockmode, config.blocklist);
+    blockByType(danmakuPool, config.blockmode, config.blocklist, config.blocklistRegexEnabled);
     /* 正则化字号 */
     normFontSize(danmakuPool, config);
     
@@ -1408,6 +1465,10 @@ void printHelpInfo()
            "\n-N, --fontname      Specify the fontname of general danmaku."
            "\n-O, --opacity       Specify the opacity of danmaku EXCEPT the special danmaku(range: 1-255)."
            "\n-L, --outline       Specify the width of outline for each danmaku(range: 0-4)."
+           "\n--outline-blur      Specify the blur radius of outline for each danmaku."
+           "\n                    Available value: 0 (default) or positive number"
+           "\n--outline-opacity   Specify the opacity of outline for danmaku EXCEPT the special danmaku"
+           "\n                    Available value: 0-255 (default: 255)"
            "\n-D, --shadow        Specify the depth of shadow for each danmaku(range: 0-4)."
            "\n-B, --bold          Specify whether the font should be boldface."
            "\n                    Available value: TRUE, FALSE (default)"
@@ -1441,6 +1502,9 @@ void printHelpInfo()
            "\n--blacklist         Specify the blacklist plain text file which contains no more than 4096 danmakus"
            "\n                     that separated by lines and will not show on the screen."
            "\n                    For example: `black.txt`."
+           "\n"
+           "\n--blacklist-regex   Specify whether lines in the blacklist file should be treated as regular expressions."
+           "\n                    Available value: TRUE, FALSE (default)"
            "\n"
            "\nOther options:"
            "\n-h, --help          Display this help and version information than exit."

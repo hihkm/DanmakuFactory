@@ -20,7 +20,7 @@ DanmakuFactory是一款弹幕文件转换工具，支持弹幕姬的礼物读取
 
 ##### Linux
 
-需要提前安装git, make, gcc
+需要提前安装git, make, gcc, cmake
 
 1. clone仓库到本地(注意当前目录下不要有相同名字的文件夹)
 
@@ -34,16 +34,17 @@ git clone git@github.com:hihkm/DanmakuFactory.git
 cd DanmakuFactory
 ```
 
-3. 创建临时文件夹
+3. 递归下载子模块
 
 ```shell
-mkdir temp
+git submodule update --init --recursive
 ```
 
 4. 编译，可执行文件为DanmakuFactory
 
 ```shell
-make
+cmake -S . -B build
+cmake --build build
 ```
 
 
