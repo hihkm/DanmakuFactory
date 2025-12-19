@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     printf("\nDanmakuFactory " VERSION " " EDITION " by hkm (hkm@tikm.org)"
            "\nhttps://github.com/hihkm/DanmakuFactory\n");
 
-tempStr[0] = '\0';
+    tempStr[0] = '\0';
 #ifdef _WIN32
     wchar_t wTempStr[MAX_TEXT_LENGTH];
     GetModuleFileNameW(NULL, wTempStr, MAX_TEXT_LENGTH);
