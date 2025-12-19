@@ -112,12 +112,11 @@ int main(int argc, char **argv)
     printf("\nDanmakuFactory " VERSION " " EDITION " by hkm (hkm@tikm.org)"
            "\nhttps://github.com/hihkm/DanmakuFactory\n");
 
+tempStr[0] = '\0';
+#ifdef _WIN32
     wchar_t wTempStr[MAX_TEXT_LENGTH];
     GetModuleFileNameW(NULL, wTempStr, MAX_TEXT_LENGTH);
     WideCharToMultiByte(CP_UTF8, 0, wTempStr, -1, tempStr, MAX_TEXT_LENGTH, NULL, NULL);
-    tempStr[0] = '\0';
-#ifdef _WIN32
-    GetModuleFileName(0, tempStr, MAX_TEXT_LENGTH);
 #else
     readlink("/proc/self/exe", tempStr, MAX_TEXT_LENGTH);
 #endif
