@@ -13,6 +13,15 @@ on:
       - "src/**/*.c"
       - "src/**/*.h"
   workflow_dispatch:
+    inputs:
+      action_type:
+        description: '操作类型选择'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release 
+          - artifact_only
 
 concurrency:
   group: "build-release"
@@ -34,8 +43,16 @@ jobs:
             platform: Linux
             arch: x64
 
+          - os: ubuntu-latest
+            platform: Linux-musl
+            arch: x64
+
           - os: ubuntu-24.04-arm
             platform: Linux
+            arch: arm64
+
+          - os: ubuntu-24.04-arm
+            platform: Linux-musl
             arch: arm64
 
           - os: macos-15-intel
@@ -67,6 +84,14 @@ jobs:
           build-cache: true
           package-cache: true
 
+      - name: Install and setup musl toolchain
+        if: matrix.platform == 'Linux-musl'
+        run: |
+          # 安装完整的musl交叉编译工具链
+          sudo apt-get update
+          sudo apt-get install -y musl-tools musl
+          xmake f --musl=y -y --verbose
+
       - name: Build & Package Project
         run: xmake package --yes --verbose
 
@@ -83,7 +108,7 @@ jobs:
           compression-level: 9
 
   release:
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.action_type == 'release') }}
     name: Upload to GitHub Release
     needs: build
     runs-on: ubuntu-latest
@@ -126,7 +151,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   format:
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.action_type == 'release') }}
     name: Auto Format Code
     needs: release
     runs-on: ubuntu-latest
