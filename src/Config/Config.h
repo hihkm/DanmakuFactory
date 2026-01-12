@@ -52,6 +52,8 @@ extern "C"
 
         int density;                 /* 密度 */
         int lineSpacing;             /* 行间距(像素) */
+        int topMargin;               /* 顶部距离(像素) */
+        int bottomMargin;            /* 底部距离(像素) */
         int fontsize;                /* 字号 */
         BOOL fontSizeStrict;         /* 是否严格保持指定的字号大小 */
         BOOL fontSizeNorm;           /* 是否修正字号 */

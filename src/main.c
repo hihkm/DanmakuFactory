@@ -59,6 +59,8 @@ static CONFIG defaultConfig = {
 
     0,     /* 弹幕密度 */
     0,     /* 行间距 */
+    0,     /* 顶部距离 */
+    0,     /* 底部距离 */
     38,    /* 字号 */
     FALSE, /* 是否严格保持指定的字号大小 */
     FALSE, /* 是否修正字号 */
@@ -363,6 +365,28 @@ int main(int argc, char **argv)
                     return 0;
                 }
                 config.lineSpacing = (int)returnValue;
+
+                argCnt += 2;
+            }
+            else if (!strcmp("--top-margin", argv[argCnt]))
+            { /* 顶部距离 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "TopMargin", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.topMargin = (int)returnValue;
+
+                argCnt += 2;
+            }
+            else if (!strcmp("--bottom-margin", argv[argCnt]))
+            { /* 底部距离 */
+                double returnValue = getArgValDouble(argc, argv, argCnt, "BottomMargin", -256.00);
+                if (fabs(returnValue - (-256.0)) < EPS)
+                {
+                    return 0;
+                }
+                config.bottomMargin = (int)returnValue;
 
                 argCnt += 2;
             }
