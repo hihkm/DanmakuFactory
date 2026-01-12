@@ -91,6 +91,7 @@ jobs:
 
     permissions:
       contents: write
+      packages: write
 
     env:
       RELEASE_DIR: "artifacts"
