@@ -39,6 +39,7 @@
 
 #include "CDanmakuFactory.h"
 #include "Define/CLIDef.h"
+#include "FileUtil/FileUtil.h"
 
 void printHelpInfo();
 int getArgNum(int argc, char **argv, const int optionIndex);
@@ -88,6 +89,9 @@ static CONFIG defaultConfig = {
 
 int main(int argc, char **argv)
 {
+#ifdef _WIN32
+    GetCommandLineUTF8(&argc, &argv);
+#endif
     FINFO outfile;
     FINFO *infile = NULL;
     int infileNum = 0;
@@ -109,10 +113,11 @@ int main(int argc, char **argv)
     printf("\nDanmakuFactory " VERSION " " EDITION " by hkm (hkm@tikm.org)"
            "\nhttps://github.com/hihkm/DanmakuFactory\n");
 
-    /* 获取程序运行目录 */
     tempStr[0] = '\0';
 #ifdef _WIN32
-    GetModuleFileName(0, tempStr, MAX_TEXT_LENGTH);
+    wchar_t wTempStr[MAX_TEXT_LENGTH];
+    GetModuleFileNameW(NULL, wTempStr, MAX_TEXT_LENGTH);
+    WideCharToMultiByte(CP_UTF8, 0, wTempStr, -1, tempStr, MAX_TEXT_LENGTH, NULL, NULL);
 #else
     readlink("/proc/self/exe", tempStr, MAX_TEXT_LENGTH);
 #endif
@@ -655,7 +660,7 @@ int main(int argc, char **argv)
                 // 读取黑名单文件
                 char *filename = argv[argCnt + 1];
 
-                FILE *fp = fopen(filename, "r");
+                FILE *fp = utf8_fopen(filename, "r");
                 if (fp == NULL)
                 {
                     fprintf(stderr,
@@ -1052,7 +1057,7 @@ int main(int argc, char **argv)
     {
         printf("Loading file \"%s\"\n", infile[cnt].fileName);
         /* 检查文件是否存在 */
-        if (access(infile[cnt].fileName, F_OK) != 0)
+        if (utf8_access(infile[cnt].fileName, F_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nNo such file.\n");
@@ -1060,7 +1065,7 @@ int main(int argc, char **argv)
         }
 
         /* 权限检查 */
-        if (access(infile[cnt].fileName, R_OK) != 0)
+        if (utf8_access(infile[cnt].fileName, R_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nPermission denied.\n");
@@ -1327,7 +1332,7 @@ int main(int argc, char **argv)
 
     /* 写文件 */
     printf("\nWritting file \"%s\"...\n", outfile.fileName);
-    if (access(outfile.fileName, F_OK) == 0)
+    if (utf8_access(outfile.fileName, F_OK) == 0)
     { /* 检查文件是否存在 */
         if (forceOverwrite == FALSE)
         {
@@ -1341,7 +1346,7 @@ int main(int argc, char **argv)
         }
 
         /* 权限检查 */
-        if (access(outfile.fileName, W_OK) != 0)
+        if (utf8_access(outfile.fileName, W_OK) != 0)
         {
             fprintf(stderr, "\nERROR"
                             "\nPermission denied.\n");

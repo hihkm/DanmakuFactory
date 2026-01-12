@@ -15,6 +15,10 @@ target("cli")
     add_packages("pcre2")
     add_files("src/*.c", "src/**/*.c")
 
+    if is_plat("windows") then
+        add_syslinks("shell32", "user32")
+    end
+
     on_package(function (target)
         if is_mode("release") then
             import("scripts.package")
