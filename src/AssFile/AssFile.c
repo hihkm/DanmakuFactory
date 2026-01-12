@@ -3593,9 +3593,9 @@ int printMessage(FILE *filePtr, int startPosX, int startPosY, int endPosX, int e
         printTime(filePtr, endTime, ",");
         fprintf(filePtr, "MSG,,0000,0000,0000,,{%s%s%s\\b1\\bord0\\shad0}%s",
                 getActionStr(actionStr, radius / 2, radius / 3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
-                effect,                                                                                  /* 补充特效 */
-                userIDColor,                                                                             /* 颜色 */
-                message->user->name                                                                      /* 用户id */
+                effect,             /* 补充特效 */
+                userIDColor,        /* 颜色 */
+                message->user->name /* 用户id */
         );
 
         /* SC金额 */
@@ -3618,8 +3618,8 @@ int printMessage(FILE *filePtr, int startPosX, int startPosY, int endPosX, int e
         fprintf(
             filePtr, "MSG,,0000,0000,0000,,{%s%s\\c&HFFFFFF\\bord0\\shad0}%s",
             getActionStr(actionStr, radius / 2, topBoxHeight, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
-            effect,                                                                                    /* 补充特效 */
-            scMsgStr                                                                                   /* SC内容 */
+            effect,  /* 补充特效 */
+            scMsgStr /* SC内容 */
         );
     }
     else if (message->type == MSG_GUARD)
@@ -3655,17 +3655,17 @@ int printMessage(FILE *filePtr, int startPosX, int startPosY, int endPosX, int e
         fprintf(filePtr,
                 "MSG,,0000,0000,0000,,{%s%s%s\\p1\\bord0\\shad0}m %d %d b %d %d %d %d %d %d "
                 "l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d l %d %d b %d %d %d %d %d %d",
-                getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY),                   /* 移动指令 */
-                effect,                                                                                  /* 补充特效 */
-                boxColor,                                                                                /* 颜色 */
-                0, radius,                                                                               /* 起点 */
-                0, radius / 2, radius / 2, 0, radius, 0,                                                 /* 左上圆角 */
-                width - radius, 0,                                                                       /* 上部直线 */
-                width - radius / 2, 0, width, radius / 2, width, radius,                                 /* 右上圆角 */
-                width, boxHeight - radius,                                                               /* 右边直线 */
+                getActionStr(actionStr, 0, 0, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
+                effect,                                                                /* 补充特效 */
+                boxColor,                                                              /* 颜色 */
+                0, radius,                                                             /* 起点 */
+                0, radius / 2, radius / 2, 0, radius, 0,                               /* 左上圆角 */
+                width - radius, 0,                                                     /* 上部直线 */
+                width - radius / 2, 0, width, radius / 2, width, radius,               /* 右上圆角 */
+                width, boxHeight - radius,                                             /* 右边直线 */
                 width, boxHeight - radius / 2, width - radius / 2, boxHeight, width - radius, boxHeight, /* 右下圆角 */
                 radius, boxHeight,                                                                       /* 底线 */
-                radius / 2, boxHeight, 0, boxHeight - radius / 2, 0, boxHeight - radius                  /* 左下圆角 */
+                radius / 2, boxHeight, 0, boxHeight - radius / 2, 0, boxHeight - radius /* 左下圆角 */
         );
 
         /* 用户ID */
@@ -3674,9 +3674,9 @@ int printMessage(FILE *filePtr, int startPosX, int startPosY, int endPosX, int e
         printTime(filePtr, endTime, ",");
         fprintf(filePtr, "MSG,,0000,0000,0000,,{%s%s%s\\bord0\\shad0}%s",
                 getActionStr(actionStr, radius / 2, radius / 3, startPosX, startPosY, endPosX, endPosY), /* 移动指令 */
-                effect,                                                                                  /* 补充特效 */
-                userIDColor,                                                                             /* 颜色 */
-                message->user->name                                                                      /* 用户id */
+                effect,             /* 补充特效 */
+                userIDColor,        /* 颜色 */
+                message->user->name /* 用户id */
         );
 
         /* 舰长信息 */

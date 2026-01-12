@@ -322,22 +322,22 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, 
                 {
                     const char *key = keyStrings[i];
                     size_t keyLen = strlen(key);
-                    
+
                     // 如果黑名单文本被<>包裹，认为是uid，使用ptr -> user -> uid进行完整匹配
                     if (keyLen >= 3 && keyStrings[i][0] == '<' && keyStrings[i][keyLen - 1] == '>')
                     {
-                        if (ptr -> user != NULL && ptr -> user -> uid != 0)
+                        if (ptr->user != NULL && ptr->user->uid != 0)
                         {
                             char *uidStr = (char *)malloc(keyLen - 1);
                             if (uidStr != NULL)
                             {
                                 strncpy(uidStr, keyStrings[i] + 1, keyLen - 2);
                                 uidStr[keyLen - 2] = '\0';
-                                if (ptr -> user -> uid == atoi(uidStr))
+                                if (ptr->user->uid == atoi(uidStr))
                                 {
-                                    if (ptr -> type > 0)
+                                    if (ptr->type > 0)
                                     {
-                                        ptr -> type *= -1;
+                                        ptr->type *= -1;
                                     }
                                     free(uidStr);
                                     break;
@@ -349,18 +349,18 @@ void blockByType(DANMAKU *const danmakuHead, const int mode, char **keyStrings, 
                     // 如果黑名单文本被[]包裹，认为是user，使用ptr -> user -> name进行完整匹配
                     else if (keyLen >= 3 && keyStrings[i][0] == '[' && keyStrings[i][keyLen - 1] == ']')
                     {
-                        if (ptr -> user != NULL && ptr -> user -> name[0] != '\0')
+                        if (ptr->user != NULL && ptr->user->name[0] != '\0')
                         {
                             char *nameStr = (char *)malloc(keyLen - 1);
                             if (nameStr != NULL)
                             {
                                 strncpy(nameStr, keyStrings[i] + 1, keyLen - 2);
                                 nameStr[keyLen - 2] = '\0';
-                                if (strcmp(ptr -> user -> name, nameStr) == 0)
+                                if (strcmp(ptr->user->name, nameStr) == 0)
                                 {
-                                    if (ptr -> type > 0)
+                                    if (ptr->type > 0)
                                     {
-                                        ptr -> type *= -1;
+                                        ptr->type *= -1;
                                     }
                                     free(nameStr);
                                     break;
