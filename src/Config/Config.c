@@ -511,7 +511,8 @@ void printConfig(CONFIG config)
         printf("(unlimit)");
     }
 
-    printf(" | LineSpacing: %d | TopMargin: %d | BottomMargin: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | Outline: %.1f",
+    printf(" | LineSpacing: %d | TopMargin: %d | BottomMargin: %d | Fontsize: %d | Fontname: \"%s\" | Opacity: %d | "
+           "Outline: %.1f",
            config.lineSpacing, config.topMargin, config.bottomMargin, config.fontsize, config.fontname, config.opacity,
            config.outline);
     if (fabs(config.outline) < EPS)
