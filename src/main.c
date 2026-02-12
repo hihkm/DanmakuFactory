@@ -705,7 +705,14 @@ int main(int argc, char **argv)
                     }
                     if (strlen(buf) == 0)
                         continue;
-                    tokens[i] = strdup(buf); // malloc here.
+                    tokens[i] = (char *)malloc(strlen(buf) + 1);
+                    if (tokens[i] == NULL)
+                    {
+                        fprintf(stderr, "\nERROR\nOut of memory.\n");
+                        fclose(fp);
+                        return 0;
+                    }
+                    strcpy(tokens[i], buf);
                     i++;
                 }
                 tokens[i] = NULL;
