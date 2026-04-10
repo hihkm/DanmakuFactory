@@ -4,7 +4,10 @@ add_rules("mode.debug", "mode.release")
 
 set_project(PROJECT_NAME)
 
-add_requires("pcre2", {configs = {shared = false}})
+add_requires("pcre2", {
+    system = false,
+    configs = {shared = false}
+})
 
 target("cli")
     set_basename(PROJECT_NAME)

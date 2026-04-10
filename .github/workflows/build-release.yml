@@ -6,12 +6,14 @@ on:
     paths:
       - "src/**/*.c"
       - "src/**/*.h"
+      - "**/*.lua"
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [master]
     paths:
       - "src/**/*.c"
       - "src/**/*.h"
+      - "**/*.lua"
   workflow_dispatch:
 
 concurrency:
