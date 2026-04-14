@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "danmakufactory",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+    ]
+  }
+}
