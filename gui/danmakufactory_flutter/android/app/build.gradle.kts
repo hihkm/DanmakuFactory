@@ -30,13 +30,25 @@ android {
         versionName = flutter.versionName
     }
 
+    // 签名
+    val releaseSigning = "release"
+    signingConfigs {
+        create(releaseSigning) {
+            storeFile = file("./danmakufactory.jks")
+            storePassword = "123456"
+            keyAlias = "key0"
+            keyPassword = "123456"
+            enableV1Signing = true
+            enableV2Signing = true
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(releaseSigning)
         }
     }
     packaging {
