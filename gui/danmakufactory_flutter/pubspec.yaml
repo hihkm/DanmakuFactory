@@ -1,0 +1,79 @@
+name: danmakufactory_flutter
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.70.1+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  danmakufactory:
+    path: ./danmakufactory
+  # 状态管理 https://github.com/rrousselGit/riverpod
+  flutter_riverpod: ^3.2.1
+  riverpod_annotation: ^4.0.2
+  # 路由 https://pub-web.flutter-io.cn/packages/go_router
+  go_router: ^17.0.0
+
+  # 文件选择 TODO可以升级
+  file_picker:
+    git:
+      url: https://gitcode.com/openharmony-sig/fluttertpc_file_picker.git
+      path: ./
+      ref: br_v8.0.7_ohos
+  # 路径
+  path_provider:
+    git:
+      url: https://gitcode.com/openharmony-sig/flutter_packages.git
+      path: packages/path_provider/path_provider
+      ref: master
+  # url
+  url_launcher:
+    git:
+      url: https://gitcode.com/openharmony-tpc/flutter_packages.git
+      path: packages/url_launcher/url_launcher
+      ref: br_url_launcher_v6.3.1_ohos
+
+  # kv存储 https://pub-web.flutter-io.cn/packages/hive_ce
+  hive_ce_flutter: ^2.3.4
+  # 实体类序列化 https://github.com/rrousselGit/freezed
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.11.0
+  # 元组工具
+  tuple: ^2.0.2
+  # 吐司
+  toastification: ^3.0.3
+
+  # 分享
+  share_plus:
+    git:
+      url: https://gitcode.com/openharmony-sig/flutter_plus_plugins.git
+      path: packages/share_plus/share_plus
+      ref: br_share_plus-v10.1.1_ohos
+
+
+dependency_overrides:
+  #强制覆盖
+  path_provider:
+    git:
+      url: https://gitcode.com/openharmony-sig/flutter_packages.git
+      path: packages/path_provider/path_provider
+      ref: master
+
+  test_api: ^0.7.7
+  web: ^1.0.0
+
+dev_dependencies:
+#  flutter_test:
+#    sdk: flutter
+  build_runner: ^2.12.2
+  flutter_lints: ^5.0.0
+  freezed: ^3.2.5
+  json_serializable: ^6.13.0
+  riverpod_generator: ^4.0.3
+
+flutter:
+  uses-material-design: true

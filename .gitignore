@@ -22,7 +22,6 @@ CMakeSettings.json
 
 # Others
 bin/
-DanmakuFactory
 
 #
 # ================================ C.gitignore ================================
@@ -80,3 +79,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+/.idea
