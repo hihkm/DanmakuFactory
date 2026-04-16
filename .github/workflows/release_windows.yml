@@ -29,6 +29,11 @@ jobs:
           # The Flutter build release channel
           channel: # optional, default is stable
 
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+
       # Get flutter dependencies and build
       - name: Build Windows
         working-directory: gui/danmakufactory_flutter

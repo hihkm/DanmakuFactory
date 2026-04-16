@@ -5,7 +5,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest
     steps:
       # 使用本项目
       - uses: actions/checkout@v5.0.0
@@ -24,6 +24,12 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+
 
       # 切换到Flutter项目目录并构建
       - name: Build APK
