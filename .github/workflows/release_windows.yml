@@ -1,0 +1,50 @@
+name: Release Windows
+on:
+  # 手动触发
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2022
+    steps:
+      # 使用本项目
+      - uses: actions/checkout@v5.0.0
+        #windows C++组件
+      - uses: microsoft/setup-msbuild@v2
+        with:
+          # Folder location of where vswhere.exe is located if a self-hosted agent
+          vswhere-path: # optional
+          # Version of Visual Studio to search; defaults to latest if not specified
+          vs-version: # optional
+          # Enable searching for pre-release versions of Visual Studio/MSBuild
+          vs-prerelease: # optional
+          # The preferred processor architecture of MSBuild. Can be either "x86", "x64", or "arm64". "x64" is only available from Visual Studio version 17.0 and later.
+          msbuild-architecture: # optional, default is x86
+
+      #设置flutter
+      - uses: subosito/flutter-action@v2.14.0
+        with:
+          # The Flutter version to make available on the path
+          flutter-version: 3.35.7
+          # The Flutter build release channel
+          channel: # optional, default is stable
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+
+      # Get flutter dependencies and build
+      - name: Build Windows
+        working-directory: gui/danmakufactory_flutter
+        run: | 
+          flutter pub get
+          flutter build windows
+      # Upload generated apk to the artifacts.
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          # Artifact name
+          name: danmakufactory_win_amd64
+          # 导出文件夹
+          path: gui/danmakufactory_flutter/build/windows/x64/runner/Release/
+          # The desired behavior if no files are found using the provided path.

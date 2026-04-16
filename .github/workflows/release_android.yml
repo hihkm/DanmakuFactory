@@ -1,0 +1,73 @@
+name: Release Android
+on:
+  # 手动触发
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      # 使用本项目
+      - uses: actions/checkout@v5.0.0
+
+      #设置flutter
+      - uses: subosito/flutter-action@v2.14.0
+        with:
+          # The Flutter version to make available on the path
+          flutter-version: 3.35.7
+          # The Flutter build release channel
+          channel: # optional, default is stable
+
+      # 设置jdk
+      - name: Set up JDK
+        uses: actions/setup-java@v5.0.0
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+
+
+      # 切换到Flutter项目目录并构建
+      - name: Build APK
+        working-directory: gui/danmakufactory_flutter
+        shell: bash
+        run: |
+          flutter pub get
+          
+          echo "kotlin.incremental=false" >> android/gradle.properties
+        
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/danmakufactory.jks
+          
+          echo "storeFile=./danmakufactory.jks" > android/key.properties
+          echo "storePassword=${KEYSTORE_PASSWORD}" >> android/key.properties
+          echo "keyAlias=${KEY_ALIAS}" >> android/key.properties
+          echo "keyPassword=${KEY_PASSWORD}" >> android/key.properties
+          
+          flutter build apk --release --split-per-abi
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload Artifact x86_64-release.apk
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: app-x86_64-release
+          path: gui/danmakufactory_flutter/build/app/outputs/flutter-apk/app-x86_64-release.apk
+
+      - name: Upload Artifact armeabi-v7a-release.apk
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: app-armeabi-v7a-release
+          path: gui/danmakufactory_flutter/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+
+      - name: Upload Artifact arm64-v8a-release.apk
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: app-arm64-v8a-release
+          path: gui/danmakufactory_flutter/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
