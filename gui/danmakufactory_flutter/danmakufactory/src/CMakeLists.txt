@@ -7,8 +7,6 @@ project(danmakufactory_library VERSION 0.0.1 LANGUAGES C)
 #set(OHOS_NATIVE_SDK "C:/Users/moli/soft/devecostudio/sdk/default/openharmony/native")
 set(OHOS_NATIVE_SDK "D:/sofe/devecostudio/sdk/default/openharmony/native")
 
-#Android配置
-set(ANDROID_NDK "C:/Users/moli/AppData/Local/Android/Sdk/ndk/29.0.14206865")
 
 #定义名称
 set(DANMAKU_FACTORY_CORE_LIB_NAME "danmakufactory_core")
@@ -17,6 +15,8 @@ message(WARNING "=== Device Info ===")
 message(WARNING "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
 message(WARNING "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 message(WARNING "ANDROID : ${ANDROID}")
+message(WARNING "CMAKE_ANDROID_NDK : ${CMAKE_ANDROID_NDK}")
+message(WARNING "ANDROID_NDK : ${ANDROID_NDK}")
 message(WARNING "OHOS : ${OHOS}")
 message(WARNING "WIN32 : ${WIN32}")
 message(WARNING "CMAKE_SOURCE_DIR :${CMAKE_SOURCE_DIR}")
@@ -103,7 +103,7 @@ elseif(ANDROID)
         # 设置工作目录
         WORKING_DIRECTORY "${XMAKE_BUILD_SCRIPT}"
         # 执行 Android xmake 编译脚本
-        COMMAND cmd.exe /c "${XMAKE_BUILD_SCRIPT}/androidXmakeBuild.bat" "${ANDROID_ABI}" "${ANDROID_NDK}"
+        COMMAND cmd.exe /c "${XMAKE_BUILD_SCRIPT}/androidXmakeBuild.bat" "${ANDROID_ABI}" "${CMAKE_ANDROID_NDK}"
         # 创建目录
         COMMAND ${CMAKE_COMMAND} -E make_directory "${ANDROID_DEFAULT_LIBS_DIR}"
         # 拷贝生成文件到安卓 jniLibs 打包目录

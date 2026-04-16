@@ -37,6 +37,8 @@ jobs:
         shell: bash
         run: |
           flutter pub get
+          
+          echo "kotlin.incremental=false" >> android/gradle.properties
         
           echo "$KEYSTORE_BASE64" | base64 --decode > android/app/danmakufactory.jks
           

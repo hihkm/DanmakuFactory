@@ -36,12 +36,14 @@
 ### 注意Linux、Mac编译暂未适配,目前只支持 windows下编译
 Android Studio版本:2025.3.3
 
+JDK版本:17
+
 flutter版本:3.35.7
 
 xmake版本:3.0.8
 
 克隆项目
-进入[danmakufactory/src/CMakeLists.txt](danmakufactory/src/CMakeLists.txt),将OHOS_NATIVE_SDK和ANDROID_NDK改为你自己本地的路径
+进入[danmakufactory/src/CMakeLists.txt](danmakufactory/src/CMakeLists.txt),将OHOS_NATIVE_SDK改为你自己本地的路径
 直接编译即可享用
 
 常用命令:
