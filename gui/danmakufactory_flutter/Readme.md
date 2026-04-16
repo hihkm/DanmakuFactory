@@ -36,7 +36,7 @@
 ### 注意Linux、Mac编译暂未适配,目前只支持 windows下编译
 Android Studio版本:2025.3.3
 
-flutter版本:3.35.8
+flutter版本:3.35.7
 
 xmake版本:3.0.8
 
