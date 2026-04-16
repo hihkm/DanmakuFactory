@@ -1,3 +1,5 @@
+import java.util.Properties
+import java.io.FileInputStream
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -32,23 +34,31 @@ android {
 
     // 签名
     val releaseSigning = "release"
-    signingConfigs {
-        create(releaseSigning) {
-            storeFile = file("./danmakufactory.jks")
-            storePassword = "123456"
-            keyAlias = "key0"
-            keyPassword = "123456"
-            enableV1Signing = true
-            enableV2Signing = true
+    val debugSigning = "debug"
+    // 加载签名配置
+    val keystorePropertiesFile = rootProject.file("key.properties")
+    val keystoreProperties = Properties()
+    val keyPropExists = keystorePropertiesFile.exists()
+    if (keyPropExists) {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+        signingConfigs {
+            create(releaseSigning) {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
         }
     }
+
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName(releaseSigning)
+            signingConfig = if (keyPropExists) signingConfigs.getByName(releaseSigning) else signingConfigs.getByName(debugSigning)
         }
     }
     packaging {
