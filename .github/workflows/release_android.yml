@@ -34,6 +34,7 @@ jobs:
       # 切换到Flutter项目目录并构建
       - name: Build APK
         working-directory: gui/danmakufactory_flutter
+        shell: bash
         run: |
           flutter pub get
         
