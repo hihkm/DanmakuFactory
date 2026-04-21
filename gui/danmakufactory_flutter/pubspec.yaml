@@ -1,7 +1,7 @@
 name: danmakufactory_flutter
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.70.1+1
+version: 1.70.2+2
 
 environment:
   sdk: ^3.9.2

@@ -14,6 +14,8 @@ elseif(WIN32)
 
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     message(WARNING "copy danmaku factory core src: Linux")
+    get_filename_component(DANMAKU_FACTORY_CORE_SRC_DIR "${CMAKE_SOURCE_DIR}/../../../src" ABSOLUTE)
+    get_filename_component(DANMAKU_FACTORY_CORE_DST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/DanmakuFactory/src" ABSOLUTE)
 elseif(APPLE)
     if(CMAKE_SYSTEM_NAME MATCHES "iOS")
         message(WARNING "copy danmaku factory core src: iOS")

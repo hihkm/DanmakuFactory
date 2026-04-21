@@ -6,6 +6,12 @@ target("danmakufactory_core")
     add_cxflags("/utf-8")
     add_cxxflags("/utf-8")
     set_kind("shared")
+
+    -- 添加soname
+    if is_plat("linux") then
+        add_shflags("-Wl,-soname,libdanmakufactory_core.so")
+    end
+
     -- 添加正则表达式
     add_packages("pcre2")
 

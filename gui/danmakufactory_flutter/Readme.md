@@ -21,19 +21,19 @@
 
 ## 预览
 
-| 平台    | 页面                                                         |
-| ------- | ------------------------------------------------------------ |
+| 平台    | 页面                                                              |
+| ------- |-----------------------------------------------------------------|
 | Windows | ![ReadmeRes/windows_page_01.png](ReadmeRes/windows_page_01.png) |
 | Android | ![ReadmeRes/android_page_01.jpg](ReadmeRes/android_page_01.jpg) |
 | Harmony | ![ReadmeRes/harmony_page_01.jpg](ReadmeRes/harmony_page_01.jpg) |
-| Linux   | 待补充                                                       |
-| Mac     | 待补充                                                       |
-| ios     | 待补充                                                       |
+| Linux   | ![ReadmeRes/linux_page_01.png](ReadmeRes/linux_page_01.png)   |
+| Mac     | 待补充                                                             |
+| ios     | 待补充                                                             |
 
 
 
 ## 源码编译事项
-### 注意Linux、Mac编译暂未适配,目前只支持 windows下编译
+### 注意Mac编译暂未适配,目前只支持 Windows、Linux下编译
 Android Studio版本:2025.3.3
 
 JDK版本:17
@@ -62,9 +62,11 @@ flutter build windows --release
 # macOS打包
 flutter build macos
 
+# 虚拟机ui倒置问题运行
+LIBGL_ALWAYS_SOFTWARE=1 flutter run -d linux
+
 # Linux打包
-flutter build linux
-flutter build linux --debug
+flutter build linux --release
 
 # Android release 包
 flutter build apk --release
@@ -76,6 +78,8 @@ flutter build apk --release --split-per-abi
 flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/debug-info --tree-shake-icons
 
 # 鸿蒙打包
+flutter build hap --release
+
 flutter build app --release
 
 ```
