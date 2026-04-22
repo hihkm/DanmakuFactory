@@ -9,9 +9,9 @@
 
 - [x] 支持Harmony
 
-- [ ] 支持Linux
+- [x] 支持Linux
 
-- [ ] 支持Mac
+- [x] 支持Mac
 
 - [ ] 支持ios
 
@@ -33,7 +33,6 @@
 
 
 ## 源码编译事项
-### 注意Mac编译暂未适配,目前只支持 Windows、Linux下编译
 Android Studio版本:2025.3.3
 
 JDK版本:17
@@ -60,7 +59,7 @@ dart run build_runner watch -d
 flutter build windows --release
 
 # macOS打包
-flutter build macos
+flutter build macos --release
 
 # 虚拟机ui倒置问题运行
 LIBGL_ALWAYS_SOFTWARE=1 flutter run -d linux
