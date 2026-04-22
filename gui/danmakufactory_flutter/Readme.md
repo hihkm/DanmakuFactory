@@ -26,8 +26,8 @@
 | Windows | ![ReadmeRes/windows_page_01.png](ReadmeRes/windows_page_01.png) |
 | Android | ![ReadmeRes/android_page_01.jpg](ReadmeRes/android_page_01.jpg) |
 | Harmony | ![ReadmeRes/harmony_page_01.jpg](ReadmeRes/harmony_page_01.jpg) |
-| Linux   | ![ReadmeRes/linux_page_01.png](ReadmeRes/linux_page_01.png)   |
-| Mac     | 待补充                                                             |
+| Linux   | ![ReadmeRes/linux_page_01.png](ReadmeRes/linux_page_01.png)     |
+| Mac     | ![ReadmeRes/mac_page_01.png](ReadmeRes/mac_page_01.png)         |
 | ios     | 待补充                                                             |
 
 
