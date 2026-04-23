@@ -9,9 +9,9 @@
 
 - [x] 支持Harmony
 
-- [ ] 支持Linux
+- [x] 支持Linux
 
-- [ ] 支持Mac
+- [x] 支持Mac
 
 - [ ] 支持ios
 
@@ -26,14 +26,13 @@
 | Windows | ![ReadmeRes/windows_page_01.png](ReadmeRes/windows_page_01.png) |
 | Android | ![ReadmeRes/android_page_01.jpg](ReadmeRes/android_page_01.jpg) |
 | Harmony | ![ReadmeRes/harmony_page_01.jpg](ReadmeRes/harmony_page_01.jpg) |
-| Linux   | ![ReadmeRes/linux_page_01.png](ReadmeRes/linux_page_01.png)   |
-| Mac     | 待补充                                                             |
+| Linux   | ![ReadmeRes/linux_page_01.png](ReadmeRes/linux_page_01.png)     |
+| Mac     | ![ReadmeRes/mac_page_01.png](ReadmeRes/mac_page_01.png)         |
 | ios     | 待补充                                                             |
 
 
 
 ## 源码编译事项
-### 注意Mac编译暂未适配,目前只支持 Windows、Linux下编译
 Android Studio版本:2025.3.3
 
 JDK版本:17
@@ -60,7 +59,7 @@ dart run build_runner watch -d
 flutter build windows --release
 
 # macOS打包
-flutter build macos
+flutter build macos --release
 
 # 虚拟机ui倒置问题运行
 LIBGL_ALWAYS_SOFTWARE=1 flutter run -d linux

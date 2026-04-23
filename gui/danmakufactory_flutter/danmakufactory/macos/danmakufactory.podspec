@@ -18,6 +18,45 @@ A new Flutter FFI plugin project.
   # paths, so Classes contains a forwarder C file that relatively imports
   # `../src/*` so that the C sources can be shared among all target platforms.
   s.source           = { :path => '.' }
+
+  # TODO repeat cmd
+  s.prepare_command = <<-CMD
+     echo "===> [macOS] Running cmake build..."
+     echo "PODS_TARGET_SRCROOT: ${PODS_TARGET_SRCROOT}"
+     SRC_ROOT_DIR="../src"
+     cd "$SRC_ROOT_DIR"
+     pwd
+     mkdir -p build/macos
+     cd build/macos
+     cmake ../.. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+     cmake --build . --config Release
+     echo "===> [macOS] CMake build completed!"
+  CMD
+
+  s.script_phases = [
+    {
+      :name => 'Build CMake Library',
+      :execution_position => :before_compile,
+      :script => <<-CMD
+           echo "===> [macOS] Running cmake build..."
+           echo "==="
+           echo "PODS_TARGET_SRCROOT: ${PODS_TARGET_SRCROOT}"
+           pwd
+           echo "==="
+
+           SRC_ROOT_DIR="../../danmakufactory/src"
+           cd "$SRC_ROOT_DIR"
+
+           mkdir -p build/macos
+           cd build/macos
+           cmake ../.. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+           cmake --build . --config Release
+           echo "===> [macOS] CMake build completed!"
+      CMD
+    }
+  ]
+
+
   s.source_files = 'Classes/**/*'
 
   # If your plugin requires a privacy manifest, for example if it collects user
@@ -28,7 +67,11 @@ A new Flutter FFI plugin project.
 
   s.dependency 'FlutterMacOS'
 
+  s.vendored_libraries = 'libs/*.dylib'
+
   s.platform = :osx, '10.11'
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.pod_target_xcconfig = {
+    'DEFINES_MODULE' => 'YES'
+  }
   s.swift_version = '5.0'
 end

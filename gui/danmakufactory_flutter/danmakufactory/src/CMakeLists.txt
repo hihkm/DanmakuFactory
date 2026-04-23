@@ -19,6 +19,7 @@ message(WARNING "CMAKE_ANDROID_NDK : ${CMAKE_ANDROID_NDK}")
 message(WARNING "ANDROID_NDK : ${ANDROID_NDK}")
 message(WARNING "OHOS : ${OHOS}")
 message(WARNING "WIN32 : ${WIN32}")
+message(WARNING "APPLE : ${APPLE}")
 message(WARNING "CMAKE_SOURCE_DIR :${CMAKE_SOURCE_DIR}")
 message(WARNING "CMAKE_CURRENT_SOURCE_DIR :${CMAKE_CURRENT_SOURCE_DIR}")
 message(WARNING "CMAKE_CURRENT_LIST_DIR :${CMAKE_CURRENT_LIST_DIR}")
@@ -30,9 +31,16 @@ if (WIN32)
     string(REPLACE "windows/flutter/ephemeral/.plugin_symlinks/" "" XMAKE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/xmake")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     string(REPLACE "linux/flutter/ephemeral/.plugin_symlinks/" "" XMAKE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/xmake")
+elseif(APPLE)
+    if(CMAKE_SYSTEM_NAME MATCHES "iOS")
+    else()
+        string(REPLACE "macos/Flutter/ephemeral/.symlinks/plugins/" "" XMAKE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/xmake")
+    endif()
 else()
     set(XMAKE_FILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/xmake)
 endif()
+
+message(WARNING "XMAKE_FILE_DIR : ${XMAKE_FILE_DIR}")
 
 set(XMAKE_BUILD_SCRIPT ${XMAKE_FILE_DIR}/script)
 set(XMAKE_BUILD_OUTPUT ${XMAKE_FILE_DIR}/build)
@@ -215,6 +223,61 @@ elseif(APPLE)
         message(WARNING "Compiling: iOS")
     else()
         message(WARNING "Compiling: macOS")
+        # 获取 macOS 架构
+        set(MACOS_ARCH "${CMAKE_OSX_ARCHITECTURES}")
+        if(NOT MACOS_ARCH)
+            execute_process(
+                COMMAND uname -m
+                OUTPUT_VARIABLE MACOS_ARCH
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+        endif()
+        message(WARNING "MACOS_ARCH:${MACOS_ARCH}")
+
+        set(XMAKE_MACOS_BUILD_OUTPUT_ROOT_DIR ${XMAKE_BUILD_OUTPUT}/macosx)
+        # 定义xmake macOS编译的dylib输出路径
+        set(XMAKE_MACOS_BUILD_OUTPUT_DYLIB ${XMAKE_MACOS_BUILD_OUTPUT_ROOT_DIR}/${MACOS_ARCH}/lib${DANMAKU_FACTORY_CORE_LIB_NAME}.dylib)
+        # x86_64
+        set(XMAKE_MACOS_X86_64_BUILD_OUTPUT_DYLIB ${XMAKE_MACOS_BUILD_OUTPUT_ROOT_DIR}/x86_64/lib${DANMAKU_FACTORY_CORE_LIB_NAME}.dylib)
+        # universal
+        set(XMAKE_MACOS_UNIVERSAL_BUILD_OUTPUT_DYLIB ${XMAKE_MACOS_BUILD_OUTPUT_ROOT_DIR}/lib${DANMAKU_FACTORY_CORE_LIB_NAME}.dylib)
+        # 定义macOS标准的库存放路径
+        set(MACOS_DEFAULT_LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../macos/libs)
+
+        # 设置xmake编译的danmakufactory_core的导入规则
+        set_target_properties(${DANMAKU_FACTORY_CORE_LIB_NAME} PROPERTIES
+            IMPORTED_NO_SONAME TRUE
+            IMPORTED_LOCATION ${XMAKE_MACOS_BUILD_OUTPUT_DYLIB}
+        )
+
+        # 执行编译脚本xmake生成文件,并在生成后自动拷贝
+        add_custom_command(
+            OUTPUT "${XMAKE_MACOS_BUILD_OUTPUT_DYLIB}"
+            # 设置工作目录
+            WORKING_DIRECTORY "${XMAKE_FILE_DIR}"
+            # 执行 macOS xmake 编译脚本
+            COMMAND xmake f -y -p macosx -a ${MACOS_ARCH} -P .
+            COMMAND xmake -P .
+            # 还需要x86_64才能打包,开发环境不需要,这里可以优化
+            COMMAND xmake f -y -p macosx -a x86_64 -P .
+            COMMAND xmake -P .
+            # 创建目录
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${MACOS_DEFAULT_LIBS_DIR}"
+            # lipo
+            COMMAND lipo -create -output ${XMAKE_MACOS_UNIVERSAL_BUILD_OUTPUT_DYLIB} ${XMAKE_MACOS_BUILD_OUTPUT_DYLIB} ${XMAKE_MACOS_X86_64_BUILD_OUTPUT_DYLIB}
+            # 拷贝生成文件到打包目录
+            COMMAND ${CMAKE_COMMAND} -E copy "${XMAKE_MACOS_UNIVERSAL_BUILD_OUTPUT_DYLIB}" "${MACOS_DEFAULT_LIBS_DIR}"
+            COMMENT "=> 正在执行 xmake macOS 编译并拷贝"
+            VERBATIM
+        )
+
+        # 包装成一个构建目标
+        add_custom_target(BUILD_XMAKE_DANMAKU_CORE DEPENDS "${XMAKE_MACOS_BUILD_OUTPUT_DYLIB}")
+        # 依赖copy源文件
+        add_dependencies(BUILD_XMAKE_DANMAKU_CORE COPY_DANMAKU_FACTORY_CORE)
+
+        install(FILES "${XMAKE_MACOS_BUILD_OUTPUT_DYLIB}" DESTINATION "lib")
+
     endif()
 else()
     message(WARNING "Compiling err: ${CMAKE_SYSTEM_NAME}")

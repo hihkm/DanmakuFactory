@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:danmakufactory_flutter/repository/app_repository.dart';
 import 'package:danmakufactory_flutter/ui/screen/main/home/model/home_state.dart';
+import 'package:danmakufactory_flutter/utils/platform_util.dart';
 import 'package:danmakufactory_flutter/utils/toast_util.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../../repository/settings_repository.dart';
@@ -39,12 +42,17 @@ class HomeNotifier extends _$HomeNotifier {
       outputDir.createSync(recursive: true);
     }
 
-    _danmakuService.convertDanmakuList(state.inputFiles, outputDirPath, outputFormatExt);
+    _danmakuService.convertDanmakuList(
+      state.inputFiles,
+      outputDirPath,
+      outputFormatExt,
+    );
   }
 
   //选择输入文件
   void pickInputFiles() async {
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      withData: Platform.isMacOS,
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: DanmakuFormat.values
@@ -54,7 +62,32 @@ class HomeNotifier extends _$HomeNotifier {
     if (result == null) {
       return;
     }
-    final paths = result.paths.nonNulls.toList();
+
+    final paths = await runPlatformAsync(
+      onMacOS: () async {
+        final tempDir = await getTemporaryDirectory();
+
+        final List<String> targetPathList = [];
+
+        for (final file in result.files) {
+          final timestamp = DateTime.now().millisecondsSinceEpoch;
+          final newPath = p.join(tempDir.path, timestamp.toString(), file.name);
+          final bytes = file.bytes;
+          if (bytes == null) {
+            continue;
+          }
+          final newFile = File(newPath);
+          await newFile.parent.create(recursive: true);
+          await newFile.writeAsBytes(bytes);
+          targetPathList.add(newPath);
+        }
+
+        return targetPathList;
+      },
+      orElse: () {
+        return result.paths.nonNulls.toList();
+      },
+    );
 
     state = state.copyWith(inputFiles: paths);
   }
