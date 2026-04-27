@@ -1,0 +1,42 @@
+name: Release Mac
+on:
+  # 手动触发
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+    steps:
+      # 使用本项目
+      - uses: actions/checkout@v5.0.0
+
+      #设置flutter
+      - uses: subosito/flutter-action@v2.14.0
+        with:
+          # The Flutter version to make available on the path
+          flutter-version: 3.35.7
+          # The Flutter build release channel
+          channel: # optional, default is stable
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+
+      # Get flutter dependencies and build
+      - name: Build macOS
+        working-directory: gui/danmakufactory_flutter
+        run: |
+          flutter pub get
+          flutter build macos --release
+
+      - name: Package macOS app
+        run: |
+          cd gui/danmakufactory_flutter/build/macos/Build/Products/Release
+          zip -r danmakufactory_macos.zip danmakufactory_flutter.app
+
+      - name: Upload macOS
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: danmakufactory_macos
+          path: gui/danmakufactory_flutter/build/macos/Build/Products/Release/danmakufactory_macos.zip

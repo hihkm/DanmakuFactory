@@ -62,5 +62,5 @@ jobs:
       - name: Upload unsigned.hap
         uses: actions/upload-artifact@v4.6.2
         with:
-          name: danmakufactory_unsigned.hap
+          name: danmakufactory_unsigned
           path: gui/danmakufactory_flutter/ohos/entry/build/default/outputs/default/entry-default-unsigned.hap
