@@ -1,4 +1,4 @@
-name: Release Linux
+name: Flutter Release Linux
 on:
   # 手动触发
   workflow_dispatch:

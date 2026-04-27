@@ -1,4 +1,4 @@
-name: Release Harmony
+name: Flutter Release Harmony
 on:
   # 手动触发
   workflow_dispatch:

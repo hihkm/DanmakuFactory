@@ -1,4 +1,4 @@
-name: Release Mac
+name: Flutter Release Mac
 on:
   # 手动触发
   workflow_dispatch:
