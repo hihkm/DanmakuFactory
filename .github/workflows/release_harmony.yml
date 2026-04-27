@@ -1,0 +1,66 @@
+name: Release Harmony
+on:
+  # 手动触发
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      # 使用本项目
+      - uses: actions/checkout@v5.0.0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl xz-utils zip libglu1-mesa
+        shell: bash
+
+      - name: Setup HarmonyOS toolchain
+        uses: ErBWs/setup-ohos@v1
+        with:
+          version: latest
+          cache: true
+
+      # 设置jdk
+      - name: Set up JDK
+        uses: actions/setup-java@v5.0.0
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      #设置flutter
+      - name: Setup flutter-ohos
+        run: |
+          git clone -b oh-3.35.7-dev https://gitcode.com/openharmony-tpc/flutter_flutter.git $GITHUB_WORKSPACE/flutter
+          echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Print Flutter version
+        run: flutter doctor -v
+        shell: bash
+
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+
+      # 切换到Flutter项目目录并构建
+      - name: Get Flutter dependencies
+        working-directory: gui/danmakufactory_flutter
+        run: GIT_LFS_SKIP_SMUDGE=1 flutter pub get
+        shell: bash
+
+      # 切换到Flutter项目目录并构建
+      - name: Build Flutter for ohos
+        working-directory: gui/danmakufactory_flutter
+        run: |
+          flutter build hap --release
+        shell: bash
+        continue-on-error: true
+
+      - name: Upload unsigned.hap
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: danmakufactory_unsigned.hap
+          path: gui/danmakufactory_flutter/ohos/entry/build/default/outputs/default/entry-default-unsigned.hap

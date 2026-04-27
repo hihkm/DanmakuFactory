@@ -3,11 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 project(danmakufactory_library VERSION 0.0.1 LANGUAGES C)
 
 
-#鸿蒙的配置
-#set(OHOS_NATIVE_SDK "C:/Users/moli/soft/devecostudio/sdk/default/openharmony/native")
-set(OHOS_NATIVE_SDK "D:/sofe/devecostudio/sdk/default/openharmony/native")
-
-
 #定义名称
 set(DANMAKU_FACTORY_CORE_LIB_NAME "danmakufactory_core")
 
@@ -16,6 +11,7 @@ message(WARNING "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
 message(WARNING "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 message(WARNING "ANDROID : ${ANDROID}")
 message(WARNING "CMAKE_ANDROID_NDK : ${CMAKE_ANDROID_NDK}")
+message(WARNING "OHOS_SDK_NATIVE : ${OHOS_SDK_NATIVE}")
 message(WARNING "ANDROID_NDK : ${ANDROID_NDK}")
 message(WARNING "OHOS : ${OHOS}")
 message(WARNING "WIN32 : ${WIN32}")
@@ -80,7 +76,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "OHOS" OR OHOS)
         # 设置工作目录
         WORKING_DIRECTORY "${XMAKE_FILE_DIR}"
         # 执行 oh xmake 编译脚本
-        COMMAND xmake f -y -p harmony -a ${OHOS_ARCH} --sdk=${OHOS_NATIVE_SDK} --bin=${OHOS_NATIVE_SDK}/llvm/bin -P .
+        COMMAND xmake f -y -p harmony -a ${OHOS_ARCH} --sdk=${OHOS_SDK_NATIVE} --bin=${OHOS_SDK_NATIVE}/llvm/bin -P .
         COMMAND xmake -P .
         # 创建目录
         COMMAND ${CMAKE_COMMAND} -E make_directory "${OHOS_DEFAULT_LIBS_DIR}"
