@@ -432,13 +432,13 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             tempText[cnt] = '\0';
 
             /* 申请文本部分空间 */
-            if ((text = (char *)malloc((strlen(tempText) + 1) * sizeof(char))) == NULL)
+            if ((text = (char *)malloc((cnt + 1) * sizeof(char))) == NULL)
             {
                 errorExit(ipF, *head, danmakuNode);
                 return 6; /* 申请内存空间失败 */
             }
 
-            strcpy(text, tempText);
+            memcpy(text, tempText, cnt + 1);
         }
 
         /* 申请一个节点的空间 */
@@ -565,7 +565,7 @@ int readXml(const char *const ipFile, DANMAKU **head, const char *mode, const fl
             strGetLeftPart(tempText, &textPtr, '\"', MAX_TEXT_LENGTH);
             strrpl(tempText, textPart, "/n", "\n", MAX_TEXT_LENGTH); // 远古弹幕转义换行符
             strGetLeftPart(NULL, &textPtr, ',', MAX_TEXT_LENGTH);
-            strcpy(text, textPart);
+            memcpy(text, textPart, strlen(textPart) + 1);
 
             specialNode->frZ = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
             specialNode->frY = atoi(deQuotMarks(strGetLeftPart(tempText, &textPtr, ',', MAX_TEXT_LENGTH)));
