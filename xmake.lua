@@ -12,7 +12,9 @@ add_requires("pcre2", {
 target("cli")
     set_basename(PROJECT_NAME)
     set_kind("binary")
-    set_languages("c11")
+    -- gnu11 (not c11): exposes POSIX prototypes such as readlink() from
+    -- <unistd.h>, which strict ISO C11 hides behind feature-test macros.
+    set_languages("gnu11")
     set_version("2.0.0", {build = "%Y%m%d%H%M"})
 
     add_packages("pcre2")
