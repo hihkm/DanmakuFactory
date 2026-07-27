@@ -1,5 +1,6 @@
 import '../repository/settings_repository.dart';
 import 'package:danmakufactory/danmakufactory.dart' as danmakufactory;
+import 'package:path/path.dart' as p;
 
 class CmdService {
   static const String _cmdFlagArguments = "-cmd";
@@ -29,10 +30,22 @@ class CmdService {
     String outputFile,
     String otherArgs,
   ) async {
-    final cmd = "-i ${inputFile} -o ${outputFile} ${otherArgs}";
+    final cmd = buildCmdByUi(inputFile, outputFile, otherArgs);
     //执行命令
     int runCmdResult = await danmakufactory.runCmdAsync(cmd);
     return runCmdResult;
+  }
+
+  static String buildCmdByUi(
+    String inputFile,
+    String outputFile,
+    String otherArgs,
+  ) {
+    final isAssToAss =
+        p.extension(inputFile).toLowerCase() == ".ass" &&
+        p.extension(outputFile).toLowerCase() == ".ass";
+    final fontArgs = isAssToAss ? "--font-size-strict" : "";
+    return "-i ${inputFile} -o ${outputFile} ${otherArgs} ${fontArgs}".trim();
   }
 
   //获取转换的命令行配置
